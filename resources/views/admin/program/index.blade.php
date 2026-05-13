@@ -2,7 +2,7 @@
 @section('title', 'Program Periode')
 @section('page-title', 'Program 7 Hari')
 @section('header-actions')
-<a href="{{ route('admin.program.create') }}" class="px-4 py-2 bg-emerald-600 text-white text-sm font-semibold rounded-lg hover:bg-emerald-700">+ Periode Baru</a>
+<a href="{{ route('admin.program.create') }}" class="px-4 py-2 bg-[#2d6a4f] text-white text-sm font-semibold rounded-lg hover:bg-[#1a5a3f] transition-colors">+ Periode Baru</a>
 @endsection
 @section('content')
 <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
@@ -10,7 +10,7 @@
     <div class="bg-white rounded-xl border shadow-sm p-5">
         <div class="flex items-start justify-between mb-3">
             <div class="font-semibold text-gray-800">{{ $period->name }}</div>
-            <span class="text-xs px-2 py-0.5 rounded-full {{ $period->is_active ? 'bg-emerald-100 text-emerald-700' : 'bg-gray-100 text-gray-500' }}">
+            <span class="text-xs px-2 py-0.5 rounded-full {{ $period->is_active ? 'bg-green-100 text-green-700' : 'bg-gray-100 text-gray-500' }}">
                 {{ $period->is_active ? 'Aktif' : 'Nonaktif' }}
             </span>
         </div>
@@ -21,7 +21,7 @@
                 <span>{{ $period->filled }}/{{ $period->quota }}</span>
             </div>
             <div class="w-full bg-gray-100 rounded-full h-1.5">
-                <div class="bg-emerald-500 h-1.5 rounded-full" style="width: {{ $period->quota > 0 ? min(100, round($period->filled / $period->quota * 100)) : 0 }}%"></div>
+                <div class="bg-[#2d6a4f] h-1.5 rounded-full" style="width: {{ $period->quota > 0 ? min(100, round($period->filled / $period->quota * 100)) : 0 }}%"></div>
             </div>
         </div>
         <div class="text-sm font-semibold text-gray-700 mb-3">

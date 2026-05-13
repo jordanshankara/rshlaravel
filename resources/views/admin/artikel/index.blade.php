@@ -2,7 +2,7 @@
 @section('title', 'Artikel')
 @section('page-title', 'Artikel')
 @section('header-actions')
-<a href="{{ route('admin.artikel.create') }}" class="px-4 py-2 bg-emerald-600 text-white text-sm font-semibold rounded-lg hover:bg-emerald-700">+ Artikel Baru</a>
+<a href="{{ route('admin.artikel.create') }}" class="px-4 py-2 bg-[#2d6a4f] text-white text-sm font-semibold rounded-lg hover:bg-[#1a5a3f] transition-colors">+ Artikel Baru</a>
 @endsection
 @section('content')
 <div class="bg-white rounded-xl border shadow-sm overflow-hidden">
@@ -32,7 +32,7 @@
                     </td>
                     <td class="px-4 py-3 text-xs text-gray-500">{{ $article->created_at->format('d M Y') }}</td>
                     <td class="px-4 py-3 flex items-center gap-3">
-                        <a href="{{ route('admin.artikel.edit', $article) }}" class="text-emerald-600 hover:underline text-xs font-medium">Edit</a>
+                        <a href="{{ route('admin.artikel.edit', $article) }}" class="text-[#2d6a4f] hover:underline text-xs font-medium">Edit</a>
                         <form method="POST" action="{{ route('admin.artikel.destroy', $article) }}" onsubmit="return confirm('Hapus artikel ini?')">
                             @csrf @method('DELETE')
                             <button type="submit" class="text-red-500 hover:underline text-xs">Hapus</button>

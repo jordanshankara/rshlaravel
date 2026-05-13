@@ -1,4 +1,4 @@
-@extends('layouts.admin')
+﻿@extends('layouts.admin')
 @section('title', 'Edit Invoice')
 @section('page-title', 'Edit Invoice')
 @section('header-actions')
@@ -12,11 +12,11 @@
             <div class="grid grid-cols-2 gap-4">
                 <div>
                     <label class="block text-sm font-medium text-gray-700 mb-1.5">Nama Klien</label>
-                    <input type="text" name="client_name" value="{{ old('client_name', $invoice->client_name) }}" required class="w-full px-3 py-2 border rounded-lg text-sm focus:ring-2 focus:ring-emerald-500 focus:outline-none">
+                    <input type="text" name="client_name" value="{{ old('client_name', $invoice->client_name) }}" required class="w-full px-3 py-2 border rounded-lg text-sm focus:ring-2 focus:ring-[#2d6a4f]/30 focus:outline-none">
                 </div>
                 <div>
                     <label class="block text-sm font-medium text-gray-700 mb-1.5">Tanggal</label>
-                    <input type="date" name="invoice_date" value="{{ old('invoice_date', $invoice->invoice_date->format('Y-m-d')) }}" required class="w-full px-3 py-2 border rounded-lg text-sm focus:ring-2 focus:ring-emerald-500 focus:outline-none">
+                    <input type="date" name="invoice_date" value="{{ old('invoice_date', $invoice->invoice_date->format('Y-m-d')) }}" required class="w-full px-3 py-2 border rounded-lg text-sm focus:ring-2 focus:ring-[#2d6a4f]/30 focus:outline-none">
                 </div>
             </div>
             <div class="grid grid-cols-2 gap-4">
@@ -42,7 +42,7 @@
             <div>
                 <div class="flex items-center justify-between mb-2">
                     <label class="block text-sm font-medium text-gray-700">Item</label>
-                    <button type="button" @click="addItem()" class="text-xs text-emerald-600 hover:underline font-medium">+ Tambah Baris</button>
+                    <button type="button" @click="addItem()" class="text-xs text-[#2d6a4f] hover:underline font-medium">+ Tambah Baris</button>
                 </div>
                 <div class="space-y-2">
                     <template x-for="(item, i) in items" :key="i">
@@ -62,10 +62,10 @@
 
             <div>
                 <label class="block text-sm font-medium text-gray-700 mb-1.5">Catatan</label>
-                <textarea name="notes" rows="2" class="w-full px-3 py-2 border rounded-lg text-sm focus:ring-2 focus:ring-emerald-500 focus:outline-none resize-none">{{ old('notes', $invoice->notes) }}</textarea>
+                <textarea name="notes" rows="2" class="w-full px-3 py-2 border rounded-lg text-sm focus:ring-2 focus:ring-[#2d6a4f]/30 focus:outline-none resize-none">{{ old('notes', $invoice->notes) }}</textarea>
             </div>
 
-            <button type="submit" class="w-full py-2.5 bg-emerald-600 text-white font-semibold rounded-lg hover:bg-emerald-700 text-sm">Simpan Perubahan</button>
+            <button type="submit" class="w-full py-2.5 bg-[#2d6a4f] text-white font-semibold rounded-lg hover:bg-[#1a5a3f] text-sm">Simpan Perubahan</button>
         </form>
     </div>
 </div>

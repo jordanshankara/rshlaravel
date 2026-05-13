@@ -1,16 +1,16 @@
-@extends('layouts.admin')
+﻿@extends('layouts.admin')
 @section('title', 'Invoice')
 @section('page-title', 'Invoice')
 
 @section('header-actions')
-<a href="{{ route('admin.invoice.create') }}" class="px-4 py-2 bg-emerald-600 text-white text-sm font-semibold rounded-lg hover:bg-emerald-700">+ Invoice Baru</a>
+<a href="{{ route('admin.invoice.create') }}" class="px-4 py-2 bg-[#2d6a4f] text-white text-sm font-semibold rounded-lg hover:bg-[#1a5a3f] transition-colors">+ Invoice Baru</a>
 @endsection
 
 @section('content')
 <div class="flex flex-wrap gap-2 mb-4">
     @foreach([''=>'Semua ('.$counts['all'].')','BELUM_LUNAS'=>'Belum Lunas ('.$counts['BELUM_LUNAS'].')','LUNAS'=>'Lunas ('.$counts['LUNAS'].')','DIBATALKAN'=>'Dibatalkan ('.$counts['DIBATALKAN'].')'] as $key => $label)
     <a href="{{ request()->fullUrlWithQuery(['status' => $key, 'page' => null]) }}"
-       class="px-3 py-1.5 text-xs font-medium rounded-full border {{ request('status', '') === $key ? 'bg-emerald-600 text-white border-emerald-600' : 'bg-white text-gray-600 border-gray-200 hover:border-emerald-400' }}">
+       class="px-3 py-1.5 text-xs font-medium rounded-full border transition-colors {{ request('status', '') === $key ? 'bg-[#2d6a4f] text-white border-[#2d6a4f]' : 'bg-white text-gray-600 border-gray-200 hover:border-[#2d6a4f] hover:text-[#2d6a4f]' }}">
         {{ $label }}
     </a>
     @endforeach
@@ -19,8 +19,8 @@
 <form method="GET" class="flex gap-2 mb-4">
     <input type="hidden" name="status" value="{{ request('status') }}">
     <input type="text" name="search" value="{{ request('search') }}" placeholder="Cari nomor, nama klien..."
-           class="flex-1 px-3 py-2 border rounded-lg text-sm focus:ring-2 focus:ring-emerald-500 focus:outline-none">
-    <button type="submit" class="px-4 py-2 bg-emerald-600 text-white text-sm rounded-lg">Cari</button>
+           class="flex-1 px-3 py-2 border rounded-lg text-sm focus:ring-2 focus:ring-[#2d6a4f]/30 focus:outline-none">
+    <button type="submit" class="px-4 py-2 bg-[#2d6a4f] text-white text-sm rounded-lg hover:bg-[#1a5a3f] transition-colors">Cari</button>
 </form>
 
 <div class="bg-white rounded-xl border shadow-sm overflow-hidden">
@@ -52,7 +52,7 @@
                         </span>
                     </td>
                     <td class="px-4 py-3 flex items-center gap-2">
-                        <a href="{{ route('admin.invoice.show', $inv) }}" class="text-emerald-600 hover:underline text-xs font-medium">Detail</a>
+                        <a href="{{ route('admin.invoice.show', $inv) }}" class="text-[#2d6a4f] hover:underline text-xs font-semibold">Detail →</a>
                         <a href="{{ route('admin.invoice.pdf', $inv) }}" class="text-gray-500 hover:underline text-xs">PDF</a>
                     </td>
                 </tr>

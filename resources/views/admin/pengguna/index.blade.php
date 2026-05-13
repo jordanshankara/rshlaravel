@@ -2,7 +2,7 @@
 @section('title', 'Pengguna')
 @section('page-title', 'Pengguna')
 @section('header-actions')
-<a href="{{ route('admin.pengguna.create') }}" class="px-4 py-2 bg-emerald-600 text-white text-sm font-semibold rounded-lg hover:bg-emerald-700">+ Pengguna Baru</a>
+<a href="{{ route('admin.pengguna.create') }}" class="px-4 py-2 bg-[#2d6a4f] text-white text-sm font-semibold rounded-lg hover:bg-[#1a5a3f] transition-colors">+ Pengguna Baru</a>
 @endsection
 @section('content')
 <div class="bg-white rounded-xl border shadow-sm overflow-hidden">
@@ -28,7 +28,7 @@
                 </td>
                 <td class="px-4 py-3 text-xs text-gray-500">{{ $user->created_at->format('d M Y') }}</td>
                 <td class="px-4 py-3 flex items-center gap-2">
-                    <a href="{{ route('admin.pengguna.edit', $user) }}" class="text-emerald-600 hover:underline text-xs font-medium">Edit</a>
+                    <a href="{{ route('admin.pengguna.edit', $user) }}" class="text-[#2d6a4f] hover:underline text-xs font-medium">Edit</a>
                     @if($user->id !== auth()->id())
                     <form method="POST" action="{{ route('admin.pengguna.destroy', $user) }}" onsubmit="return confirm('Hapus pengguna ini?')">
                         @csrf @method('DELETE')

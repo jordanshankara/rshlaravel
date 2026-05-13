@@ -1,4 +1,4 @@
-@extends('layouts.admin')
+﻿@extends('layouts.admin')
 @section('title', 'Edit Artikel')
 @section('page-title', 'Edit Artikel')
 @section('header-actions')
@@ -11,15 +11,15 @@
             @csrf @method('PUT')
             <div>
                 <label class="block text-sm font-medium text-gray-700 mb-1.5">Judul</label>
-                <input type="text" name="title" value="{{ old('title', $artikel->title) }}" required class="w-full px-3 py-2 border rounded-lg text-sm focus:ring-2 focus:ring-emerald-500 focus:outline-none">
+                <input type="text" name="title" value="{{ old('title', $artikel->title) }}" required class="w-full px-3 py-2 border rounded-lg text-sm focus:ring-2 focus:ring-[#2d6a4f]/30 focus:outline-none">
             </div>
             <div>
                 <label class="block text-sm font-medium text-gray-700 mb-1.5">Ringkasan</label>
-                <textarea name="excerpt" rows="2" required class="w-full px-3 py-2 border rounded-lg text-sm focus:ring-2 focus:ring-emerald-500 focus:outline-none resize-none">{{ old('excerpt', $artikel->excerpt) }}</textarea>
+                <textarea name="excerpt" rows="2" required class="w-full px-3 py-2 border rounded-lg text-sm focus:ring-2 focus:ring-[#2d6a4f]/30 focus:outline-none resize-none">{{ old('excerpt', $artikel->excerpt) }}</textarea>
             </div>
             <div>
                 <label class="block text-sm font-medium text-gray-700 mb-1.5">Konten</label>
-                <textarea name="content" rows="12" required class="w-full px-3 py-2 border rounded-lg text-sm focus:ring-2 focus:ring-emerald-500 focus:outline-none font-mono">{{ old('content', $artikel->content) }}</textarea>
+                <textarea name="content" rows="12" required class="w-full px-3 py-2 border rounded-lg text-sm focus:ring-2 focus:ring-[#2d6a4f]/30 focus:outline-none font-mono">{{ old('content', $artikel->content) }}</textarea>
             </div>
             <div class="grid grid-cols-2 gap-4">
                 <div>
@@ -44,13 +44,13 @@
                     <label class="flex items-center gap-1.5 text-sm cursor-pointer">
                         <input type="checkbox" name="categories[]" value="{{ $cat->id }}"
                                {{ in_array($cat->id, old('categories', $artikel->categories->pluck('id')->toArray())) ? 'checked' : '' }}
-                               class="rounded border-gray-300 text-emerald-600">
+                               class="rounded border-gray-300 text-[#2d6a4f]">
                         {{ $cat->name }}
                     </label>
                     @endforeach
                 </div>
             </div>
-            <button type="submit" class="px-6 py-2.5 bg-emerald-600 text-white font-semibold rounded-lg hover:bg-emerald-700 text-sm">Simpan Perubahan</button>
+            <button type="submit" class="px-6 py-2.5 bg-[#2d6a4f] text-white font-semibold rounded-lg hover:bg-[#1a5a3f] text-sm">Simpan Perubahan</button>
         </form>
     </div>
 </div>

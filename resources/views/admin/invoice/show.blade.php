@@ -3,11 +3,14 @@
 @section('page-title', 'Invoice '.$invoice->invoice_number)
 @section('header-actions')
 <div class="flex gap-2">
-    <a href="{{ route('admin.invoice.pdf', $invoice) }}" class="px-4 py-2 border border-gray-300 text-gray-700 text-sm font-semibold rounded-lg hover:bg-gray-50">Unduh PDF</a>
+    <a href="{{ route('admin.invoice.pdf', $invoice) }}" class="px-4 py-2 border border-gray-200 text-gray-700 text-sm font-semibold rounded-lg hover:bg-gray-50 transition-colors">Unduh PDF</a>
     @if(!$invoice->is_system_generated)
-    <a href="{{ route('admin.invoice.edit', $invoice) }}" class="px-4 py-2 bg-emerald-600 text-white text-sm font-semibold rounded-lg hover:bg-emerald-700">Edit</a>
+    <a href="{{ route('admin.invoice.edit', $invoice) }}" class="px-4 py-2 bg-[#2d6a4f] text-white text-sm font-semibold rounded-lg hover:bg-[#1a5a3f] transition-colors">Edit</a>
     @endif
-    <a href="{{ route('admin.invoice.index') }}" class="text-sm text-gray-500 hover:text-gray-700 self-center ml-2">← Kembali</a>
+    <a href="{{ route('admin.invoice.index') }}" class="text-sm text-gray-500 hover:text-gray-700 self-center ml-2 flex items-center gap-1">
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/></svg>
+        Kembali
+    </a>
 </div>
 @endsection
 @section('content')
@@ -75,7 +78,7 @@
     @if($invoice->registration)
     <div class="bg-white rounded-xl border shadow-sm p-5">
         <div class="font-semibold text-sm mb-3">Terkait Pendaftaran</div>
-        <a href="{{ route('admin.registrasi.show', $invoice->registration) }}" class="text-sm text-emerald-600 hover:underline font-medium">
+        <a href="{{ route('admin.registrasi.show', $invoice->registration) }}" class="text-sm text-[#2d6a4f] hover:underline font-medium">
             {{ $invoice->registration->registration_code }} — {{ $invoice->registration->full_name }}
         </a>
     </div>
