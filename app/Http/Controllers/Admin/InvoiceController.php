@@ -37,15 +37,18 @@ class InvoiceController extends Controller
             'LUNAS'       => Invoice::where('payment_status', 'LUNAS')->count(),
             'DIBATALKAN'  => Invoice::where('payment_status', 'DIBATALKAN')->count(),
         ];
+        $totalCount   = $counts['all'];
+        $totalRevenue = Invoice::where('payment_status', 'LUNAS')->sum('total_amount');
+        $unpaidCount  = $counts['BELUM_LUNAS'];
 
-        return view('admin.invoice.index', compact('invoices', 'counts'));
+        return view('admin.invoice.index', compact('invoices', 'counts', 'totalCount', 'totalRevenue', 'unpaidCount'));
     }
 
     public function show(Invoice $invoice)
     {
         $invoice->load('items', 'paymentDetail', 'author', 'registration.programPeriod');
-        $paymentDetails = PaymentDetail::all();
-        return view('admin.invoice.show', compact('invoice', 'paymentDetails'));
+        $settings = SiteSetting::getMany(['site_name', 'site_address', 'site_phone']);
+        return view('admin.invoice.show', compact('invoice', 'settings'));
     }
 
     public function create()
@@ -173,12 +176,20 @@ class InvoiceController extends Controller
     public function downloadPdf(Invoice $invoice)
     {
         $invoice->load('items', 'paymentDetail', 'registration.programPeriod');
-        $settings = SiteSetting::getMany(['site_name', 'site_address', 'site_phone']);
+        $settings = SiteSetting::getMany(['site_name', 'site_address', 'site_phone', 'site_email']);
 
-        $pdf = Pdf::loadView('admin.invoice.pdf', compact('invoice', 'settings'));
+        $logoPath = public_path('assets/logo/logo-rec-white.png');
+        $logoData = file_exists($logoPath) ? 'data:image/png;base64,' . base64_encode(file_get_contents($logoPath)) : null;
+
+        $pdf = Pdf::loadView('admin.invoice.pdf', compact('invoice', 'settings', 'logoData'));
         $pdf->setPaper('a4', 'portrait');
 
-        $filename = "Invoice-{$invoice->invoice_number}.pdf";
+        $statusLabel = match($invoice->payment_status) {
+            'LUNAS'      => 'LUNAS',
+            'DIBATALKAN' => 'DIBATALKAN',
+            default      => 'BELUM-LUNAS',
+        };
+        $filename = "Invoice-{$invoice->invoice_number}-{$statusLabel}.pdf";
         return $pdf->download($filename);
     }
 }

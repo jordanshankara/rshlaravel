@@ -15,7 +15,8 @@ class LoginController extends Controller
         if (Auth::check()) {
             return redirect()->route('admin.dashboard');
         }
-        return view('auth.login');
+        $turnstileSiteKey = config('services.turnstile.site_key', '');
+        return view('auth.login', compact('turnstileSiteKey'));
     }
 
     public function login(Request $request)
@@ -24,6 +25,24 @@ class LoginController extends Controller
             'username' => 'required|string',
             'password' => 'required|string',
         ]);
+
+        // Verify Turnstile if configured
+        $turnstileSecret = config('services.turnstile.secret_key', '');
+        if ($turnstileSecret) {
+            $token = $request->input('cf-turnstile-response');
+            if (!$token) {
+                return back()->withErrors(['username' => 'Verifikasi CAPTCHA diperlukan.'])
+                    ->withInput($request->only('username'));
+            }
+            $verify = \Illuminate\Support\Facades\Http::asForm()->post(
+                'https://challenges.cloudflare.com/turnstile/v0/siteverify',
+                ['secret' => $turnstileSecret, 'response' => $token, 'remoteip' => $request->ip()]
+            );
+            if (!$verify->json('success')) {
+                return back()->withErrors(['username' => 'Verifikasi CAPTCHA gagal. Silakan coba lagi.'])
+                    ->withInput($request->only('username'));
+            }
+        }
 
         $ip = $request->ip();
         $key = 'login:' . $ip;

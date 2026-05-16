@@ -3,113 +3,137 @@
 <head>
 <meta charset="UTF-8">
 <style>
-  * { margin: 0; padding: 0; box-sizing: border-box; }
-  body { font-family: DejaVu Sans, sans-serif; font-size: 11px; color: #1a1a1a; background: #fff; }
-  .page { padding: 40px; }
-  .header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 30px; }
-  .company-name { font-size: 20px; font-weight: 700; color: #065f46; }
-  .invoice-meta { text-align: right; }
-  .invoice-meta h1 { font-size: 22px; font-weight: 700; color: #374151; letter-spacing: 2px; }
-  .invoice-meta p { color: #6b7280; margin-top: 2px; }
-  .divider { border: none; border-top: 2px solid #d1fae5; margin: 20px 0; }
-  .info-grid { display: flex; gap: 40px; margin-bottom: 24px; }
-  .info-block { flex: 1; }
-  .info-label { font-size: 9px; text-transform: uppercase; color: #9ca3af; letter-spacing: 1px; margin-bottom: 4px; }
-  .info-value { font-size: 12px; font-weight: 600; color: #111827; }
-  .info-sub { font-size: 10px; color: #6b7280; margin-top: 1px; }
-  table { width: 100%; border-collapse: collapse; margin-bottom: 20px; }
-  th { background: #ecfdf5; color: #065f46; font-size: 10px; text-transform: uppercase; padding: 8px 10px; text-align: left; letter-spacing: 0.5px; }
-  td { padding: 8px 10px; border-bottom: 1px solid #f3f4f6; font-size: 11px; }
-  .text-right { text-align: right; }
-  .total-row td { font-weight: 700; font-size: 13px; border-top: 2px solid #d1fae5; border-bottom: none; }
-  .status-badge { display: inline-block; padding: 4px 12px; border-radius: 20px; font-size: 10px; font-weight: 700; letter-spacing: 0.5px; }
-  .status-lunas { background: #d1fae5; color: #065f46; }
-  .status-belum { background: #fef3c7; color: #92400e; }
-  .status-batal { background: #f3f4f6; color: #6b7280; }
-  .notes { background: #f9fafb; border-left: 3px solid #d1fae5; padding: 10px 14px; border-radius: 4px; font-size: 10px; color: #6b7280; }
-  .payment-box { border: 1px solid #d1fae5; border-radius: 6px; padding: 14px; margin-top: 16px; background: #f0fdf4; }
-  .payment-box .title { font-size: 10px; text-transform: uppercase; color: #065f46; font-weight: 700; letter-spacing: 0.5px; margin-bottom: 8px; }
-  .footer { margin-top: 40px; text-align: center; font-size: 9px; color: #9ca3af; }
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body { font-family: DejaVu Sans, sans-serif; font-size: 11px; color: #1a1a1a; background: #fff; }
+table { border-collapse: collapse; }
 </style>
 </head>
 <body>
-<div class="page">
-  <div class="header">
-    <div>
-      <div class="company-name">RSH Satu Bumi</div>
-      <div style="font-size:10px;color:#6b7280;margin-top:4px;">{{ $settings['site_address'] ?? '' }}</div>
-      <div style="font-size:10px;color:#6b7280;">{{ $settings['site_phone'] ?? '' }}</div>
-    </div>
-    <div class="invoice-meta">
-      <h1>INVOICE</h1>
-      <p>{{ $invoice->invoice_number }}</p>
-      <p>{{ $invoice->invoice_date->format('d M Y') }}</p>
-      <div style="margin-top:8px;">
-        <span class="status-badge {{ $invoice->payment_status === 'LUNAS' ? 'status-lunas' : ($invoice->payment_status === 'DIBATALKAN' ? 'status-batal' : 'status-belum') }}">
-          {{ $invoice->payment_status }}
-        </span>
-      </div>
-    </div>
-  </div>
 
-  <hr class="divider">
+{{-- ── HEADER ─────────────────────────────────────────── --}}
+<table width="100%" style="background-color:#065f46;">
+  <tr>
+    <td style="padding:18px 30px; vertical-align:middle;">
+      @if(!empty($logoData))
+        <img src="{{ $logoData }}" alt="RSH Satu Bumi" style="height:36px; display:block;">
+      @else
+        <div style="font-size:18px;font-weight:700;color:#fff;letter-spacing:-0.5px;">RSH Satu Bumi</div>
+      @endif
+    </td>
+    <td style="padding:18px 30px; text-align:right; vertical-align:middle;">
+      <div style="font-size:9px;color:#a7f3d0;text-transform:uppercase;letter-spacing:1.5px;margin-bottom:3px;">Invoice</div>
+      <div style="font-size:16px;font-weight:700;color:#fff;letter-spacing:0.5px;">{{ $invoice->invoice_number }}</div>
+    </td>
+  </tr>
+</table>
 
-  <div class="info-grid">
-    <div class="info-block">
-      <div class="info-label">Tagihan Kepada</div>
-      <div class="info-value">{{ $invoice->client_name }}</div>
-    </div>
-    <div class="info-block">
-      <div class="info-label">Tanggal Invoice</div>
-      <div class="info-value">{{ $invoice->invoice_date->format('d M Y') }}</div>
-    </div>
-  </div>
+{{-- ── ADDRESS BAR ─────────────────────────────────────── --}}
+<table width="100%" style="background-color:#1a4731;">
+  <tr>
+    <td style="padding:5px 30px; color:#6ee7b7; font-size:9px; letter-spacing:0.3px;">
+      {{ $settings['site_address'] ?? 'Jl. Bukit Pelangi KM 2, Bogor' }}
+      &nbsp;·&nbsp;
+      {{ $settings['site_phone'] ?? '' }}
+      @if(!empty($settings['site_email']))
+        &nbsp;·&nbsp; {{ $settings['site_email'] }}
+      @endif
+    </td>
+  </tr>
+</table>
 
-  <table>
+{{-- ── BODY ────────────────────────────────────────────── --}}
+<div style="padding:24px 30px;">
+
+  {{-- Bill-To / Date --}}
+  <table width="100%" style="margin-bottom:18px;">
+    <tr>
+      <td style="width:55%; vertical-align:top; padding-right:20px;">
+        <div style="font-size:8px;text-transform:uppercase;color:#9ca3af;letter-spacing:1px;margin-bottom:5px;">Tagihan Kepada</div>
+        <div style="font-size:13px;font-weight:700;color:#111827;">{{ $invoice->client_name }}</div>
+        @if($invoice->registration?->programPeriod)
+        <div style="font-size:10px;color:#6b7280;margin-top:3px;">{{ $invoice->registration->programPeriod->name }}</div>
+        @endif
+      </td>
+      <td style="width:45%; text-align:right; vertical-align:top;">
+        <div style="font-size:8px;text-transform:uppercase;color:#9ca3af;letter-spacing:1px;margin-bottom:5px;">Tanggal Invoice</div>
+        <div style="font-size:12px;font-weight:600;color:#111827;">{{ $invoice->invoice_date->format('d F Y') }}</div>
+        <div style="margin-top:7px;">
+          @if($invoice->payment_status === 'LUNAS')
+            <span style="display:inline-block;padding:3px 12px;border-radius:20px;font-size:9px;font-weight:700;background:#d1fae5;color:#065f46;">LUNAS</span>
+          @elseif($invoice->payment_status === 'DIBATALKAN')
+            <span style="display:inline-block;padding:3px 12px;border-radius:20px;font-size:9px;font-weight:700;background:#f3f4f6;color:#6b7280;">DIBATALKAN</span>
+          @else
+            <span style="display:inline-block;padding:3px 12px;border-radius:20px;font-size:9px;font-weight:700;background:#fef3c7;color:#92400e;">BELUM LUNAS</span>
+          @endif
+        </div>
+      </td>
+    </tr>
+  </table>
+
+  {{-- Divider --}}
+  <div style="border-top:1px solid #d1fae5; margin-bottom:16px;"></div>
+
+  {{-- Items Table --}}
+  <table width="100%">
     <thead>
-      <tr>
-        <th>Deskripsi</th>
-        <th class="text-right" style="width:60px;">Qty</th>
-        <th class="text-right" style="width:120px;">Harga</th>
-        <th class="text-right" style="width:60px;">Disc%</th>
-        <th class="text-right" style="width:130px;">Subtotal</th>
+      <tr style="background-color:#ecfdf5;">
+        <th style="padding:8px 10px; text-align:left; font-size:9px; color:#065f46; text-transform:uppercase; letter-spacing:0.5px;">Deskripsi</th>
+        <th style="padding:8px 10px; text-align:center; font-size:9px; color:#065f46; text-transform:uppercase; letter-spacing:0.5px; width:50px;">Qty</th>
+        <th style="padding:8px 10px; text-align:right; font-size:9px; color:#065f46; text-transform:uppercase; letter-spacing:0.5px; width:115px;">Harga</th>
+        <th style="padding:8px 10px; text-align:right; font-size:9px; color:#065f46; text-transform:uppercase; letter-spacing:0.5px; width:55px;">Disc%</th>
+        <th style="padding:8px 10px; text-align:right; font-size:9px; color:#065f46; text-transform:uppercase; letter-spacing:0.5px; width:125px;">Subtotal</th>
       </tr>
     </thead>
     <tbody>
       @foreach($invoice->items as $item)
-      <tr>
-        <td>{{ $item->description }}</td>
-        <td class="text-right">{{ $item->quantity }}</td>
-        <td class="text-right">Rp {{ number_format($item->price, 0, ',', '.') }}</td>
-        <td class="text-right">{{ $item->discount > 0 ? $item->discount.'%' : '-' }}</td>
-        <td class="text-right">Rp {{ number_format($item->price * $item->quantity * (1 - $item->discount / 100), 0, ',', '.') }}</td>
+      <tr style="border-bottom:1px solid #f3f4f6;">
+        <td style="padding:9px 10px; font-size:11px; color:#374151;">{{ $item->description }}</td>
+        <td style="padding:9px 10px; text-align:center; font-size:11px; color:#374151;">{{ $item->quantity }}</td>
+        <td style="padding:9px 10px; text-align:right; font-size:11px; color:#374151;">Rp {{ number_format($item->price, 0, ',', '.') }}</td>
+        <td style="padding:9px 10px; text-align:right; font-size:11px; color:#9ca3af;">{{ $item->discount > 0 ? $item->discount.'%' : '-' }}</td>
+        <td style="padding:9px 10px; text-align:right; font-size:11px; font-weight:600; color:#111827;">Rp {{ number_format($item->price * $item->quantity * (1 - $item->discount / 100), 0, ',', '.') }}</td>
       </tr>
       @endforeach
-    </tbody>
-    <tfoot>
-      <tr class="total-row">
-        <td colspan="4">TOTAL</td>
-        <td class="text-right">Rp {{ number_format($invoice->total_amount, 0, ',', '.') }}</td>
+      <tr style="background-color:#f0fdf4; border-top:2px solid #065f46;">
+        <td colspan="4" style="padding:11px 10px; font-size:10px; font-weight:700; color:#065f46; text-transform:uppercase; letter-spacing:0.5px;">Total Tagihan</td>
+        <td style="padding:11px 10px; text-align:right; font-size:16px; font-weight:700; color:#065f46;">Rp {{ number_format($invoice->total_amount, 0, ',', '.') }}</td>
       </tr>
-    </tfoot>
+    </tbody>
   </table>
 
-  @if($invoice->notes)
-  <div class="notes">{{ $invoice->notes }}</div>
-  @endif
-
+  {{-- Payment Info (only if BELUM_LUNAS) --}}
   @if($invoice->paymentDetail && $invoice->payment_status === 'BELUM_LUNAS')
-  <div class="payment-box">
-    <div class="title">Informasi Pembayaran</div>
+  <div style="border:1px solid #d1fae5; border-radius:6px; padding:14px; margin-top:18px; background:#f0fdf4;">
+    <div style="font-size:9px; text-transform:uppercase; color:#065f46; font-weight:700; letter-spacing:0.5px; margin-bottom:9px;">Informasi Pembayaran</div>
     <table style="margin:0;">
-      <tr><td style="padding:2px 0;color:#6b7280;width:120px;">Bank</td><td style="padding:2px 0;font-weight:600;">{{ $invoice->paymentDetail->bank_name }}</td></tr>
-      <tr><td style="padding:2px 0;color:#6b7280;">No. Rekening</td><td style="padding:2px 0;font-weight:600;">{{ $invoice->paymentDetail->account_number }}</td></tr>
-      <tr><td style="padding:2px 0;color:#6b7280;">Atas Nama</td><td style="padding:2px 0;font-weight:600;">{{ $invoice->paymentDetail->account_name }}</td></tr>
+      <tr>
+        <td style="padding:3px 0; color:#6b7280; width:120px; font-size:10px;">Bank</td>
+        <td style="padding:3px 0; font-weight:600; font-size:11px;">{{ $invoice->paymentDetail->bank_name }}</td>
+      </tr>
+      <tr>
+        <td style="padding:3px 0; color:#6b7280; font-size:10px;">No. Rekening</td>
+        <td style="padding:3px 0; font-weight:600; font-size:11px;">{{ $invoice->paymentDetail->account_number }}</td>
+      </tr>
+      <tr>
+        <td style="padding:3px 0; color:#6b7280; font-size:10px;">Atas Nama</td>
+        <td style="padding:3px 0; font-weight:600; font-size:11px;">{{ $invoice->paymentDetail->account_name }}</td>
+      </tr>
     </table>
   </div>
   @endif
 
-  <div class="footer">Terima kasih atas kepercayaan Anda. · RSH Satu Bumi</div>
+  {{-- Notes --}}
+  @if($invoice->notes)
+  <div style="background:#f9fafb; border-left:3px solid #d1fae5; padding:10px 14px; border-radius:4px; font-size:10px; color:#6b7280; margin-top:16px;">
+    {{ $invoice->notes }}
+  </div>
+  @endif
+
+  {{-- Footer --}}
+  <div style="margin-top:40px; text-align:center; font-size:9px; color:#9ca3af; border-top:1px solid #f3f4f6; padding-top:16px;">
+    Terima kasih atas kepercayaan Anda &nbsp;·&nbsp; Rumah Sehat Holistik Satu Bumi
+  </div>
+
 </div>
 </body>
 </html>

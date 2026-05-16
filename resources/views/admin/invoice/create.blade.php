@@ -1,13 +1,14 @@
-﻿@extends('layouts.admin')
+@extends('layouts.admin')
 @section('title', 'Invoice Baru')
 @section('page-title', 'Invoice Baru')
 @section('header-actions')
 <a href="{{ route('admin.invoice.index') }}" class="text-sm text-gray-500 hover:text-gray-700">← Kembali</a>
 @endsection
 @section('content')
-<div class="max-w-2xl" x-data="invoiceForm()">
+<div class="max-w-2xl" x-data="invoiceForm(null, {{ $products->map(fn($p) => ['id'=>$p->id,'name'=>$p->name,'category'=>$p->category,'price'=>(float)$p->price])->values()->toJson() }})">
     <div class="bg-white rounded-xl border shadow-sm p-6">
-        <form method="POST" action="{{ route('admin.invoice.store') }}" class="space-y-5">
+        <form method="POST" action="{{ route('admin.invoice.store') }}" class="space-y-5"
+              @submit.prevent="if(cleanBeforeSubmit()) $el.submit()">
             @csrf
             <div class="grid grid-cols-2 gap-4">
                 <div>
@@ -43,14 +44,59 @@
                     <label class="block text-sm font-medium text-gray-700">Item</label>
                     <button type="button" @click="addItem()" class="text-xs text-[#2d6a4f] hover:underline font-medium">+ Tambah Baris</button>
                 </div>
+
+                {{-- Column headers --}}
+                <div class="hidden sm:grid grid-cols-[1fr_56px_144px_80px_24px] gap-2 mb-1 px-1">
+                    <span class="text-xs text-gray-400">Deskripsi</span>
+                    <span class="text-xs text-gray-400 text-center">Qty</span>
+                    <span class="text-xs text-gray-400">Harga (Rp)</span>
+                    <span class="text-xs text-gray-400">Disc%</span>
+                    <span></span>
+                </div>
+
                 <div class="space-y-2">
                     <template x-for="(item, i) in items" :key="i">
-                        <div class="flex gap-2 items-start">
-                            <input type="text" :name="'items['+i+'][description]'" x-model="item.description" placeholder="Deskripsi" required class="flex-1 px-3 py-2 border rounded-lg text-sm focus:outline-none">
-                            <input type="number" :name="'items['+i+'][quantity]'" x-model="item.quantity" min="1" required class="w-16 px-3 py-2 border rounded-lg text-sm focus:outline-none text-center">
-                            <input type="number" :name="'items['+i+'][price]'" x-model="item.price" min="0" placeholder="Harga" required class="w-36 px-3 py-2 border rounded-lg text-sm focus:outline-none">
-                            <input type="number" :name="'items['+i+'][discount]'" x-model="item.discount" min="0" max="100" placeholder="Disc%" class="w-20 px-3 py-2 border rounded-lg text-sm focus:outline-none">
-                            <button type="button" @click="removeItem(i)" x-show="items.length > 1" class="text-red-400 hover:text-red-600 mt-2">✕</button>
+                        <div class="grid grid-cols-[1fr_56px_144px_80px_24px] gap-2 items-start">
+                            {{-- Description with autocomplete --}}
+                            <div class="relative">
+                                <input type="text"
+                                       :name="'items['+i+'][description]'"
+                                       x-model="item.description"
+                                       @focus="activeRow = i"
+                                       @input="activeRow = i"
+                                       @blur="setTimeout(() => { if (activeRow === i) activeRow = null }, 180)"
+                                       placeholder="Deskripsi produk/layanan"
+                                       required
+                                       autocomplete="off"
+                                       class="w-full px-3 py-2 border rounded-lg text-sm focus:ring-2 focus:ring-[#2d6a4f]/30 focus:outline-none">
+                                <div x-show="activeRow === i && getSuggestions(i).length > 0"
+                                     x-cloak
+                                     class="absolute top-full left-0 right-0 z-20 mt-1 bg-white border border-gray-200 rounded-lg shadow-lg max-h-52 overflow-y-auto">
+                                    <template x-for="product in getSuggestions(i)" :key="product.id">
+                                        <button type="button"
+                                                @mousedown.prevent="selectProduct(i, product)"
+                                                class="w-full text-left px-3 py-2.5 hover:bg-green-50 flex items-center justify-between gap-2 border-b border-gray-50 last:border-0">
+                                            <div class="min-w-0">
+                                                <div class="text-sm text-gray-800 truncate" x-text="product.name"></div>
+                                                <div class="text-xs text-gray-400" x-show="product.category" x-text="product.category"></div>
+                                            </div>
+                                            <span class="text-xs font-semibold text-[#2d6a4f] flex-shrink-0" x-text="formatPrice(product.price)"></span>
+                                        </button>
+                                    </template>
+                                </div>
+                            </div>
+                            <input type="number" :name="'items['+i+'][quantity]'" x-model="item.quantity" min="1" required
+                                   class="px-2 py-2 border rounded-lg text-sm focus:outline-none text-center">
+                            <input type="number" :name="'items['+i+'][price]'" x-model="item.price" min="0" placeholder="0" required
+                                   class="px-3 py-2 border rounded-lg text-sm focus:outline-none">
+                            <input type="number" :name="'items['+i+'][discount]'" x-model="item.discount" min="0" max="100" placeholder="0"
+                                   class="px-3 py-2 border rounded-lg text-sm focus:outline-none">
+                            <button type="button" @click="removeItem(i)" x-show="items.length > 1"
+                                    class="text-gray-400 hover:text-red-500 mt-2 transition-colors">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                                </svg>
+                            </button>
                         </div>
                     </template>
                 </div>
@@ -71,14 +117,50 @@
 @endsection
 @push('scripts')
 <script>
-function invoiceForm() {
+function invoiceForm(initialItems, products) {
     return {
-        items: [{ description: '', quantity: 1, price: 0, discount: 0 }],
-        addItem() { this.items.push({ description: '', quantity: 1, price: 0, discount: 0 }); },
-        removeItem(i) { this.items.splice(i, 1); },
+        items: (initialItems && initialItems.length) ? initialItems : [{ description: '', quantity: 1, price: 0, discount: 0 }],
+        products: products || [],
+        activeRow: null,
+
+        addItem() {
+            this.items.push({ description: '', quantity: 1, price: 0, discount: 0 });
+        },
+        removeItem(i) {
+            this.items.splice(i, 1);
+            if (this.activeRow === i) this.activeRow = null;
+        },
+        getSuggestions(i) {
+            const q = (this.items[i]?.description || '').toLowerCase().trim();
+            const list = q
+                ? this.products.filter(p =>
+                    p.name.toLowerCase().includes(q) ||
+                    (p.category && p.category.toLowerCase().includes(q))
+                  )
+                : this.products;
+            return list.slice(0, 8);
+        },
+        selectProduct(i, product) {
+            this.items[i].description = product.name;
+            this.items[i].price = product.price;
+            this.activeRow = null;
+        },
         formatTotal() {
-            const t = this.items.reduce((s, i) => s + (i.price * i.quantity * (1 - (i.discount || 0) / 100)), 0);
+            const t = this.items.reduce((s, item) =>
+                s + ((item.price || 0) * (item.quantity || 1) * (1 - ((item.discount || 0) / 100))), 0);
             return new Intl.NumberFormat('id-ID').format(Math.round(t));
+        },
+        formatPrice(p) {
+            return 'Rp ' + new Intl.NumberFormat('id-ID').format(p);
+        },
+        cleanBeforeSubmit() {
+            // Remove rows with no description before submitting
+            this.items = this.items.filter(item => (item.description || '').trim() !== '');
+            if (this.items.length === 0) {
+                this.items = [{ description: '', quantity: 1, price: 0, discount: 0 }];
+                return false;
+            }
+            return true;
         }
     }
 }

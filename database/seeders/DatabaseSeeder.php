@@ -39,5 +39,7 @@ class DatabaseSeeder extends Seeder
         foreach ($defaults as $key => $value) {
             SiteSetting::firstOrCreate(['key' => $key], ['value' => $value]);
         }
+
+        $this->call(ArticleSeeder::class);
     }
 }

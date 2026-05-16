@@ -3,9 +3,17 @@
 @section('page-title', 'Registrasi')
 
 @section('content')
+@php
+$statusLabels = [
+    'PENDING_PAYMENT' => 'Pending Payment',
+    'CONFIRMED'       => 'DP',
+    'FULLY_PAID'      => 'Full Paid',
+    'CANCELLED'       => 'Dibatalkan',
+];
+@endphp
 {{-- Filter tabs --}}
 <div class="flex flex-wrap gap-2 mb-4">
-    @foreach([''=>'Semua ('.$counts['all'].')','PENDING_PAYMENT'=>'Menunggu ('.$counts['PENDING_PAYMENT'].')','CONFIRMED'=>'Dikonfirmasi ('.$counts['CONFIRMED'].')','FULLY_PAID'=>'Lunas ('.$counts['FULLY_PAID'].')','CANCELLED'=>'Batal ('.$counts['CANCELLED'].')'] as $key => $label)
+    @foreach(['' => 'Semua ('.$counts['all'].')', 'PENDING_PAYMENT' => 'Pending Payment ('.$counts['PENDING_PAYMENT'].')', 'CONFIRMED' => 'DP ('.$counts['CONFIRMED'].')', 'FULLY_PAID' => 'Full Paid ('.$counts['FULLY_PAID'].')', 'CANCELLED' => 'Dibatalkan ('.$counts['CANCELLED'].')'] as $key => $label)
     <a href="{{ request()->fullUrlWithQuery(['status' => $key, 'page' => null]) }}"
        class="px-3 py-1.5 text-xs font-medium rounded-full border transition-colors {{ request('status', '') === $key ? 'bg-[#2d6a4f] text-white border-[#2d6a4f]' : 'bg-white text-gray-600 border-gray-200 hover:border-[#2d6a4f] hover:text-[#2d6a4f]' }}">
         {{ $label }}
@@ -56,7 +64,7 @@
                                ($reg->status === 'CONFIRMED' ? 'bg-emerald-100 text-emerald-700' :
                                ($reg->status === 'CANCELLED' ? 'bg-gray-100 text-gray-500' :
                                'bg-amber-100 text-amber-700')) }}">
-                            {{ str_replace('_', ' ', $reg->status) }}
+                            {{ $statusLabels[$reg->status] ?? $reg->status }}
                         </span>
                     </td>
                     <td class="px-4 py-3 text-xs text-gray-500">{{ $reg->submitted_at->format('d M Y') }}</td>

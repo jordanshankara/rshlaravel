@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\ProgramPeriod;
 use App\Models\Registration;
 use App\Models\SiteSetting;
+use App\Services\EmailService;
 use App\Services\RegistrationInvoiceService;
 use App\Services\SheetsService;
 use Illuminate\Http\Request;
@@ -18,6 +19,7 @@ class PendaftaranController extends Controller
     public function __construct(
         private RegistrationInvoiceService $invoiceService,
         private SheetsService $sheetsService,
+        private EmailService $emailService,
     ) {}
 
     public function index()
@@ -30,7 +32,8 @@ class PendaftaranController extends Controller
                 return $p;
             });
 
-        $settings = SiteSetting::getMany(['turnstile_site_key', 'bank_name', 'bank_account_number', 'bank_account_name']);
+        $settings = SiteSetting::getMany(['bank_name', 'bank_account_number', 'bank_account_name']);
+        $settings['turnstile_site_key'] = config('services.turnstile.site_key', '');
         return view('public.pendaftaran.form', compact('periods', 'settings'));
     }
 
@@ -69,13 +72,13 @@ class PendaftaranController extends Controller
             'height_weight'    => 'required|string|max:100',
             'program_period_id' => 'required|exists:program_periods,id',
             'health_complaints' => 'required|string',
-            'clinical_details'  => 'required|string',
+            'clinical_details'  => 'nullable|string',
             'bmi'               => 'nullable|numeric',
             'emotion_state'     => 'required|string',
             'food_allergies'    => 'required|string',
             'treatment_history' => 'required|string',
             'current_meds'      => 'required|string',
-            'confidence_level'  => 'required|integer|min:1|max:10',
+            'confidence_level'  => 'required|integer|min:1|max:5',
         ]);
 
         RateLimiter::hit($rateLimitKey, 60 * 60);
@@ -128,9 +131,14 @@ class PendaftaranController extends Controller
                 return $reg;
             });
 
-            // Sync invoice (outside transaction, non-critical)
+            // Sync invoice (non-critical)
             try {
                 $this->invoiceService->syncInvoice($registration->load('programPeriod', 'invoice'));
+            } catch (\Throwable) {}
+
+            // Send CS notification email (non-critical)
+            try {
+                $this->emailService->sendNewRegistrationNotification($registration);
             } catch (\Throwable) {}
 
             // Sync Google Sheets (non-critical)
@@ -143,10 +151,38 @@ class PendaftaranController extends Controller
 
             RateLimiter::clear($rateLimitKey);
 
+            // Reload with all relations needed for the response
+            $registration->load('programPeriod', 'invoice.items', 'invoice.paymentDetail');
+            $invoice = $registration->invoice;
+            $period  = $registration->programPeriod;
+
             return response()->json([
-                'success' => true,
-                'code'    => $registration->registration_code,
-                'message' => 'Pendaftaran berhasil! Kode Anda: ' . $registration->registration_code,
+                'success'   => true,
+                'code'      => $registration->registration_code,
+                'full_name' => $registration->full_name,
+                'period' => $period ? [
+                    'name' => $period->name,
+                ] : null,
+                'invoice' => $invoice ? [
+                    'invoice_number'  => $invoice->invoice_number,
+                    'invoice_date'    => $invoice->invoice_date?->format('d F Y'),
+                    'payment_status'  => $invoice->payment_status,
+                    'total_amount'    => (float) $invoice->total_amount,
+                    'notes'           => $invoice->notes,
+                    'items'           => $invoice->items->map(fn ($item) => [
+                        'id'          => $item->id,
+                        'description' => $item->description,
+                        'quantity'    => (int) $item->quantity,
+                        'price'       => (float) $item->price,
+                        'discount'    => (float) $item->discount,
+                        'subtotal'    => (float) ($item->price * $item->quantity * (1 - $item->discount / 100)),
+                    ])->values(),
+                ] : null,
+                'payment_detail' => $invoice?->paymentDetail ? [
+                    'bank_name'      => $invoice->paymentDetail->bank_name,
+                    'account_number' => $invoice->paymentDetail->account_number,
+                    'account_name'   => $invoice->paymentDetail->account_name,
+                ] : null,
             ]);
         } catch (\Exception $e) {
             return match ($e->getMessage()) {
@@ -206,6 +242,65 @@ class PendaftaranController extends Controller
                 'account_name'    => $invoice->paymentDetail?->account_name,
             ] : null,
         ]);
+    }
+
+    public function konfirmasi(Request $request)
+    {
+        $ip = $request->ip();
+        $key = 'konfirmasi:' . $ip;
+
+        if (RateLimiter::tooManyAttempts($key, 10)) {
+            return response()->json(['error' => 'Terlalu banyak percobaan. Coba lagi nanti.'], 429);
+        }
+
+        $request->validate(['code' => 'required|string|max:30']);
+
+        $registration = Registration::where('registration_code', strtoupper(trim($request->code)))
+            ->first();
+
+        if (!$registration) {
+            RateLimiter::hit($key, 15 * 60);
+            return response()->json(['confirmed' => false, 'error' => 'Kode tidak ditemukan.'], 404);
+        }
+
+        if (in_array($registration->status, ['CONFIRMED', 'FULLY_PAID'])) {
+            RateLimiter::clear($key);
+            return response()->json(['confirmed' => true]);
+        }
+
+        RateLimiter::hit($key, 60);
+        return response()->json([
+            'confirmed' => false,
+            'error' => 'Pembayaran belum dikonfirmasi oleh admin. Status saat ini: ' . $registration->status,
+        ]);
+    }
+
+    public function downloadInvoice(string $code)
+    {
+        $registration = Registration::where('registration_code', strtoupper(trim($code)))
+            ->with('invoice.items', 'invoice.paymentDetail')
+            ->firstOrFail();
+
+        $invoice = $registration->invoice;
+        if (!$invoice) {
+            abort(404, 'Invoice tidak ditemukan.');
+        }
+
+        $invoice->load('items', 'paymentDetail', 'registration.programPeriod');
+        $settings = \App\Models\SiteSetting::getMany(['site_name', 'site_address', 'site_phone', 'site_email']);
+
+        $logoPath = public_path('assets/logo/logo-rec-white.png');
+        $logoData = file_exists($logoPath) ? 'data:image/png;base64,' . base64_encode(file_get_contents($logoPath)) : null;
+
+        $pdf = \Barryvdh\DomPDF\Facade\Pdf::loadView('admin.invoice.pdf', compact('invoice', 'settings', 'logoData'));
+        $pdf->setPaper('a4', 'portrait');
+
+        $statusLabel = match($invoice->payment_status) {
+            'LUNAS'      => 'LUNAS',
+            'DIBATALKAN' => 'DIBATALKAN',
+            default      => 'BELUM-LUNAS',
+        };
+        return $pdf->download("Invoice-{$invoice->invoice_number}-{$statusLabel}.pdf");
     }
 
     private function generateCode(): string

@@ -12,6 +12,14 @@
 @endsection
 
 @section('content')
+@php
+$statusLabels = [
+    'PENDING_PAYMENT' => 'Pending Payment',
+    'CONFIRMED'       => 'DP',
+    'FULLY_PAID'      => 'Full Paid',
+    'CANCELLED'       => 'Dibatalkan',
+];
+@endphp
 <div class="grid grid-cols-1 lg:grid-cols-3 gap-6" x-data="reschedulePanel()">
 
 {{-- Left: Personal & Health data --}}
@@ -27,7 +35,7 @@
                    ($registration->status === 'CONFIRMED' ? 'bg-emerald-100 text-emerald-700' :
                    ($registration->status === 'CANCELLED' ? 'bg-gray-100 text-gray-500' :
                    'bg-amber-100 text-amber-700')) }}">
-                {{ str_replace('_', ' ', $registration->status) }}
+                {{ $statusLabels[$registration->status] ?? $registration->status }}
             </span>
         </div>
         <div class="grid grid-cols-2 gap-4 text-sm">
@@ -100,23 +108,40 @@
 
     {{-- Update Status --}}
     @php
-        $validNext = [
-            'PENDING_PAYMENT' => ['CONFIRMED', 'CANCELLED'],
-            'CONFIRMED'       => ['FULLY_PAID', 'CANCELLED'],
-            'FULLY_PAID'      => [],
-            'CANCELLED'       => [],
-        ][$registration->status] ?? [];
+    $allStatuses = [
+        'PENDING_PAYMENT' => ['label' => 'Pending Payment', 'ring' => 'border-amber-400 bg-amber-50',   'dot' => '#f59e0b', 'text' => 'text-amber-800'],
+        'CONFIRMED'       => ['label' => 'DP',              'ring' => 'border-emerald-400 bg-emerald-50','dot' => '#10b981', 'text' => 'text-emerald-800'],
+        'FULLY_PAID'      => ['label' => 'Full Paid',       'ring' => 'border-green-500 bg-green-50',   'dot' => '#16a34a', 'text' => 'text-green-800'],
+        'CANCELLED'       => ['label' => 'Dibatalkan',      'ring' => 'border-gray-400 bg-gray-50',     'dot' => '#9ca3af', 'text' => 'text-gray-700'],
+    ];
     @endphp
-    @if(count($validNext) > 0)
-    <div class="bg-white rounded-xl border border-gray-200 shadow-sm p-5">
+    <div class="bg-white rounded-xl border border-gray-200 shadow-sm p-5"
+         x-data="{ selectedStatus: '{{ $registration->status }}' }">
         <h3 class="text-xs font-semibold text-gray-400 uppercase tracking-wide mb-3">Update Status</h3>
         <form method="POST" action="{{ route('admin.registrasi.update-status', $registration) }}">
             @csrf @method('PATCH')
-            <select name="status" class="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm mb-3 focus:outline-none focus:ring-2 focus:ring-[#2d6a4f]/30 focus:border-[#2d6a4f]">
-                @foreach($validNext as $s)
-                <option value="{{ $s }}">{{ str_replace('_', ' ', $s) }}</option>
+            <input type="hidden" name="status" x-model="selectedStatus">
+            <div class="space-y-2 mb-3">
+                @foreach($allStatuses as $key => $cfg)
+                <label class="flex items-center gap-3 p-3 rounded-lg border cursor-pointer transition-all"
+                       :class="selectedStatus === '{{ $key }}' ? '{{ $cfg['ring'] }}' : 'border-gray-200 bg-white hover:bg-gray-50'">
+                    <input type="radio" value="{{ $key }}" x-model="selectedStatus" class="sr-only">
+                    <div class="w-4 h-4 rounded-full border-2 flex-shrink-0 flex items-center justify-center transition-all"
+                         :style="selectedStatus === '{{ $key }}'
+                             ? 'border-color:{{ $cfg['dot'] }};background:{{ $cfg['dot'] }};'
+                             : 'border-color:#d1d5db;background:white;'">
+                        <div class="w-1.5 h-1.5 rounded-full bg-white" x-show="selectedStatus === '{{ $key }}'"></div>
+                    </div>
+                    <span class="text-sm font-medium flex-1 transition-colors"
+                          :class="selectedStatus === '{{ $key }}' ? '{{ $cfg['text'] }}' : 'text-gray-600'">
+                        {{ $cfg['label'] }}
+                    </span>
+                    @if($key === $registration->status)
+                    <span class="text-[10px] px-1.5 py-0.5 rounded bg-white/60 text-gray-400 font-medium border border-gray-200">saat ini</span>
+                    @endif
+                </label>
                 @endforeach
-            </select>
+            </div>
             <textarea name="payment_note" rows="2" placeholder="Catatan pembayaran (opsional)"
                       class="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm mb-3 focus:outline-none focus:ring-2 focus:ring-[#2d6a4f]/30 focus:border-[#2d6a4f] resize-none"></textarea>
             <button type="submit" class="w-full py-2.5 bg-[#2d6a4f] text-white text-sm font-semibold rounded-lg hover:bg-[#1a5a3f] transition-colors">
@@ -124,11 +149,10 @@
             </button>
         </form>
     </div>
-    @endif
 
     {{-- Invoice --}}
     @if($registration->invoice)
-    <div class="bg-white rounded-xl border border-gray-200 shadow-sm p-5">
+    <div class="bg-white rounded-xl border border-gray-200 shadow-sm p-5" x-data="{ showInvoice: false }">
         <div class="flex items-center justify-between mb-3">
             <h3 class="text-xs font-semibold text-gray-400 uppercase tracking-wide">Invoice</h3>
             <a href="{{ route('admin.invoice.pdf', $registration->invoice) }}"
@@ -145,18 +169,79 @@
             </div>
             <div class="flex justify-between items-center">
                 <span class="text-gray-400">Status</span>
-                <span class="px-2 py-0.5 rounded-full font-medium
+                <span class="px-2 py-0.5 rounded-full font-medium text-xs
                     {{ $registration->invoice->payment_status === 'LUNAS' ? 'bg-green-100 text-green-700' :
                        ($registration->invoice->payment_status === 'DIBATALKAN' ? 'bg-gray-100 text-gray-500' :
                        'bg-amber-100 text-amber-700') }}">
-                    {{ $registration->invoice->payment_status }}
+                    {{ $registration->invoice->payment_status === 'LUNAS' ? 'Lunas' :
+                       ($registration->invoice->payment_status === 'DIBATALKAN' ? 'Dibatalkan' : 'Belum Lunas') }}
                 </span>
             </div>
         </div>
-        <a href="{{ route('admin.invoice.show', $registration->invoice) }}"
-           class="block mt-3 text-center text-xs text-[#2d6a4f] font-medium hover:underline">
-            Lihat Detail Invoice →
-        </a>
+        <button @click="showInvoice = !showInvoice"
+                class="block mt-3 w-full text-center text-xs text-[#2d6a4f] font-medium hover:underline transition-colors py-1">
+            <span x-text="showInvoice ? 'Sembunyikan Preview ↑' : 'Lihat Preview ↓'"></span>
+        </button>
+
+        {{-- Inline Invoice Preview --}}
+        <div x-show="showInvoice" x-cloak class="mt-3 border border-gray-100 rounded-xl overflow-hidden text-xs">
+            {{-- Mini header --}}
+            <div class="px-4 py-3 flex items-center justify-between" style="background:linear-gradient(135deg,#065f46,#15803d)">
+                <div class="flex items-center gap-2">
+                    <img src="{{ asset('assets/logo/logo-rec-white.png') }}" alt="RSH Satu Bumi" class="h-6">
+                </div>
+                <div class="text-right">
+                    <p class="text-[9px] text-green-300 uppercase tracking-wider">Invoice</p>
+                    <p class="text-white font-bold text-xs">{{ $registration->invoice->invoice_number }}</p>
+                </div>
+            </div>
+            {{-- Bill to / date --}}
+            <div class="px-4 py-3 grid grid-cols-2 gap-3 border-b border-gray-100 bg-white">
+                <div>
+                    <p class="text-[9px] text-gray-400 uppercase tracking-wider mb-1">Tagihan Kepada</p>
+                    <p class="font-semibold text-gray-800">{{ $registration->invoice->client_name }}</p>
+                </div>
+                <div class="text-right">
+                    <p class="text-[9px] text-gray-400 uppercase tracking-wider mb-1">Tanggal</p>
+                    <p class="font-semibold text-gray-800">{{ $registration->invoice->invoice_date->format('d M Y') }}</p>
+                </div>
+            </div>
+            {{-- Items --}}
+            <div class="px-4 bg-white">
+                <table class="w-full text-xs">
+                    <thead>
+                        <tr class="border-b border-gray-200">
+                            <th class="text-left text-gray-400 text-[9px] uppercase pb-2 pt-3 font-medium">Deskripsi</th>
+                            <th class="text-right text-gray-400 text-[9px] uppercase pb-2 pt-3 font-medium w-8">Qty</th>
+                            <th class="text-right text-gray-400 text-[9px] uppercase pb-2 pt-3 font-medium">Subtotal</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach($registration->invoice->items as $item)
+                        <tr class="border-b border-gray-50">
+                            <td class="py-2 pr-3 text-gray-700">{{ $item->description }}</td>
+                            <td class="py-2 text-right text-gray-500">{{ $item->quantity }}</td>
+                            <td class="py-2 text-right font-semibold text-gray-800">Rp {{ number_format($item->price * $item->quantity * (1 - $item->discount / 100), 0, ',', '.') }}</td>
+                        </tr>
+                        @endforeach
+                    </tbody>
+                </table>
+            </div>
+            {{-- Total --}}
+            <div class="px-4 py-3 flex justify-between items-center bg-green-50 border-t border-green-100">
+                <span class="text-[10px] text-green-700 font-semibold uppercase tracking-wide">Total</span>
+                <span class="text-base font-bold text-green-800">Rp {{ number_format($registration->invoice->total_amount, 0, ',', '.') }}</span>
+            </div>
+            {{-- Payment detail if BELUM_LUNAS --}}
+            @if($registration->invoice->paymentDetail && $registration->invoice->payment_status === 'BELUM_LUNAS')
+            <div class="px-4 py-3 bg-white border-t border-gray-100 text-[10px] text-gray-600 space-y-0.5">
+                <p class="text-[9px] text-gray-400 uppercase tracking-wider mb-1.5">Informasi Pembayaran</p>
+                <p>Bank: <strong>{{ $registration->invoice->paymentDetail->bank_name }}</strong></p>
+                <p>No. Rekening: <strong>{{ $registration->invoice->paymentDetail->account_number }}</strong></p>
+                <p>Atas Nama: <strong>{{ $registration->invoice->paymentDetail->account_name }}</strong></p>
+            </div>
+            @endif
+        </div>
     </div>
     @endif
 

@@ -23,6 +23,8 @@ html {
   scroll-behavior: smooth;
 }
 
+[x-cloak] { display: none !important; }
+
 body {
   background: var(--background);
   color: var(--foreground);
@@ -99,6 +101,17 @@ h1, h2, h3, h4, h5, h6 {
 .prose strong { font-weight: 600; color: #0d3d1a; }
 .prose a { color: #1a6b2f; text-decoration: underline; }
 .prose a:hover { color: #f97316; }
+
+/* Quill editor prose rendering */
+.ql-editor h2 { font-size: 1.5rem; font-weight: 700; margin: 2rem 0 0.75rem; color: #0d3d1a; }
+.ql-editor h3 { font-size: 1.25rem; font-weight: 600; margin: 1.5rem 0 0.5rem; color: #1a6b2f; }
+.ql-editor p { color: #374151; line-height: 1.75; margin: 0.75rem 0; }
+.ql-editor ul { list-style-type: disc; padding-left: 1.5rem; margin: 1rem 0; }
+.ql-editor ol { list-style-type: decimal; padding-left: 1.5rem; margin: 1rem 0; }
+.ql-editor li { color: #374151; line-height: 1.7; margin-bottom: 0.25rem; }
+.ql-editor blockquote { border-left: 4px solid #2d9348; padding-left: 1rem; color: #4b5563; font-style: italic; margin: 1.25rem 0; }
+.ql-editor strong { font-weight: 600; color: #0d3d1a; }
+.ql-editor a { color: #1a6b2f; text-decoration: underline; }
 
 ::-webkit-scrollbar { width: 8px; }
 ::-webkit-scrollbar-track { background: #e8f5e9; }

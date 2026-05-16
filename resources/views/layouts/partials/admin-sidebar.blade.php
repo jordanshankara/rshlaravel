@@ -30,7 +30,7 @@
         @if(auth()->user()->role === 'ADMIN')
         <div>
             <a href="{{ route('admin.invoice.index') }}"
-               class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors {{ request()->routeIs('admin.invoice.*') ? 'bg-[#2d6a4f] text-white' : 'text-gray-600 hover:bg-gray-100 hover:text-gray-900' }}">
+               class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors {{ request()->routeIs('admin.invoice.*') || request()->routeIs('admin.payment-detail.*') || request()->routeIs('admin.invoice-product.*') ? 'bg-[#2d6a4f] text-white' : 'text-gray-600 hover:bg-gray-100 hover:text-gray-900' }}">
                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M9 14l6-6m-5.5.5h.01m4.99 5h.01M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16l3.5-2 3.5 2 3.5-2 3.5 2z"/>
                 </svg>
@@ -38,12 +38,16 @@
             </a>
             <div class="ml-8 mt-0.5 space-y-0.5">
                 <a href="{{ route('admin.invoice.index') }}"
-                   class="block px-3 py-1.5 rounded-lg text-xs font-medium transition-colors {{ request()->routeIs('admin.invoice.index') || (request()->routeIs('admin.invoice.*') && !request()->routeIs('admin.invoice.pending')) ? 'text-[#2d6a4f] bg-green-50' : 'text-gray-500 hover:text-gray-700 hover:bg-gray-50' }}">
-                    Semua
+                   class="block px-3 py-1.5 rounded-lg text-xs font-medium transition-colors {{ request()->routeIs('admin.invoice.*') ? 'text-[#2d6a4f] bg-green-50' : 'text-gray-500 hover:text-gray-700 hover:bg-gray-50' }}">
+                    Semua Invoice
                 </a>
-                <a href="{{ route('admin.invoice.pending') }}"
-                   class="block px-3 py-1.5 rounded-lg text-xs font-medium transition-colors {{ request()->routeIs('admin.invoice.pending') ? 'text-[#2d6a4f] bg-green-50' : 'text-gray-500 hover:text-gray-700 hover:bg-gray-50' }}">
-                    Pending
+                <a href="{{ route('admin.payment-detail.index') }}"
+                   class="block px-3 py-1.5 rounded-lg text-xs font-medium transition-colors {{ request()->routeIs('admin.payment-detail.*') ? 'text-[#2d6a4f] bg-green-50' : 'text-gray-500 hover:text-gray-700 hover:bg-gray-50' }}">
+                    Rekening
+                </a>
+                <a href="{{ route('admin.invoice-product.index') }}"
+                   class="block px-3 py-1.5 rounded-lg text-xs font-medium transition-colors {{ request()->routeIs('admin.invoice-product.*') ? 'text-[#2d6a4f] bg-green-50' : 'text-gray-500 hover:text-gray-700 hover:bg-gray-50' }}">
+                    Produk
                 </a>
             </div>
         </div>

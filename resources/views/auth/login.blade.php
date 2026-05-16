@@ -8,6 +8,9 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link rel="stylesheet" href="{{ asset('css/app.css') }}">
     <script src="https://cdn.tailwindcss.com"></script>
+    @if($turnstileSiteKey)
+    <script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
+    @endif
 </head>
 <body class="h-full min-h-screen flex items-center justify-center bg-gradient-to-br from-green-950 to-green-800">
 <div class="w-full max-w-sm px-4">
@@ -37,6 +40,9 @@
                        class="rounded border-gray-300 text-[#2d6a4f] focus:ring-[#2d6a4f]">
                 <label for="remember" class="text-sm text-gray-600">Ingat saya</label>
             </div>
+            @if($turnstileSiteKey)
+            <div class="cf-turnstile" data-sitekey="{{ $turnstileSiteKey }}" data-theme="light"></div>
+            @endif
             <button type="submit"
                     class="w-full py-3 bg-[#2d6a4f] hover:bg-[#1a5a3f] text-white font-semibold rounded-xl transition text-sm">
                 Masuk

@@ -51,7 +51,7 @@
                 <div class="rounded-3xl p-5 shadow-2xl border border-white/30"
                      style="background: rgba(255,255,255,0.15); backdrop-filter: blur(20px)">
                     <div class="relative w-full rounded-2xl overflow-hidden mb-4" style="aspect-ratio: 4/5">
-                        <img src="{{ asset('assets/env/tim.JPG') }}" alt="Terapis RSH Satu Bumi"
+                        <img src="{{ asset('assets/env/building-2.jpeg') }}" alt="Terapis RSH Satu Bumi"
                              class="w-full h-full object-cover object-top">
                         <div class="absolute inset-0" style="background: linear-gradient(to top, rgba(5,46,22,0.6), transparent, transparent)"></div>
                         <div class="absolute bottom-3 left-3 right-3">
@@ -119,7 +119,7 @@
         <div class="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
             {{-- Left: photo + glass overlay --}}
             <div class="relative rounded-3xl overflow-hidden shadow-[0_8px_40px_rgba(13,61,26,0.18)]" style="aspect-ratio: 4/3">
-                <img src="{{ asset('assets/env/building-2.jpeg') }}" alt="Fasilitas RSH Satu Bumi"
+                <img src="{{ asset('assets/env/env-4.jpg') }}" alt="Fasilitas RSH Satu Bumi"
                      class="w-full h-full object-cover">
                 <div class="absolute inset-0" style="background: linear-gradient(to top, rgba(5,46,22,0.7), transparent, transparent)"></div>
                 <div class="absolute bottom-4 left-4 right-4 grid grid-cols-2 gap-3">
@@ -185,7 +185,7 @@
 
         <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
             @foreach([
-                ['badge'=>'Tes Kesehatan','title'=>'Quantum Scanning','desc'=>'Deteksi kelemahan tubuh secara cepat, akurat, dan tanpa radiasi menggunakan teknologi Magnetic Resonance Modulation.','img'=>'latihan/quantum_new.webp','icon'=>'M9 3H5a2 2 0 00-2 2v4m6-6h10a2 2 0 012 2v4M9 3v18m0 0h10a2 2 0 002-2V9M9 21H5a2 2 0 01-2-2V9m0 0h18'],
+                ['badge'=>'Tes Kesehatan','title'=>'Quantum Scanning','desc'=>'Deteksi kelemahan tubuh secara cepat, akurat, dan tanpa radiasi menggunakan teknologi Magnetic Resonance Modulation.','img'=>'latihan/quantum.webp','icon'=>'M9 3H5a2 2 0 00-2 2v4m6-6h10a2 2 0 012 2v4M9 3v18m0 0h10a2 2 0 002-2V9M9 21H5a2 2 0 01-2-2V9m0 0h18'],
                 ['badge'=>'Terapi Energi Alam','title'=>'Divya Aushadh','desc'=>'Pengobatan menggunakan energi alam untuk meningkatkan aliran energi ke seluruh tubuh dan membantu proses penyembuhan alami.','img'=>'latihan/reiki.JPG','icon'=>'M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z'],
                 ['badge'=>'Program Instan','title'=>'Sehat dalam Sekejap','desc'=>'Teknik detoksifikasi, pola makan sehat, dan keseimbangan tubuh-pikiran yang mudah diterapkan dalam waktu singkat.','img'=>'latihan/meditasi.JPG','icon'=>'M13 10V3L4 14h7v7l9-11h-7z'],
                 ['badge'=>'Program Eksklusif','title'=>'7 Hari Menuju Sehat','desc'=>'Detoks alami, pola makan bergizi, meditasi, dan aktivitas fisik untuk penyembuhan tubuh dan pikiran secara holistik.','img'=>'latihan/yoga.jpg','icon'=>'M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z'],
@@ -243,7 +243,7 @@
             <div class="grid grid-cols-1 lg:grid-cols-2">
                 {{-- Left: photo + dark overlay --}}
                 <div class="relative overflow-hidden" style="min-height: 360px">
-                    <img src="{{ asset('assets/env/building.jpg') }}" alt="Tim Terapis RSH Satu Bumi"
+                    <img src="{{ asset('assets/env/tim.JPG') }}" alt="Tim Terapis RSH Satu Bumi"
                          class="absolute inset-0 w-full h-full object-cover">
                     <div class="absolute inset-0" style="background: linear-gradient(to right, rgba(5,46,22,0.85), rgba(20,83,45,0.7), rgba(21,128,61,0.4))"></div>
                     <div class="relative z-10 p-10 h-full flex flex-col justify-center">

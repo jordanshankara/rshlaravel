@@ -1,5 +1,5 @@
 @extends('layouts.public')
-@section('title', 'Daftar Program — RSH Satu Bumi')
+@section('title', 'Daftar Program 7 Hari — RSH Satu Bumi')
 
 @push('head')
 @if(!empty($settings['turnstile_site_key']))
@@ -9,154 +9,361 @@
 
 @section('content')
 
-{{-- Page Header --}}
-<div class="relative h-48 overflow-hidden">
-    <img src="{{ asset('assets/green.webp') }}" alt="" class="absolute inset-0 w-full h-full object-cover">
-    <div class="absolute inset-0" style="background: linear-gradient(to bottom, rgba(5,46,22,0.75), rgba(13,61,26,0.85))"></div>
-    <div class="relative h-full flex flex-col items-center justify-center text-center px-4">
-        <span class="text-[#f97316] uppercase tracking-widest text-xs font-bold mb-3">PROGRAM 7 HARI</span>
-        <h1 class="text-3xl font-bold text-white">Daftar Program</h1>
+{{-- Hero --}}
+<section class="relative overflow-hidden py-28 px-4 text-center">
+    <img src="{{ asset('assets/latihan/yoga.jpg') }}" alt="" class="absolute inset-0 w-full h-full object-cover object-center">
+    <div class="absolute inset-0" style="background:linear-gradient(to bottom,rgba(5,30,15,0.90),rgba(10,50,25,0.84))"></div>
+    <div class="relative z-10">
+        <span class="inline-block border border-[#f97316]/60 text-[#f97316] text-xs font-bold px-4 py-1.5 rounded-full uppercase tracking-widest mb-5">Program Eksklusif</span>
+        <h1 class="text-3xl sm:text-4xl lg:text-5xl font-bold text-white mb-4">7 Hari Menuju Sehat Raga &amp; Jiwa</h1>
+        <p class="text-green-200 max-w-lg mx-auto text-sm leading-relaxed">
+            Mohon luangkan 3 menit untuk melengkapi data di bawah ini. Informasi Anda bersifat rahasia<br class="hidden sm:block">
+            dan akan membantu tim ahli kami merancang pendekatan yang paling tepat untuk Anda.
+        </p>
     </div>
-</div>
+</section>
 
-<div class="max-w-2xl mx-auto px-4 py-12" x-data="registrationForm()">
-    <p class="text-gray-500 text-center mb-8">Isi formulir di bawah untuk mendaftarkan diri ke Program 7 Hari Menuju Sehat Raga &amp; Jiwa.</p>
+{{-- Body --}}
+<section class="py-10 px-4 bg-gray-50 min-h-screen">
+<div class="max-w-2xl mx-auto" x-data="registrationForm()">
 
-    {{-- Success state --}}
-    <div x-show="submitted" x-cloak class="glass-card rounded-2xl p-8 text-center border-green-200/50">
-        <div class="text-5xl mb-4">✅</div>
-        <h2 class="text-2xl font-bold text-[#0d3d1a] mb-2">Pendaftaran Berhasil!</h2>
-        <p class="text-gray-600 mb-4">Kode pendaftaran Anda:</p>
-        <div class="text-3xl font-mono font-bold text-[#1a6b2f] bg-white border-2 border-[#1a6b2f]/30 rounded-xl px-8 py-4 inline-block mb-6" x-text="regCode"></div>
-        <p class="text-sm text-gray-500 mb-6">Simpan kode ini untuk melacak status pendaftaran Anda.</p>
-        <div class="flex gap-3 justify-center">
-            <a href="{{ route('daftar.confirm') }}" class="px-6 py-2.5 border border-[#1a6b2f] text-[#1a6b2f] font-semibold rounded-xl hover:bg-green-50 transition">Cek Status</a>
-            <a href="{{ route('home') }}" class="px-6 py-2.5 bg-[#1a6b2f] text-white font-semibold rounded-xl hover:bg-[#0d3d1a] transition">Kembali ke Beranda</a>
+{{-- ═══════════════════════════════ SUCCESS STATE ═══════════════════════════════ --}}
+<div x-show="submitted" x-cloak class="space-y-4">
+
+    {{-- Header card --}}
+    <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-8 text-center">
+        <div class="w-16 h-16 rounded-full bg-green-100 flex items-center justify-center mx-auto mb-4">
+            <svg class="w-8 h-8 text-[#1a6b2f]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"/>
+            </svg>
         </div>
+        <h2 class="text-xl font-bold text-gray-900 mb-1">Data Berhasil Diterima!</h2>
+        <p class="text-gray-500 text-sm">Halo, <span class="font-semibold text-gray-800" x-text="fullName"></span>. Lanjutkan ke langkah pembayaran di bawah.</p>
     </div>
 
-    {{-- Form --}}
-    <form x-show="!submitted" @submit.prevent="submit()" class="space-y-6">
-        {{-- Data Pribadi --}}
-        <div class="glass-card rounded-2xl p-6 space-y-4">
-            <h2 class="font-bold text-lg text-[#0d3d1a]">Data Pribadi</h2>
-
-            <div>
-                <label class="block text-sm font-medium text-gray-700 mb-1.5">Nama Lengkap <span class="text-red-500">*</span></label>
-                <input type="text" x-model="form.full_name" required class="input">
-            </div>
-            <div class="grid grid-cols-2 gap-4">
-                <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-1.5">Tanggal Lahir <span class="text-red-500">*</span></label>
-                    <input type="date" x-model="form.birth_date" required class="input">
-                </div>
-                <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-1.5">Pekerjaan <span class="text-red-500">*</span></label>
-                    <input type="text" x-model="form.occupation" required class="input">
-                </div>
-            </div>
-            <div class="grid grid-cols-2 gap-4">
-                <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-1.5">WhatsApp <span class="text-red-500">*</span></label>
-                    <input type="text" x-model="form.whatsapp" required class="input" placeholder="628xxxx">
-                </div>
-                <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-1.5">TB/BB <span class="text-red-500">*</span></label>
-                    <input type="text" x-model="form.height_weight" required class="input" placeholder="170cm / 65kg">
-                </div>
-            </div>
-            <div>
-                <label class="block text-sm font-medium text-gray-700 mb-1.5">Alamat <span class="text-red-500">*</span></label>
-                <textarea x-model="form.address" rows="2" required class="input" style="resize:none"></textarea>
-            </div>
+    {{-- Langkah Pembayaran --}}
+    <div class="rounded-2xl border border-amber-200 p-5" style="background:#fffbeb">
+        <div class="flex items-center gap-2 mb-4">
+            <svg class="w-4 h-4 text-amber-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/>
+            </svg>
+            <span class="font-bold text-amber-800 text-sm">Langkah Pembayaran</span>
         </div>
-
-        {{-- Pilih Periode --}}
-        <div class="glass-card rounded-2xl p-6">
-            <h2 class="font-bold text-lg text-[#0d3d1a] mb-4">Pilih Periode Program</h2>
-            @forelse($periods as $period)
-            @php $available = $period->quota - $period->filled; @endphp
-            <label class="flex items-start gap-3 p-4 border rounded-xl cursor-pointer hover:border-[#1a6b2f] transition-colors mb-3 last:mb-0 bg-white/60"
-                   :class="form.program_period_id == {{ $period->id }} ? 'border-[#1a6b2f] bg-green-50/80' : 'border-gray-200'">
-                <input type="radio" x-model="form.program_period_id" value="{{ $period->id }}"
-                       {{ $available <= 0 ? 'disabled' : '' }}
-                       class="mt-1 text-[#1a6b2f] focus:ring-[#1a6b2f]">
-                <div class="flex-1">
-                    <div class="font-semibold {{ $available <= 0 ? 'text-gray-400' : 'text-[#0d3d1a]' }}">{{ $period->name }}</div>
-                    <div class="text-sm text-gray-500">{{ $period->start_date->format('d M Y') }} – {{ $period->end_date->format('d M Y') }}</div>
-                    <div class="text-sm font-bold text-[#1a6b2f] mt-1">Rp {{ number_format($period->price, 0, ',', '.') }}
-                        <span class="text-xs text-gray-500 font-normal">· DP Rp {{ number_format($period->dp_amount, 0, ',', '.') }}</span>
+        <ol class="space-y-3 text-sm text-gray-700 mb-5">
+            <li class="flex items-start gap-3">
+                <span class="w-6 h-6 rounded-full bg-amber-500 text-white text-xs font-bold flex items-center justify-center flex-shrink-0 mt-0.5">1</span>
+                <div>
+                    Transfer DP sebesar <strong x-text="invoice ? formatRupiah(invoice.total_amount) : ''"></strong> ke rekening:
+                    <div class="mt-1.5 space-y-0.5">
+                        <div>Bank: <strong x-text="paymentDetail ? paymentDetail.bank_name : '-'"></strong></div>
+                        <div>No. Rekening: <strong x-text="paymentDetail ? paymentDetail.account_number : '-'"></strong></div>
+                        <div>Atas Nama: <strong x-text="paymentDetail ? paymentDetail.account_name : '-'"></strong></div>
                     </div>
                 </div>
-                <div class="text-right">
-                    @if($available > 0)
-                    <span class="text-xs text-[#1a6b2f] font-medium">{{ $available }} kursi</span>
-                    @else
-                    <span class="text-xs text-red-500 font-medium">Penuh</span>
+            </li>
+            <li class="flex items-start gap-3">
+                <span class="w-6 h-6 rounded-full bg-amber-500 text-white text-xs font-bold flex items-center justify-center flex-shrink-0 mt-0.5">2</span>
+                <span>Kirimkan bukti transfer ke WhatsApp admin beserta kode pendaftaran Anda.</span>
+            </li>
+            <li class="flex items-start gap-3">
+                <span class="w-6 h-6 rounded-full bg-amber-500 text-white text-xs font-bold flex items-center justify-center flex-shrink-0 mt-0.5">3</span>
+                <span>Admin akan mengkonfirmasi dan mengirimkan <strong>kode konfirmasi</strong> kepada Anda.</span>
+            </li>
+        </ol>
+        <a :href="waLink" target="_blank" rel="noopener noreferrer"
+           class="flex items-center justify-center gap-2 w-full py-3 bg-[#1a6b2f] text-white font-semibold rounded-xl hover:bg-[#0d3d1a] transition-colors text-sm">
+            <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
+                <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/>
+            </svg>
+            Kirim Bukti Pembayaran via WhatsApp
+        </a>
+    </div>
+
+    {{-- Confirm code --}}
+    <div class="bg-white rounded-2xl border border-gray-200 shadow-sm p-6">
+        <div x-show="!confirmSuccess">
+            <h3 class="font-bold text-gray-900 mb-1">Sudah Dapat Kode dari CS?</h3>
+            <p class="text-xs text-gray-500 mb-4">Masukkan kode yang dikirimkan CS setelah pembayaran DP dikonfirmasi.</p>
+            <div class="flex gap-2">
+                <input type="text" x-model="confirmCode" placeholder="MASUKKAN KODE DARI CS"
+                       class="flex-1 px-3 py-2.5 border border-gray-300 rounded-lg text-sm uppercase tracking-widest placeholder-gray-300 focus:ring-2 focus:ring-[#1a6b2f]/30 focus:border-[#1a6b2f] focus:outline-none">
+                <button @click="submitConfirm()" :disabled="confirmLoading || !confirmCode.trim()"
+                        class="px-4 py-2.5 bg-[#1a6b2f] text-white font-semibold rounded-lg text-sm hover:bg-[#0d3d1a] disabled:opacity-50 transition">
+                    <span x-show="!confirmLoading">Daftar</span>
+                    <span x-show="confirmLoading">...</span>
+                </button>
+            </div>
+            <p x-show="confirmError" class="mt-2 text-xs text-red-600" x-text="confirmError"></p>
+        </div>
+        <div x-show="confirmSuccess" class="text-center py-2 space-y-3">
+            <div class="w-10 h-10 rounded-full bg-green-100 flex items-center justify-center mx-auto mb-3">
+                <svg class="w-5 h-5 text-[#1a6b2f]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"/>
+                </svg>
+            </div>
+            <p class="font-bold text-[#0d3d1a] text-sm">Pembayaran Dikonfirmasi!</p>
+            <p class="text-xs text-gray-500">Pendaftaran Anda telah dikonfirmasi. Berikut invoice Anda:</p>
+            <a :href="'/daftar/invoice/' + (regCode || confirmCode)" target="_blank" rel="noopener noreferrer"
+               class="inline-flex items-center gap-1.5 px-4 py-2.5 bg-red-500 text-white text-sm font-semibold rounded-lg hover:bg-red-600 transition">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/>
+                </svg>
+                Unduh Invoice PDF
+            </a>
+        </div>
+    </div>
+
+    {{-- Bottom links --}}
+    <div class="text-center space-y-2 pb-4">
+        <div>
+            <button @click="showFormData = !showFormData" class="text-sm text-[#1a6b2f] hover:underline">
+                <span x-text="showFormData ? 'Sembunyikan data ↑' : 'Lihat data yang saya isi →'"></span>
+            </button>
+        </div>
+        <div x-show="showFormData" class="bg-white rounded-xl border border-gray-100 p-4 text-left text-xs space-y-1.5 text-gray-600">
+            <p><span class="font-semibold text-gray-800">Nama:</span> <span x-text="form.full_name"></span></p>
+            <p><span class="font-semibold text-gray-800">Tanggal Lahir:</span> <span x-text="form.birth_date"></span></p>
+            <p><span class="font-semibold text-gray-800">WhatsApp:</span> <span x-text="form.whatsapp"></span></p>
+            <p><span class="font-semibold text-gray-800">Keluhan:</span> <span x-text="form.health_complaints"></span></p>
+        </div>
+        <div>
+            <button @click="resetForm()" class="text-xs text-gray-400 hover:text-gray-600 hover:underline">Isi ulang dari awal</button>
+        </div>
+    </div>
+</div>
+
+{{-- ═══════════════════════════════ FORM ═══════════════════════════════ --}}
+<form x-show="!submitted" x-cloak @submit.prevent="submit()" class="space-y-5">
+
+    {{-- ── SECTION 1: Data Pribadi ── --}}
+    <div class="bg-white rounded-2xl border border-gray-200 shadow-sm p-6 space-y-4">
+        <h2 class="font-bold text-gray-900 flex items-center gap-2">
+            <span class="text-base">🧑</span> Data Pribadi
+        </h2>
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">Nama Lengkap <span class="text-red-500">*</span></label>
+                <input type="text" x-model="form.full_name" required placeholder="Nama sesuai KTP"
+                       class="w-full px-3 py-2.5 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-[#1a6b2f]/30 focus:border-[#1a6b2f] focus:outline-none">
+            </div>
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">Tanggal Lahir <span class="text-red-500">*</span></label>
+                <input type="date" x-model="form.birth_date" required
+                       class="w-full px-3 py-2.5 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-[#1a6b2f]/30 focus:border-[#1a6b2f] focus:outline-none">
+            </div>
+        </div>
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">Pekerjaan / Profesi Saat Ini <span class="text-red-500">*</span></label>
+                <p class="text-xs text-[#1a6b2f] mb-1.5">Membantu kami memahami ritme aktivitas harian dan tingkat stres Anda.</p>
+                <input type="text" x-model="form.occupation" required placeholder="Contoh: Wiraswasta, Ibu Rumah Tangga"
+                       class="w-full px-3 py-2.5 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-[#1a6b2f]/30 focus:border-[#1a6b2f] focus:outline-none">
+            </div>
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">Nomor WhatsApp Aktif <span class="text-red-500">*</span></label>
+                <div class="flex">
+                    <select x-model="countryCode" class="px-2 py-2.5 border border-r-0 border-gray-300 rounded-l-lg text-sm bg-gray-50 focus:outline-none text-gray-600">
+                        <option value="62">ID +62</option>
+                        <option value="60">MY +60</option>
+                        <option value="65">SG +65</option>
+                        <option value="61">AU +61</option>
+                    </select>
+                    <input type="tel" x-model="waNumber" required placeholder="8123456789"
+                           class="flex-1 px-3 py-2.5 border border-gray-300 rounded-r-lg text-sm focus:ring-2 focus:ring-[#1a6b2f]/30 focus:border-[#1a6b2f] focus:outline-none">
+                </div>
+                <p class="text-[11px] text-gray-400 mt-1">Tanpa angka 0 di depan. Contoh: 8123456789</p>
+            </div>
+        </div>
+        <div class="grid grid-cols-2 gap-4">
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">Tinggi Badan <span class="text-red-500">*</span></label>
+                <div class="relative">
+                    <input type="number" x-model="heightVal" @input="computeHeightWeight()" min="100" max="250" required
+                           class="w-full px-3 py-2.5 pr-10 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-[#1a6b2f]/30 focus:border-[#1a6b2f] focus:outline-none">
+                    <span class="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 text-xs">cm</span>
+                </div>
+            </div>
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">Berat Badan <span class="text-red-500">*</span></label>
+                <div class="relative">
+                    <input type="number" x-model="weightVal" @input="computeHeightWeight()" min="20" max="300" required
+                           class="w-full px-3 py-2.5 pr-10 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-[#1a6b2f]/30 focus:border-[#1a6b2f] focus:outline-none">
+                    <span class="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 text-xs">kg</span>
+                </div>
+            </div>
+        </div>
+        <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1">Alamat Domisili <span class="text-red-500">*</span></label>
+            <textarea x-model="form.address" rows="2" required placeholder="Alamat lengkap tempat tinggal saat ini"
+                      class="w-full px-3 py-2.5 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-[#1a6b2f]/30 focus:border-[#1a6b2f] focus:outline-none resize-none"></textarea>
+        </div>
+    </div>
+
+    {{-- ── SECTION 2: Pilih Periode ── --}}
+    <div class="bg-white rounded-2xl border border-gray-200 shadow-sm p-6">
+        <h2 class="font-bold text-gray-900 flex items-center gap-2 mb-4">
+            <span class="text-base">📅</span> Pilih Periode Program
+        </h2>
+        @forelse($periods as $period)
+        @php $available = $period->quota - $period->filled; $full = $available <= 0; @endphp
+        <label class="block border rounded-xl p-4 mb-3 last:mb-0 transition-all cursor-pointer {{ $full ? 'cursor-not-allowed opacity-60' : 'hover:border-[#1a6b2f]' }}"
+               :class="form.program_period_id == '{{ $period->id }}' ? 'border-[#1a6b2f] bg-green-50/60' : 'border-gray-200 bg-white'">
+            <div class="flex items-start gap-3">
+                <input type="radio" x-model="form.program_period_id" value="{{ $period->id }}"
+                       {{ $full ? 'disabled' : '' }} class="mt-1 text-[#1a6b2f] focus:ring-[#1a6b2f]">
+                <div class="flex-1">
+                    <div class="font-semibold {{ $full ? 'text-gray-400' : 'text-gray-900' }} text-sm">{{ $period->name }}</div>
+                    <div class="text-xs text-gray-500 mt-0.5">{{ $period->start_date->format('d M Y') }} – {{ $period->end_date->format('d M Y') }}</div>
+                    <div class="text-sm font-bold text-[#1a6b2f] mt-1">
+                        Rp {{ number_format($period->price, 0, ',', '.') }}
+                        <span class="text-xs text-gray-500 font-normal">– DP Rp {{ number_format($period->dp_amount, 0, ',', '.') }}</span>
+                    </div>
+                    <div class="mt-1 text-xs {{ $full ? 'text-[#f97316] font-medium' : 'text-gray-500' }}">
+                        @if($full) Kuota penuh
+                        @else Sisa {{ $available }} dari {{ $period->quota }} tempat
+                        @endif
+                    </div>
+                </div>
+            </div>
+        </label>
+        @empty
+        <p class="text-gray-400 text-sm text-center py-4">Tidak ada periode aktif saat ini. Hubungi kami untuk informasi lebih lanjut.</p>
+        @endforelse
+    </div>
+
+    {{-- ── SECTION 3: Data Kesehatan ── --}}
+    <div class="bg-white rounded-2xl border border-gray-200 shadow-sm p-6 space-y-5">
+        <h2 class="font-bold text-gray-900 flex items-center gap-2">
+            <span class="text-base">🏥</span> Data Kesehatan
+        </h2>
+
+        {{-- Complaints checkboxes --}}
+        <div>
+            <label class="block text-sm font-medium text-gray-700 mb-3">Keluhan Kesehatan Utama <span class="text-red-500">*</span></label>
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-y-2 gap-x-4">
+                @php
+                $clinicalMap = [
+                    'Diabetes / Gula Darah Tinggi'      => ['model' => 'bloodSugar',    'label' => 'Gula Darah Puasa',       'placeholder' => 'Contoh: 150',    'unit' => 'mg/dL'],
+                    'Hipertensi / Tekanan Darah Tinggi' => ['model' => 'bloodPressure', 'label' => 'Tekanan Darah',          'placeholder' => 'Contoh: 140/90', 'unit' => 'mmHg'],
+                    'Kolesterol Tinggi'                 => ['model' => 'cholesterol',   'label' => 'Kadar Kolesterol Total', 'placeholder' => 'Contoh: 220',    'unit' => 'mg/dL'],
+                    'Asam Urat'                         => ['model' => 'uricAcid',      'label' => 'Kadar Asam Urat',        'placeholder' => 'Contoh: 8.5',    'unit' => 'mg/dL'],
+                ];
+                @endphp
+                @foreach([
+                    'Diabetes / Gula Darah Tinggi',
+                    'Hipertensi / Tekanan Darah Tinggi',
+                    'Kolesterol Tinggi',
+                    'Asam Urat',
+                    'Obesitas / Kelebihan Berat Badan',
+                    'Gangguan Pencernaan (Konstipasi / BAB tidak lancar)',
+                    'Asam Lambung / GERD',
+                    'Insomnia / Gangguan Tidur',
+                    'Kelelahan Kronis',
+                    'Nyeri Sendi / Otot',
+                ] as $complaint)
+                <div class="flex flex-col">
+                    <label class="flex items-start gap-2 cursor-pointer group">
+                        <input type="checkbox" value="{{ $complaint }}" x-model="selectedComplaints"
+                               @change="onComplaintToggle('{{ $complaint }}', $event.target.checked)"
+                               class="mt-0.5 rounded border-gray-300 text-[#1a6b2f] focus:ring-[#1a6b2f] flex-shrink-0">
+                        <span class="text-sm text-gray-700 group-hover:text-gray-900 leading-snug">{{ $complaint }}</span>
+                    </label>
+                    @if(isset($clinicalMap[$complaint]))
+                    @php $c = $clinicalMap[$complaint]; @endphp
+                    <div x-show="selectedComplaints.includes('{{ $complaint }}')" x-cloak class="ml-6 mt-2 mb-1">
+                        <label class="block text-xs text-gray-500 mb-1">{{ $c['label'] }} <span class="text-gray-400">— isi jika tahu</span></label>
+                        <div class="flex items-center gap-2">
+                            <input type="text" x-model="{{ $c['model'] }}" placeholder="{{ $c['placeholder'] }}"
+                                   class="flex-1 px-3 py-1.5 border border-gray-300 rounded-md text-sm focus:ring-2 focus:ring-[#1a6b2f]/30 focus:border-[#1a6b2f] focus:outline-none">
+                            <span class="text-xs text-gray-400 whitespace-nowrap">{{ $c['unit'] }}</span>
+                        </div>
+                    </div>
                     @endif
                 </div>
-            </label>
-            @empty
-            <p class="text-gray-400 text-sm">Tidak ada periode aktif saat ini.</p>
-            @endforelse
-        </div>
-
-        {{-- Data Kesehatan --}}
-        <div class="glass-card rounded-2xl p-6 space-y-4">
-            <h2 class="font-bold text-lg text-[#0d3d1a]">Data Kesehatan</h2>
-
-            <div>
-                <label class="block text-sm font-medium text-gray-700 mb-1.5">Keluhan Kesehatan <span class="text-red-500">*</span></label>
-                <textarea x-model="form.health_complaints" rows="3" required class="input" style="resize:none"
-                          placeholder="Jelaskan keluhan atau kondisi kesehatan Anda saat ini..."></textarea>
+                @endforeach
             </div>
-            <div>
-                <label class="block text-sm font-medium text-gray-700 mb-1.5">Kondisi Klinis / Diagnosis</label>
-                <textarea x-model="form.clinical_details" rows="2" class="input" style="resize:none"></textarea>
-            </div>
-            <div class="grid grid-cols-2 gap-4">
-                <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-1.5">BMI (opsional)</label>
-                    <input type="number" step="0.1" x-model="form.bmi" class="input">
-                </div>
-                <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-1.5">Tingkat Keyakinan (1-10) <span class="text-red-500">*</span></label>
-                    <input type="number" x-model="form.confidence_level" min="1" max="10" required class="input">
-                </div>
-            </div>
-            <div>
-                <label class="block text-sm font-medium text-gray-700 mb-1.5">Kondisi Emosi <span class="text-red-500">*</span></label>
-                <textarea x-model="form.emotion_state" rows="2" required class="input" style="resize:none"></textarea>
-            </div>
-            <div>
-                <label class="block text-sm font-medium text-gray-700 mb-1.5">Alergi Makanan <span class="text-red-500">*</span></label>
-                <input type="text" x-model="form.food_allergies" required class="input" placeholder="Tidak ada / sebutkan">
-            </div>
-            <div>
-                <label class="block text-sm font-medium text-gray-700 mb-1.5">Riwayat Pengobatan <span class="text-red-500">*</span></label>
-                <textarea x-model="form.treatment_history" rows="2" required class="input" style="resize:none"></textarea>
-            </div>
-            <div>
-                <label class="block text-sm font-medium text-gray-700 mb-1.5">Obat yang Sedang Dikonsumsi <span class="text-red-500">*</span></label>
-                <input type="text" x-model="form.current_meds" required class="input" placeholder="Tidak ada / sebutkan">
+            <div class="mt-3">
+                <label class="block text-xs text-gray-500 mb-1">Lainnya:</label>
+                <textarea x-model="otherComplaints" rows="2" placeholder="Sebutkan keluhan lain yang tidak ada di atas..."
+                          class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-[#1a6b2f]/30 focus:border-[#1a6b2f] focus:outline-none resize-none"></textarea>
             </div>
         </div>
 
-        {{-- Error --}}
-        <div x-show="error" class="p-4 bg-red-50 border border-red-200 rounded-xl text-sm text-red-700" x-text="error"></div>
+        {{-- Kondisi Emosi --}}
+        <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1">Kondisi Emosi yang Dominan Akhir-Akhir Ini <span class="text-red-500">*</span></label>
+            <p class="text-xs text-gray-400 mb-1.5">Apakah ada rasa takut berlebih, cemas, stres pekerjaan, atau sulit tidur? Ceritakan dengan nyaman.</p>
+            <textarea x-model="form.emotion_state" rows="3" required placeholder="Ceritakan kondisi emosi Anda..."
+                      class="w-full px-3 py-2.5 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-[#1a6b2f]/30 focus:border-[#1a6b2f] focus:outline-none resize-none"></textarea>
+        </div>
 
-        {{-- Turnstile --}}
-        @if(!empty($settings['turnstile_site_key']))
-        <div class="cf-turnstile" data-sitekey="{{ $settings['turnstile_site_key'] }}"></div>
-        @endif
+        {{-- Alergi --}}
+        <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1">Alergi atau Pantangan Makanan <span class="text-red-500">*</span></label>
+            <p class="text-xs text-gray-400 mb-1.5">Misal: kacang, gluten, susu, dll. Ketik 'tidak ada' jika tidak ada.</p>
+            <input type="text" x-model="form.food_allergies" required placeholder="Sebutkan atau ketik 'Tidak ada'"
+                   class="w-full px-3 py-2.5 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-[#1a6b2f]/30 focus:border-[#1a6b2f] focus:outline-none">
+        </div>
 
-        <button type="submit" :disabled="loading"
-                class="w-full py-3.5 bg-[#1a6b2f] text-white font-bold text-lg rounded-xl hover:bg-[#0d3d1a] disabled:opacity-50 disabled:cursor-not-allowed transition">
-            <span x-show="!loading">Kirim Pendaftaran</span>
-            <span x-show="loading">Mengirim...</span>
-        </button>
-    </form>
+        {{-- Riwayat Pengobatan --}}
+        <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1">Riwayat Pengobatan / Terapi di Tempat Lain <span class="text-red-500">*</span></label>
+            <p class="text-xs text-gray-400 mb-1.5">Pernah menjalani pengobatan klinis, terapi, atau diet khusus?</p>
+            <textarea x-model="form.treatment_history" rows="2" required placeholder="Sebutkan atau ketik 'Belum pernah'"
+                      class="w-full px-3 py-2.5 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-[#1a6b2f]/30 focus:border-[#1a6b2f] focus:outline-none resize-none"></textarea>
+        </div>
+
+        {{-- Obat / Suplemen --}}
+        <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1">Konsumsi Obat / Suplemen Saat Ini <span class="text-red-500">*</span></label>
+            <p class="text-xs text-gray-400 mb-1.5">Sebutkan obat-obatan medis atau herbal yang rutin dikonsumsi beserta durasinya.</p>
+            <textarea x-model="form.current_meds" rows="2" required placeholder="Sebutkan atau ketik 'Tidak ada'"
+                      class="w-full px-3 py-2.5 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-[#1a6b2f]/30 focus:border-[#1a6b2f] focus:outline-none resize-none"></textarea>
+        </div>
+
+        {{-- Confidence level --}}
+        <div>
+            <label class="block text-sm font-medium text-gray-700 mb-3">Seberapa Yakin Anda Pulih Setelah Mengikuti Program Ini? <span class="text-red-500">*</span></label>
+            <div class="flex gap-2">
+                @foreach([1,2,3,4,5] as $level)
+                <button type="button" @click="form.confidence_level = {{ $level }}"
+                        class="w-11 h-11 rounded-full border-2 font-bold text-sm transition-all"
+                        :class="form.confidence_level == {{ $level }}
+                            ? 'border-[#1a6b2f] bg-[#1a6b2f] text-white'
+                            : 'border-gray-300 text-gray-500 hover:border-[#1a6b2f] hover:text-[#1a6b2f]'">
+                    {{ $level }}
+                </button>
+                @endforeach
+            </div>
+            <p class="text-xs text-gray-400 mt-2">1 = Kurang yakin · 5 = Sangat yakin</p>
+        </div>
+    </div>
+
+    {{-- Error message --}}
+    <div x-show="error" x-cloak class="p-4 bg-red-50 border border-red-200 rounded-xl text-sm text-red-700" x-text="error"></div>
+
+    {{-- Turnstile --}}
+    @if(!empty($settings['turnstile_site_key']))
+    <div class="cf-turnstile" data-sitekey="{{ $settings['turnstile_site_key'] }}"></div>
+    @endif
+
+    {{-- Submit --}}
+    <button type="submit" :disabled="loading || !form.program_period_id || !form.confidence_level || selectedComplaints.length === 0"
+            class="w-full py-4 bg-[#1a6b2f] text-white font-bold text-base rounded-xl hover:bg-[#0d3d1a] disabled:opacity-50 disabled:cursor-not-allowed transition-all shadow-lg">
+        <span x-show="!loading">Daftar Sekarang</span>
+        <span x-show="loading" class="flex items-center justify-center gap-2">
+            <svg class="animate-spin w-4 h-4" fill="none" viewBox="0 0 24 24">
+                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"></path>
+            </svg>
+            Mengirim...
+        </span>
+    </button>
+
+</form>
+
 </div>
+</section>
 
 @endsection
 
@@ -167,15 +374,101 @@ function registrationForm() {
         submitted: false,
         loading: false,
         error: '',
+        showInvoice: true,
+        showFormData: false,
+
         regCode: '',
+        fullName: '',
+        invoice: null,
+        paymentDetail: null,
+        period: null,
+
+        confirmCode: '',
+        confirmLoading: false,
+        confirmError: '',
+        confirmSuccess: false,
+
+        countryCode: '62',
+        waNumber: '',
+        heightVal: '165',
+        weightVal: '70',
+        selectedComplaints: [],
+        otherComplaints: '',
+        bloodSugar: '',
+        bloodPressure: '',
+        cholesterol: '',
+        uricAcid: '',
+
+        clinicalTriggers: [
+            { complaint: 'Diabetes / Gula Darah Tinggi',      field: 'bloodSugar',    label: 'Gula Darah Puasa',       placeholder: 'Contoh: 150',    unit: 'mg/dL' },
+            { complaint: 'Hipertensi / Tekanan Darah Tinggi', field: 'bloodPressure', label: 'Tekanan Darah',          placeholder: 'Contoh: 140/90', unit: 'mmHg' },
+            { complaint: 'Kolesterol Tinggi',                 field: 'cholesterol',   label: 'Kadar Kolesterol Total', placeholder: 'Contoh: 220',    unit: 'mg/dL' },
+            { complaint: 'Asam Urat',                         field: 'uricAcid',      label: 'Kadar Asam Urat',        placeholder: 'Contoh: 8.5',    unit: 'mg/dL' },
+        ],
+
+        onComplaintToggle(complaint, checked) {
+            if (!checked) {
+                const t = this.clinicalTriggers.find(t => t.complaint === complaint);
+                if (t) this[t.field] = '';
+            }
+        },
+
         form: {
             full_name: '', birth_date: '', occupation: '', whatsapp: '', address: '',
-            height_weight: '', program_period_id: '',
-            health_complaints: '', clinical_details: '', bmi: '',
+            height_weight: '', bmi: '', program_period_id: '',
+            health_complaints: '', clinical_details: '-',
             emotion_state: '', food_allergies: '', treatment_history: '',
             current_meds: '', confidence_level: '',
         },
+
+        get waLink() {
+            const phone = '62816677225';
+            if (!this.fullName) return 'http://api.whatsapp.com/send?phone=' + phone;
+            const dp = this.invoice ? this.formatRupiah(this.invoice.total_amount) : '';
+            const period = this.period ? this.period.name : '';
+            const msg = `Halo Admin RSH Satu Bumi,\n\nSaya *${this.fullName}* telah melakukan transfer DP sebesar *${dp}* untuk Program 7 Hari - ${period}.\n\nKode Pendaftaran: *${this.regCode}*\n\nMohon dikonfirmasi. Terima kasih.`;
+            return 'http://api.whatsapp.com/send?phone=' + phone + '&text=' + encodeURIComponent(msg);
+        },
+
+        formatRupiah(amount) {
+            return 'Rp ' + new Intl.NumberFormat('id-ID').format(amount);
+        },
+
+        computeHeightWeight() {
+            const h = parseFloat(this.heightVal) || 0;
+            const w = parseFloat(this.weightVal) || 0;
+            this.form.height_weight = h + ' cm / ' + w + ' kg';
+            if (h > 0 && w > 0) {
+                this.form.bmi = (w / Math.pow(h / 100, 2)).toFixed(1);
+            }
+        },
+
+        buildPayload() {
+            const complaints = [...this.selectedComplaints];
+            if (this.otherComplaints.trim()) {
+                complaints.push('Lainnya: ' + this.otherComplaints.trim());
+            }
+            this.form.health_complaints = JSON.stringify(complaints);
+
+            const parts = [];
+            for (const t of this.clinicalTriggers) {
+                const val = (this[t.field] || '').trim();
+                if (val && this.selectedComplaints.includes(t.complaint)) {
+                    parts.push(`${t.label}: ${val} ${t.unit}`);
+                }
+            }
+            this.form.clinical_details = parts.length ? parts.join(', ') : '-';
+
+            this.form.whatsapp = this.countryCode + this.waNumber.replace(/^0+/, '');
+            this.computeHeightWeight();
+        },
+
         async submit() {
+            this.buildPayload();
+            if (this.selectedComplaints.length === 0) {
+                this.error = 'Pilih minimal satu keluhan kesehatan.';
+                return;
+            }
             this.error = '';
             this.loading = true;
             try {
@@ -194,15 +487,78 @@ function registrationForm() {
                 });
                 const data = await res.json();
                 if (data.success) {
-                    this.regCode = data.code;
-                    this.submitted = true;
+                    this.regCode     = data.code;
+                    this.fullName    = data.full_name;
+                    this.invoice     = data.invoice;
+                    this.paymentDetail = data.payment_detail;
+                    this.period      = data.period;
+                    this.submitted   = true;
+                    window.scrollTo({ top: 0, behavior: 'smooth' });
                 } else {
                     this.error = data.error || 'Terjadi kesalahan.';
                 }
             } catch(e) {
-                this.error = 'Terjadi kesalahan. Silakan coba lagi.';
+                this.error = 'Terjadi kesalahan jaringan. Silakan coba lagi.';
             }
             this.loading = false;
+        },
+
+        async submitConfirm() {
+            if (!this.confirmCode.trim()) return;
+            this.confirmError = '';
+            this.confirmLoading = true;
+            try {
+                const res = await fetch('{{ route('daftar.konfirmasi') }}', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
+                        'Accept': 'application/json',
+                    },
+                    body: JSON.stringify({ code: this.confirmCode.trim() }),
+                });
+                const data = await res.json();
+                if (data.confirmed) {
+                    this.confirmSuccess = true;
+                } else {
+                    this.confirmError = data.error || 'Kode tidak valid atau pembayaran belum dikonfirmasi oleh admin.';
+                }
+            } catch(e) {
+                this.confirmError = 'Terjadi kesalahan. Silakan coba lagi.';
+            }
+            this.confirmLoading = false;
+        },
+
+        resetForm() {
+            if (!confirm('Yakin ingin mengisi ulang dari awal? Semua data akan dihapus.')) return;
+            this.submitted = false;
+            this.error = '';
+            this.regCode = '';
+            this.fullName = '';
+            this.invoice = null;
+            this.paymentDetail = null;
+            this.period = null;
+            this.selectedComplaints = [];
+            this.otherComplaints = '';
+            this.bloodSugar = '';
+            this.bloodPressure = '';
+            this.cholesterol = '';
+            this.uricAcid = '';
+            this.waNumber = '';
+            this.confirmCode = '';
+            this.confirmError = '';
+            this.confirmSuccess = false;
+            this.form = {
+                full_name: '', birth_date: '', occupation: '', whatsapp: '', address: '',
+                height_weight: '', bmi: '', program_period_id: '',
+                health_complaints: '', clinical_details: '-',
+                emotion_state: '', food_allergies: '', treatment_history: '',
+                current_meds: '', confidence_level: '',
+            };
+        },
+
+        init() {
+            this.computeHeightWeight();
         }
     }
 }

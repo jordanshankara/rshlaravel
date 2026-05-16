@@ -12,10 +12,11 @@ class PengaturanController extends Controller
     private const SETTING_KEYS = [
         'site_name', 'site_tagline', 'site_address', 'site_phone', 'site_email',
         'bank_name', 'bank_account_number', 'bank_account_name',
-        'turnstile_site_key',
         'google_maps_embed',
         'whatsapp_number',
         'program_description',
+        'notification_emails',
+        'ai_provider', 'ai_base_url', 'ai_api_key', 'ai_model', 'ai_article_prompt',
     ];
 
     public function index()
@@ -28,10 +29,11 @@ class PengaturanController extends Controller
     public function update(Request $request)
     {
         $request->validate([
-            'site_name'    => 'required|string|max:255',
-            'site_email'   => 'nullable|email',
-            'site_phone'   => 'nullable|string|max:30',
-            'whatsapp_number' => 'nullable|string|max:30',
+            'site_name'          => 'nullable|string|max:255',
+            'site_email'         => 'nullable|email',
+            'site_phone'         => 'nullable|string|max:30',
+            'whatsapp_number'    => 'nullable|string|max:30',
+            'notification_emails'=> 'nullable|string|max:500',
         ]);
 
         foreach (self::SETTING_KEYS as $key) {

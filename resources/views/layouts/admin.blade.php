@@ -23,6 +23,7 @@
         }
     </script>
     <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+    @stack('styles')
 </head>
 <body class="h-full" x-data="{ sidebarOpen: false }">
 <div class="flex h-full min-h-screen">
