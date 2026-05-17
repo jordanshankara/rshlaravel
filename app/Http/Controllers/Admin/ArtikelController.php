@@ -45,6 +45,8 @@ class ArtikelController extends Controller
 
     public function generateAI(Request $request)
     {
+        if (auth()->user()->role !== 'ADMIN') abort(403, 'Hanya admin yang dapat menggunakan AI.');
+
         $request->validate([
             'topic'   => 'required|string|max:2000',
             'sources' => 'nullable|string|max:5000',
@@ -126,6 +128,8 @@ class ArtikelController extends Controller
         $data['published_at'] = $request->status === 'PUBLISHED' ? now() : null;
         unset($data['categories']);
 
+        $data['content'] = $this->sanitizeContent($data['content']);
+
         $article = Article::create($data);
         $article->author_id = Auth::id();
         $article->save();
@@ -179,6 +183,8 @@ class ArtikelController extends Controller
 
         unset($data['categories']);
 
+        $data['content'] = $this->sanitizeContent($data['content']);
+
         $artikel->update($data);
         $artikel->categories()->sync($request->categories ?? []);
 
@@ -187,6 +193,8 @@ class ArtikelController extends Controller
 
     public function destroy(Article $artikel)
     {
+        if (auth()->user()->role !== 'ADMIN') abort(403, 'Hanya admin yang dapat menghapus artikel.');
+
         if ($artikel->cover_image) {
             Storage::disk('public')->delete($artikel->cover_image);
         }
@@ -208,8 +216,19 @@ class ArtikelController extends Controller
 
     public function uploadCover(Request $request)
     {
-        $request->validate(['file' => 'required|image|max:4096']);
+        $request->validate(['file' => 'required|image|mimes:jpeg,jpg,png,gif,webp|max:4096']);
         $path = $request->file('file')->store('articles', 'public');
         return response()->json(['url' => $path]);
+    }
+
+    private function sanitizeContent(string $html): string
+    {
+        $allowed = '<p><br><strong><em><u><s><h2><h3><ol><ul><li><blockquote><a><img>';
+        $html = strip_tags($html, $allowed);
+        // Remove on* event attributes (onerror, onclick, onload, etc.)
+        $html = preg_replace('/\s+on\w+\s*=\s*(?:"[^"]*"|\'[^\']*\')/i', '', $html);
+        // Replace javascript: in href/src with #
+        $html = preg_replace('/\b(href|src)\s*=\s*["\']?\s*javascript:/i', '$1="#"', $html);
+        return $html;
     }
 }

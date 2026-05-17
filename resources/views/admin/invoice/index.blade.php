@@ -77,9 +77,22 @@
                     <td class="px-4 py-3">
                         <x-invoice-status-badge :status="$inv->payment_status" />
                     </td>
-                    <td class="px-4 py-3 flex items-center gap-2">
-                        <a href="{{ route('admin.invoice.show', $inv) }}" class="text-[#2d6a4f] hover:underline text-xs font-semibold">Detail →</a>
-                        <a href="{{ route('admin.invoice.pdf', $inv) }}" class="text-gray-500 hover:underline text-xs">PDF</a>
+                    <td class="px-4 py-3">
+                        <div class="flex items-center gap-1">
+                            <a href="{{ route('admin.invoice.show', $inv) }}" title="Detail"
+                               class="p-1.5 rounded-lg text-gray-400 hover:text-[#2d6a4f] hover:bg-[#2d6a4f]/10 transition-colors">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/>
+                                </svg>
+                            </a>
+                            <a href="{{ route('admin.invoice.pdf', $inv) }}" title="Unduh PDF" target="_blank"
+                               class="p-1.5 rounded-lg text-gray-400 hover:text-gray-600 hover:bg-gray-100 transition-colors">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+                                </svg>
+                            </a>
+                        </div>
                     </td>
                 </tr>
                 @empty

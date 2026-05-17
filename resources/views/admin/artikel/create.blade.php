@@ -47,7 +47,7 @@
 </div>
 @endif
 
-<div x-data="articleForm()" class="flex gap-6 items-start">
+<div x-data="articleForm()" class="flex flex-col lg:flex-row gap-6 items-start">
 
     {{-- ── LEFT COLUMN ── --}}
     <form id="artikel-form" method="POST" action="{{ route('admin.artikel.store') }}"
@@ -79,7 +79,7 @@
     </form>
 
     {{-- ── RIGHT SIDEBAR ── --}}
-    <div class="w-64 flex-shrink-0 space-y-3">
+    <div class="w-full lg:w-64 lg:flex-shrink-0 space-y-3">
 
         {{-- Card 1: Cover Image --}}
         <div class="bg-white rounded-xl border shadow-sm p-4">

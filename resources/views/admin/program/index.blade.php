@@ -28,11 +28,21 @@
             Rp {{ number_format($period->price, 0, ',', '.') }}
             <span class="text-xs text-gray-400 font-normal ml-1">(DP: Rp {{ number_format($period->dp_amount, 0, ',', '.') }})</span>
         </div>
-        <div class="flex gap-2">
-            <a href="{{ route('admin.program.edit', $period) }}" class="flex-1 text-center py-1.5 border border-gray-200 text-sm rounded-lg hover:bg-gray-50">Edit</a>
+        <div class="flex gap-1 justify-end">
+            <a href="{{ route('admin.program.edit', $period) }}" title="Edit"
+               class="p-1.5 rounded-lg text-gray-400 hover:text-[#2d6a4f] hover:bg-[#2d6a4f]/10 transition-colors">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/>
+                </svg>
+            </a>
             <form method="POST" action="{{ route('admin.program.destroy', $period) }}" onsubmit="return confirm('Hapus periode ini?')">
                 @csrf @method('DELETE')
-                <button type="submit" class="px-3 py-1.5 border border-red-200 text-red-600 text-sm rounded-lg hover:bg-red-50">Hapus</button>
+                <button type="submit" title="Hapus"
+                        class="p-1.5 rounded-lg text-gray-400 hover:text-red-500 hover:bg-red-50 transition-colors">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
+                    </svg>
+                </button>
             </form>
         </div>
     </div>

@@ -27,8 +27,12 @@ class EmailService
         $html = $this->buildHtml($registration);
 
         try {
-            Mail::html($html, function ($message) use ($recipients, $subject) {
-                $message->to($recipients)->subject($subject);
+            $fromAddress = config('mail.from.address', 'ai@rshsatubumi.id');
+            $fromName    = config('mail.from.name', 'RSH Satu Bumi');
+            Mail::html($html, function ($message) use ($recipients, $subject, $fromAddress, $fromName) {
+                $message->from($fromAddress, $fromName)
+                        ->to($recipients)
+                        ->subject($subject);
             });
 
             $registration->update(['email_sent' => true]);
@@ -76,7 +80,7 @@ class EmailService
         $allergies  = e($registration->food_allergies);
         $history    = e($registration->treatment_history);
         $meds       = e($registration->current_meds);
-        $confidence = $registration->confidence_level . ' / 10';
+        $confidence = $registration->confidence_level . ' / 5';
 
         $invoiceNum = $invoice ? e($invoice->invoice_number) : '-';
         $invoiceAmt = $invoice ? 'Rp ' . number_format($invoice->total_amount, 0, ',', '.') : '-';

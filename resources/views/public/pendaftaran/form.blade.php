@@ -114,7 +114,7 @@
     </div>
 
     {{-- Bottom links --}}
-    <div class="text-center space-y-2 pb-4">
+    <div class="text-center space-y-3 pb-4">
         <div>
             <button @click="showFormData = !showFormData" class="text-sm text-[#1a6b2f] hover:underline">
                 <span x-text="showFormData ? 'Sembunyikan data ↑' : 'Lihat data yang saya isi →'"></span>
@@ -126,8 +126,12 @@
             <p><span class="font-semibold text-gray-800">WhatsApp:</span> <span x-text="form.whatsapp"></span></p>
             <p><span class="font-semibold text-gray-800">Keluhan:</span> <span x-text="form.health_complaints"></span></p>
         </div>
-        <div>
-            <button @click="resetForm()" class="text-xs text-gray-400 hover:text-gray-600 hover:underline">Isi ulang dari awal</button>
+        {{-- Prominent reset button for new registration --}}
+        <div class="pt-1">
+            <button @click="resetForm()"
+                    class="w-full py-3 border-2 border-gray-300 text-gray-600 font-semibold rounded-xl hover:border-[#1a6b2f] hover:text-[#1a6b2f] hover:bg-green-50 transition-all text-sm">
+                ↺ Isi Ulang Form (untuk mendaftarkan orang lain)
+            </button>
         </div>
     </div>
 </div>
@@ -168,13 +172,16 @@
                         <option value="65">SG +65</option>
                         <option value="61">AU +61</option>
                     </select>
-                    <input type="tel" x-model="waNumber" required placeholder="8123456789"
+                    <input type="tel" x-model="waNumber" required placeholder="81234567890"
+                           inputmode="numeric"
+                           @keydown="if(!['Backspace','Delete','Tab','ArrowLeft','ArrowRight','Home','End'].includes($event.key) && !/^\d$/.test($event.key) && !$event.ctrlKey && !$event.metaKey) $event.preventDefault()"
+                           @input="waNumber = $event.target.value.replace(/\D/g,'')"
                            class="flex-1 px-3 py-2.5 border border-gray-300 rounded-r-lg text-sm focus:ring-2 focus:ring-[#1a6b2f]/30 focus:border-[#1a6b2f] focus:outline-none">
                 </div>
-                <p class="text-[11px] text-gray-400 mt-1">Tanpa angka 0 di depan. Contoh: 8123456789</p>
+                <p class="text-[11px] text-gray-400 mt-1">Hanya angka. Contoh: 81234567890 (tanpa awalan 0 atau 62)</p>
             </div>
         </div>
-        <div class="grid grid-cols-2 gap-4">
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div>
                 <label class="block text-sm font-medium text-gray-700 mb-1">Tinggi Badan <span class="text-red-500">*</span></label>
                 <div class="relative">
@@ -424,9 +431,8 @@ function registrationForm() {
         get waLink() {
             const phone = '62816677225';
             if (!this.fullName) return 'http://api.whatsapp.com/send?phone=' + phone;
-            const dp = this.invoice ? this.formatRupiah(this.invoice.total_amount) : '';
-            const period = this.period ? this.period.name : '';
-            const msg = `Halo Admin RSH Satu Bumi,\n\nSaya *${this.fullName}* telah melakukan transfer DP sebesar *${dp}* untuk Program 7 Hari - ${period}.\n\nKode Pendaftaran: *${this.regCode}*\n\nMohon dikonfirmasi. Terima kasih.`;
+            const period = this.period ? this.period.name : 'Program 7 Hari';
+            const msg = `Halo Admin RSH Satu Bumi,\n\nSaya *${this.fullName}* ingin mengirimkan bukti pembayaran untuk *${period}*.\n\nTerima kasih.`;
             return 'http://api.whatsapp.com/send?phone=' + phone + '&text=' + encodeURIComponent(msg);
         },
 
@@ -459,7 +465,10 @@ function registrationForm() {
             }
             this.form.clinical_details = parts.length ? parts.join(', ') : '-';
 
-            this.form.whatsapp = this.countryCode + this.waNumber.replace(/^0+/, '');
+            let wa = this.waNumber.replace(/\D/g, '');
+            if (wa.startsWith('62')) wa = wa.slice(2);
+            else if (wa.startsWith('0')) wa = wa.slice(1);
+            this.form.whatsapp = this.countryCode + wa;
             this.computeHeightWeight();
         },
 
@@ -493,6 +502,13 @@ function registrationForm() {
                     this.paymentDetail = data.payment_detail;
                     this.period      = data.period;
                     this.submitted   = true;
+                    try {
+                        localStorage.setItem('rsh_submitted', JSON.stringify({
+                            regCode: this.regCode, fullName: this.fullName,
+                            invoice: this.invoice, paymentDetail: this.paymentDetail,
+                            period: this.period, form: this.form,
+                        }));
+                    } catch(e) {}
                     window.scrollTo({ top: 0, behavior: 'smooth' });
                 } else {
                     this.error = data.error || 'Terjadi kesalahan.';
@@ -531,6 +547,7 @@ function registrationForm() {
 
         resetForm() {
             if (!confirm('Yakin ingin mengisi ulang dari awal? Semua data akan dihapus.')) return;
+            try { localStorage.removeItem('rsh_submitted'); } catch(e) {}
             this.submitted = false;
             this.error = '';
             this.regCode = '';
@@ -559,6 +576,19 @@ function registrationForm() {
 
         init() {
             this.computeHeightWeight();
+            try {
+                const saved = localStorage.getItem('rsh_submitted');
+                if (saved) {
+                    const s = JSON.parse(saved);
+                    this.regCode      = s.regCode || '';
+                    this.fullName     = s.fullName || '';
+                    this.invoice      = s.invoice || null;
+                    this.paymentDetail= s.paymentDetail || null;
+                    this.period       = s.period || null;
+                    this.form         = Object.assign(this.form, s.form || {});
+                    this.submitted    = true;
+                }
+            } catch(e) {}
         }
     }
 }

@@ -85,7 +85,7 @@ $statusLabels = [
                 </div>
                 <div>
                     <span class="text-xs text-gray-400 font-medium uppercase tracking-wide">Tingkat Keyakinan</span>
-                    <p class="text-gray-700 mt-0.5">{{ $registration->confidence_level }}/10</p>
+                    <p class="text-gray-700 mt-0.5">{{ $registration->confidence_level }}/5</p>
                 </div>
             </div>
         </div>
@@ -155,8 +155,6 @@ $statusLabels = [
     <div class="bg-white rounded-xl border border-gray-200 shadow-sm p-5" x-data="{ showInvoice: false }">
         <div class="flex items-center justify-between mb-3">
             <h3 class="text-xs font-semibold text-gray-400 uppercase tracking-wide">Invoice</h3>
-            <a href="{{ route('admin.invoice.pdf', $registration->invoice) }}"
-               class="text-xs text-[#2d6a4f] hover:underline font-medium">Unduh PDF</a>
         </div>
         <div class="space-y-2 text-xs">
             <div class="flex justify-between">
@@ -178,10 +176,20 @@ $statusLabels = [
                 </span>
             </div>
         </div>
-        <button @click="showInvoice = !showInvoice"
-                class="block mt-3 w-full text-center text-xs text-[#2d6a4f] font-medium hover:underline transition-colors py-1">
-            <span x-text="showInvoice ? 'Sembunyikan Preview ↑' : 'Lihat Preview ↓'"></span>
-        </button>
+        <div class="flex gap-2 mt-3">
+            <button @click="showInvoice = !showInvoice"
+                    class="flex-1 text-center text-xs text-[#2d6a4f] font-medium hover:underline transition-colors py-1 border border-[#2d6a4f] rounded-lg hover:bg-green-50">
+                <span x-text="showInvoice ? 'Sembunyikan Preview ↑' : 'Lihat Preview ↓'"></span>
+            </button>
+            <a href="{{ route('admin.invoice.pdf', $registration->invoice) }}"
+               target="_blank"
+               class="flex items-center gap-1 px-3 py-1 bg-[#2d6a4f] text-white text-xs font-semibold rounded-lg hover:bg-[#1a5a3f] transition-colors">
+                <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/>
+                </svg>
+                Unduh PDF
+            </a>
+        </div>
 
         {{-- Inline Invoice Preview --}}
         <div x-show="showInvoice" x-cloak class="mt-3 border border-gray-100 rounded-xl overflow-hidden text-xs">

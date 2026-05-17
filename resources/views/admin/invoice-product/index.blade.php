@@ -16,19 +16,19 @@
 }">
 
 {{-- Header --}}
-<div class="flex items-center justify-between mb-5">
+<div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-5">
     <div>
         <h1 class="text-xl font-bold text-gray-900">Produk / Layanan</h1>
         <p class="text-xs text-gray-400 mt-0.5">Daftar layanan yang bisa dipilih saat membuat invoice</p>
     </div>
     <div class="flex items-center gap-3">
-        <label class="flex items-center gap-2 text-sm text-gray-600 cursor-pointer select-none">
+        <label class="flex items-center gap-2 text-sm text-gray-600 cursor-pointer select-none whitespace-nowrap">
             <input type="checkbox" x-model="showInactive" class="rounded border-gray-300 text-[#2d6a4f]">
             Tampilkan nonaktif
         </label>
         <button @click="open = true; editing = null; form = { name: '', category: '', description: '', price: '', is_active: true }"
-                class="flex items-center gap-1.5 px-4 py-2 bg-[#2d6a4f] hover:bg-[#1a5a3f] text-white text-sm font-semibold rounded-lg transition-colors">
-            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                class="flex items-center gap-1.5 px-4 py-2 bg-[#2d6a4f] hover:bg-[#1a5a3f] text-white text-sm font-semibold rounded-lg transition-colors whitespace-nowrap flex-shrink-0">
+            <svg class="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
             </svg>
             Tambah Produk
@@ -52,20 +52,20 @@
     </div>
     <div class="divide-y divide-gray-100">
         @foreach($items as $product)
-        <div class="px-5 py-4 flex items-center justify-between hover:bg-gray-50 {{ $product->is_active ? '' : 'opacity-50' }}"
+        <div class="px-5 py-4 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 hover:bg-gray-50 {{ $product->is_active ? '' : 'opacity-50' }}"
              x-show="showInactive || {{ $product->is_active ? 'true' : 'false' }}">
             <div class="flex-1 min-w-0">
-                <div class="flex items-center gap-2">
+                <div class="flex items-center gap-2 flex-wrap">
                     <span class="text-sm font-medium text-gray-800">{{ $product->name }}</span>
                     @if(!$product->is_active)
                     <span class="text-xs px-2 py-0.5 rounded-full font-medium bg-gray-100 text-gray-500">Nonaktif</span>
                     @endif
                 </div>
                 @if($product->description)
-                <p class="text-xs text-gray-400 mt-0.5 truncate max-w-xs">{{ $product->description }}</p>
+                <p class="text-xs text-gray-400 mt-0.5 truncate">{{ $product->description }}</p>
                 @endif
             </div>
-            <div class="flex items-center gap-4 ml-4">
+            <div class="flex items-center gap-4 flex-shrink-0">
                 <span class="text-sm font-semibold text-gray-700">Rp {{ number_format($product->price, 0, ',', '.') }}</span>
                 <div class="flex items-center gap-1">
                     {{-- Toggle active/inactive --}}

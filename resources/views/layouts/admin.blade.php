@@ -33,17 +33,6 @@
         @include('layouts.partials.admin-sidebar')
     </aside>
 
-    {{-- Mobile toggle button --}}
-    <div class="lg:hidden fixed top-4 left-4 z-50">
-        <button @click="sidebarOpen = !sidebarOpen"
-                class="p-2 bg-white rounded-lg shadow border border-gray-200">
-            <svg class="w-5 h-5 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path x-show="!sidebarOpen" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/>
-                <path x-show="sidebarOpen" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
-            </svg>
-        </button>
-    </div>
-
     {{-- Mobile overlay --}}
     <div class="lg:hidden fixed inset-0 bg-black/40 z-40" x-show="sidebarOpen" x-cloak @click="sidebarOpen = false"></div>
 
@@ -55,8 +44,15 @@
 
     {{-- Main content --}}
     <div class="flex-1 flex flex-col min-w-0">
-        <header class="sticky top-0 z-20 bg-white border-b border-gray-200 px-4 py-3 flex items-center gap-4">
-            <div class="lg:hidden w-10"></div>
+        <header class="sticky top-0 z-20 bg-white border-b border-gray-200 px-4 py-3 flex items-center gap-3">
+            {{-- Burger — inline in header, not floating --}}
+            <button class="lg:hidden p-1.5 rounded-lg text-gray-500 hover:bg-gray-100 transition-colors flex-shrink-0"
+                    @click="sidebarOpen = !sidebarOpen">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path x-show="!sidebarOpen" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/>
+                    <path x-show="sidebarOpen" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                </svg>
+            </button>
             <h1 class="text-base font-semibold text-gray-800 flex-1">@yield('page-title', 'Dashboard')</h1>
             @yield('header-actions')
         </header>

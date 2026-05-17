@@ -22,18 +22,20 @@ $statusLabels = [
 </div>
 
 {{-- Search & filter --}}
-<form method="GET" class="flex gap-2 mb-4">
+<form method="GET" class="flex flex-col sm:flex-row gap-2 mb-4">
     <input type="hidden" name="status" value="{{ request('status') }}">
     <input type="text" name="search" value="{{ request('search') }}"
            placeholder="Cari nama, kode, WhatsApp..."
            class="flex-1 px-3 py-2 border border-gray-200 rounded-lg text-sm focus:ring-2 focus:ring-[#2d6a4f]/30 focus:border-[#2d6a4f] focus:outline-none">
-    <select name="period_id" class="px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:border-[#2d6a4f]">
-        <option value="">Semua Periode</option>
-        @foreach($periods as $period)
-        <option value="{{ $period->id }}" {{ request('period_id') == $period->id ? 'selected' : '' }}>{{ $period->name }}</option>
-        @endforeach
-    </select>
-    <button type="submit" class="px-4 py-2 bg-[#2d6a4f] text-white text-sm rounded-lg hover:bg-[#1a5a3f] transition-colors">Cari</button>
+    <div class="flex gap-2">
+        <select name="period_id" class="flex-1 sm:flex-none px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:border-[#2d6a4f]">
+            <option value="">Semua Periode</option>
+            @foreach($periods as $period)
+            <option value="{{ $period->id }}" {{ request('period_id') == $period->id ? 'selected' : '' }}>{{ $period->name }}</option>
+            @endforeach
+        </select>
+        <button type="submit" class="px-4 py-2 bg-[#2d6a4f] text-white text-sm rounded-lg hover:bg-[#1a5a3f] transition-colors whitespace-nowrap flex-shrink-0">Cari</button>
+    </div>
 </form>
 
 <div class="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden">
@@ -69,8 +71,13 @@ $statusLabels = [
                     </td>
                     <td class="px-4 py-3 text-xs text-gray-500">{{ $reg->submitted_at->format('d M Y') }}</td>
                     <td class="px-4 py-3">
-                        <a href="{{ route('admin.registrasi.show', $reg) }}"
-                           class="text-[#2d6a4f] hover:text-[#1a5a3f] text-xs font-semibold hover:underline">Detail →</a>
+                        <a href="{{ route('admin.registrasi.show', $reg) }}" title="Detail"
+                           class="p-1.5 rounded-lg text-gray-400 hover:text-[#2d6a4f] hover:bg-[#2d6a4f]/10 transition-colors inline-flex">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/>
+                            </svg>
+                        </a>
                     </td>
                 </tr>
                 @empty

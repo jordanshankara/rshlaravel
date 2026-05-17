@@ -10,7 +10,7 @@
         <form method="POST" action="{{ route('admin.invoice.store') }}" class="space-y-5"
               @submit.prevent="if(cleanBeforeSubmit()) $el.submit()">
             @csrf
-            <div class="grid grid-cols-2 gap-4">
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
                     <label class="block text-sm font-medium text-gray-700 mb-1.5">Nama Klien</label>
                     <input type="text" name="client_name" required class="w-full px-3 py-2 border rounded-lg text-sm focus:ring-2 focus:ring-[#2d6a4f]/30 focus:outline-none">
@@ -20,7 +20,7 @@
                     <input type="date" name="invoice_date" value="{{ date('Y-m-d') }}" required class="w-full px-3 py-2 border rounded-lg text-sm focus:ring-2 focus:ring-[#2d6a4f]/30 focus:outline-none">
                 </div>
             </div>
-            <div class="grid grid-cols-2 gap-4">
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
                     <label class="block text-sm font-medium text-gray-700 mb-1.5">Status Pembayaran</label>
                     <select name="payment_status" class="w-full px-3 py-2 border rounded-lg text-sm focus:outline-none">
@@ -56,14 +56,14 @@
 
                 <div class="space-y-2">
                     <template x-for="(item, i) in items" :key="i">
-                        <div class="grid grid-cols-[1fr_56px_144px_80px_24px] gap-2 items-start">
+                        <div class="flex flex-col sm:grid sm:grid-cols-[1fr_56px_144px_80px_24px] gap-2 items-start">
                             {{-- Description with autocomplete --}}
                             <div class="relative">
                                 <input type="text"
                                        :name="'items['+i+'][description]'"
                                        x-model="item.description"
                                        @focus="activeRow = i"
-                                       @input="activeRow = i"
+                                       @input="activeRow = i; item.priceFromProduct = false"
                                        @blur="setTimeout(() => { if (activeRow === i) activeRow = null }, 180)"
                                        placeholder="Deskripsi produk/layanan"
                                        required
@@ -85,18 +85,23 @@
                                     </template>
                                 </div>
                             </div>
-                            <input type="number" :name="'items['+i+'][quantity]'" x-model="item.quantity" min="1" required
-                                   class="px-2 py-2 border rounded-lg text-sm focus:outline-none text-center">
-                            <input type="number" :name="'items['+i+'][price]'" x-model="item.price" min="0" placeholder="0" required
-                                   class="px-3 py-2 border rounded-lg text-sm focus:outline-none">
-                            <input type="number" :name="'items['+i+'][discount]'" x-model="item.discount" min="0" max="100" placeholder="0"
-                                   class="px-3 py-2 border rounded-lg text-sm focus:outline-none">
-                            <button type="button" @click="removeItem(i)" x-show="items.length > 1"
-                                    class="text-gray-400 hover:text-red-500 mt-2 transition-colors">
-                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
-                                </svg>
-                            </button>
+                            <div class="grid grid-cols-[56px_1fr_64px_24px] sm:contents gap-2 items-center">
+                                <input type="number" :name="'items['+i+'][quantity]'" x-model="item.quantity" min="1" required
+                                       class="w-full px-2 py-2 border rounded-lg text-sm focus:outline-none text-center">
+                                <input type="number" :name="'items['+i+'][price]'" x-model="item.price" min="0" placeholder="0" required
+                                       :readonly="item.priceFromProduct"
+                                       :title="item.priceFromProduct ? 'Edit harga dari halaman produk' : ''"
+                                       :class="item.priceFromProduct ? 'bg-gray-50 text-gray-500 cursor-not-allowed' : ''"
+                                       class="w-full px-3 py-2 border rounded-lg text-sm focus:outline-none">
+                                <input type="number" :name="'items['+i+'][discount]'" x-model="item.discount" min="0" max="100" placeholder="0"
+                                       class="w-full px-2 py-2 border rounded-lg text-sm focus:outline-none">
+                                <button type="button" @click="removeItem(i)" x-show="items.length > 1"
+                                        class="text-gray-400 hover:text-red-500 transition-colors justify-self-center">
+                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                                    </svg>
+                                </button>
+                            </div>
                         </div>
                     </template>
                 </div>
@@ -119,19 +124,24 @@
 <script>
 function invoiceForm(initialItems, products) {
     return {
-        items: (initialItems && initialItems.length) ? initialItems : [{ description: '', quantity: 1, price: 0, discount: 0 }],
+        items: (initialItems && initialItems.length)
+            ? initialItems.map(i => ({ ...i, priceFromProduct: false }))
+            : [{ description: '', quantity: 1, price: 0, discount: 0, priceFromProduct: false }],
         products: products || [],
         activeRow: null,
 
         addItem() {
-            this.items.push({ description: '', quantity: 1, price: 0, discount: 0 });
+            this.items.push({ description: '', quantity: 1, price: 0, discount: 0, priceFromProduct: false });
         },
         removeItem(i) {
             this.items.splice(i, 1);
             if (this.activeRow === i) this.activeRow = null;
         },
         getSuggestions(i) {
-            const q = (this.items[i]?.description || '').toLowerCase().trim();
+            const item = this.items[i];
+            if (!item) return [];
+            if (item.priceFromProduct) return this.products.slice(0, 8);
+            const q = (item.description || '').toLowerCase().trim();
             const list = q
                 ? this.products.filter(p =>
                     p.name.toLowerCase().includes(q) ||
@@ -143,6 +153,7 @@ function invoiceForm(initialItems, products) {
         selectProduct(i, product) {
             this.items[i].description = product.name;
             this.items[i].price = product.price;
+            this.items[i].priceFromProduct = true;
             this.activeRow = null;
         },
         formatTotal() {

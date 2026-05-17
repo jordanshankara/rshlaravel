@@ -3,6 +3,15 @@
 @section('page-title', 'Dashboard')
 
 @section('content')
+{{-- Brand banner --}}
+<div class="bg-white rounded-2xl px-6 py-5 mb-6 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 border border-gray-200 shadow-sm">
+    <img src="{{ asset('assets/logo/logo-rec-colored.png') }}" alt="Rumah Sehat Holistik Satu Bumi" class="h-14 w-auto max-w-[200px]">
+    <div class="sm:text-right">
+        <p class="text-xs text-gray-400 uppercase tracking-wider font-semibold">Panel Admin</p>
+        <p class="text-sm text-gray-600 mt-0.5">Selamat datang, <span class="font-semibold text-[#2d6a4f]">{{ auth()->user()->name }}</span></p>
+    </div>
+</div>
+
 {{-- Stat cards --}}
 <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
     @foreach([

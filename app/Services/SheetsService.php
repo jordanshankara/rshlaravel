@@ -37,12 +37,37 @@ class SheetsService
         return $this->service;
     }
 
+    private function ensureHeaders(Sheets $service): void
+    {
+        try {
+            $response = $service->spreadsheets_values->get($this->spreadsheetId, 'Sheet1!A1:R1');
+            $values = $response->getValues();
+            if (!empty($values[0])) return;
+
+            $headers = [
+                'Kode Pendaftaran', 'Tanggal Daftar', 'Nama Lengkap', 'Tanggal Lahir',
+                'Pekerjaan', 'WhatsApp', 'Alamat', 'Tinggi/Berat',
+                'Periode Program', 'Status', 'Keluhan Kesehatan', 'Data Klinis',
+                'BMI', 'Kondisi Emosi', 'Alergi Makanan', 'Riwayat Pengobatan',
+                'Obat/Suplemen', 'Tingkat Keyakinan',
+            ];
+            $body = new ValueRange(['values' => [$headers]]);
+            $service->spreadsheets_values->update(
+                $this->spreadsheetId,
+                'Sheet1!A1',
+                $body,
+                ['valueInputOption' => 'RAW']
+            );
+        } catch (\Throwable) {}
+    }
+
     public function appendRegistration(Registration $registration): ?string
     {
         $service = $this->getService();
         if (!$service) return null;
 
         try {
+            $this->ensureHeaders($service);
             $registration->load('programPeriod');
             $period = $registration->programPeriod;
 
@@ -90,6 +115,7 @@ class SheetsService
         if (!$service || !$rowId) return;
 
         try {
+            $rowId = (string)(int)$rowId;
             $range = "Sheet1!J{$rowId}";
             $body = new ValueRange(['values' => [[$status]]]);
             $service->spreadsheets_values->update(

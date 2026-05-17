@@ -1,12 +1,14 @@
 <div class="flex flex-col h-full">
     {{-- Logo --}}
-    <div class="px-6 py-5 border-b border-gray-200">
-        <div class="flex items-center gap-2.5">
-            <div class="w-8 h-8 rounded-lg bg-[#2d6a4f] flex items-center justify-center flex-shrink-0">
-                <span class="text-white text-xs font-bold">RSH</span>
-            </div>
-            <span class="font-semibold text-gray-900 text-sm leading-tight">Satu Bumi</span>
-        </div>
+    <div class="px-5 py-4 border-b border-gray-200 flex items-center justify-between">
+        <img src="{{ asset('assets/logo/logo-rec-colored.png') }}" alt="RSH Satu Bumi" class="h-10 w-auto">
+        {{-- Close button — mobile only --}}
+        <button @click="sidebarOpen = false"
+                class="lg:hidden p-1.5 rounded-lg text-gray-400 hover:text-gray-600 hover:bg-gray-100 transition-colors flex-shrink-0">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+            </svg>
+        </button>
     </div>
 
     {{-- Nav --}}
