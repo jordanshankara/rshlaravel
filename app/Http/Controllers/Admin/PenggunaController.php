@@ -29,12 +29,13 @@ class PenggunaController extends Controller
             'role'     => 'required|in:ADMIN,EDITOR',
         ]);
 
-        User::create([
+        $user = User::create([
             'username' => $request->username,
             'name'     => $request->name,
             'password' => Hash::make($request->password, ['rounds' => 12]),
-            'role'     => $request->role,
         ]);
+        $user->role = $request->role;
+        $user->save();
 
         return redirect()->route('admin.pengguna.index')->with('success', 'Pengguna berhasil ditambahkan.');
     }
@@ -56,7 +57,6 @@ class PenggunaController extends Controller
         $data = [
             'username' => $request->username,
             'name'     => $request->name,
-            'role'     => $request->role,
         ];
 
         if ($request->filled('password')) {
@@ -64,6 +64,8 @@ class PenggunaController extends Controller
         }
 
         $pengguna->update($data);
+        $pengguna->role = $request->role;
+        $pengguna->save();
         return redirect()->route('admin.pengguna.index')->with('success', 'Pengguna berhasil diperbarui.');
     }
 

@@ -53,6 +53,7 @@ class InvoiceProductController extends Controller
     public function toggle(InvoiceProduct $invoiceProduct)
     {
         $invoiceProduct->update(['is_active' => !$invoiceProduct->is_active]);
-        return response()->json(['is_active' => $invoiceProduct->is_active]);
+        $label = $invoiceProduct->is_active ? 'diaktifkan' : 'dinonaktifkan';
+        return back()->with('success', "Produk berhasil {$label}.");
     }
 }

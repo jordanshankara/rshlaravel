@@ -68,17 +68,18 @@ class RegistrationInvoiceService
                 ]);
             } else {
                 $invoice = Invoice::create([
-                    'invoice_number'       => $invoiceNumber,
-                    'client_name'          => $registration->full_name,
-                    'invoice_date'         => $registration->submitted_at->toDateString(),
-                    'payment_status'       => $paymentStatus,
-                    'total_amount'         => $amount,
-                    'notes'                => $notes,
-                    'author_id'            => null,
-                    'is_system_generated'  => true,
-                    'registration_id'      => $registration->id,
-                    'payment_detail_id'    => $paymentDetailId,
+                    'invoice_number'    => $invoiceNumber,
+                    'client_name'       => $registration->full_name,
+                    'invoice_date'      => $registration->submitted_at->toDateString(),
+                    'payment_status'    => $paymentStatus,
+                    'total_amount'      => $amount,
+                    'notes'             => $notes,
+                    'author_id'         => null,
+                    'registration_id'   => $registration->id,
+                    'payment_detail_id' => $paymentDetailId,
                 ]);
+                $invoice->is_system_generated = true;
+                $invoice->save();
                 InvoiceItem::create([
                     'invoice_id'  => $invoice->id,
                     'description' => $description,

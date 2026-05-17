@@ -10,10 +10,9 @@ class ProgramPeriodController extends Controller
 {
     public function index()
     {
-        $periods = ProgramPeriod::orderByDesc('start_date')->get()->map(function ($p) {
-            $p->filled = $p->registrations()->whereNotIn('status', ['CANCELLED'])->count();
-            return $p;
-        });
+        $periods = ProgramPeriod::withCount(['registrations as filled' => fn($q) => $q->whereNotIn('status', ['CANCELLED'])])
+            ->orderByDesc('start_date')
+            ->get();
         return view('admin.program.index', compact('periods'));
     }
 
@@ -40,7 +39,7 @@ class ProgramPeriodController extends Controller
 
     public function edit(ProgramPeriod $program)
     {
-        $program->filled = $program->registrations()->whereNotIn('status', ['CANCELLED'])->count();
+        $program->filled = $program->registrations()->whereNotIn('status', ['CANCELLED'])->count(); // single record, no N+1
         return view('admin.program.edit', compact('program'));
     }
 

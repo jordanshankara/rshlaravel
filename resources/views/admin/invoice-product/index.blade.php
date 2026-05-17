@@ -2,17 +2,11 @@
 @section('title', 'Produk Invoice')
 @section('page-title', 'Produk Invoice')
 
-@section('header-actions')
-<button @click="open = true; editing = null; form = { name: '', category: '', description: '', price: '', is_active: true }"
-        class="px-4 py-2 bg-[#2d6a4f] text-white text-sm font-semibold rounded-lg hover:bg-[#1a5a3f] transition-colors">
-    + Produk Baru
-</button>
-@endsection
-
 @section('content')
 <div x-data="{
     open: false,
     editing: null,
+    showInactive: false,
     form: { name: '', category: '', description: '', price: '', is_active: true },
     openEdit(p) {
         this.editing = p;
@@ -21,24 +15,51 @@
     }
 }">
 
+{{-- Header --}}
+<div class="flex items-center justify-between mb-5">
+    <div>
+        <h1 class="text-xl font-bold text-gray-900">Produk / Layanan</h1>
+        <p class="text-xs text-gray-400 mt-0.5">Daftar layanan yang bisa dipilih saat membuat invoice</p>
+    </div>
+    <div class="flex items-center gap-3">
+        <label class="flex items-center gap-2 text-sm text-gray-600 cursor-pointer select-none">
+            <input type="checkbox" x-model="showInactive" class="rounded border-gray-300 text-[#2d6a4f]">
+            Tampilkan nonaktif
+        </label>
+        <button @click="open = true; editing = null; form = { name: '', category: '', description: '', price: '', is_active: true }"
+                class="flex items-center gap-1.5 px-4 py-2 bg-[#2d6a4f] hover:bg-[#1a5a3f] text-white text-sm font-semibold rounded-lg transition-colors">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
+            </svg>
+            Tambah Produk
+        </button>
+    </div>
+</div>
+
 @if(session('success'))
 <div class="mb-4 px-4 py-3 bg-green-50 border border-green-200 text-green-700 rounded-lg text-sm">{{ session('success') }}</div>
 @endif
 
+@if(session('error'))
+<div class="mb-4 px-4 py-3 bg-red-50 border border-red-200 text-red-700 rounded-lg text-sm">{{ session('error') }}</div>
+@endif
+
 @forelse($products->groupBy('category') as $category => $items)
-<div class="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden mb-4">
+<div class="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden mb-4"
+     x-show="showInactive || {{ $items->where('is_active', true)->count() > 0 ? 'true' : 'false' }}">
     <div class="px-5 py-3 bg-gray-50 border-b border-gray-200">
         <h3 class="text-xs font-bold text-gray-500 uppercase tracking-wider">{{ $category ?: 'Umum' }}</h3>
     </div>
     <div class="divide-y divide-gray-100">
         @foreach($items as $product)
-        <div class="px-5 py-4 flex items-center justify-between hover:bg-gray-50">
+        <div class="px-5 py-4 flex items-center justify-between hover:bg-gray-50 {{ $product->is_active ? '' : 'opacity-50' }}"
+             x-show="showInactive || {{ $product->is_active ? 'true' : 'false' }}">
             <div class="flex-1 min-w-0">
                 <div class="flex items-center gap-2">
                     <span class="text-sm font-medium text-gray-800">{{ $product->name }}</span>
-                    <span class="text-xs px-2 py-0.5 rounded-full font-medium {{ $product->is_active ? 'bg-green-100 text-green-700' : 'bg-gray-100 text-gray-500' }}">
-                        {{ $product->is_active ? 'Aktif' : 'Nonaktif' }}
-                    </span>
+                    @if(!$product->is_active)
+                    <span class="text-xs px-2 py-0.5 rounded-full font-medium bg-gray-100 text-gray-500">Nonaktif</span>
+                    @endif
                 </div>
                 @if($product->description)
                 <p class="text-xs text-gray-400 mt-0.5 truncate max-w-xs">{{ $product->description }}</p>
@@ -46,18 +67,39 @@
             </div>
             <div class="flex items-center gap-4 ml-4">
                 <span class="text-sm font-semibold text-gray-700">Rp {{ number_format($product->price, 0, ',', '.') }}</span>
-                <div class="flex items-center gap-2">
+                <div class="flex items-center gap-1">
+                    {{-- Toggle active/inactive --}}
                     <form method="POST" action="{{ route('admin.invoice-product.toggle', $product) }}">
                         @csrf @method('PATCH')
-                        <button type="submit" class="text-xs {{ $product->is_active ? 'text-amber-600' : 'text-green-600' }} hover:underline">
-                            {{ $product->is_active ? 'Nonaktifkan' : 'Aktifkan' }}
+                        <button type="submit" title="{{ $product->is_active ? 'Nonaktifkan' : 'Aktifkan' }}"
+                                class="p-1.5 rounded-lg transition-colors {{ $product->is_active ? 'text-amber-500 hover:bg-amber-50' : 'text-green-600 hover:bg-green-50' }}">
+                            @if($product->is_active)
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728A9 9 0 015.636 5.636m12.728 12.728L5.636 5.636"/>
+                            </svg>
+                            @else
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                            </svg>
+                            @endif
                         </button>
                     </form>
-                    <button @click="openEdit({{ $product->toJson() }})"
-                            class="text-xs text-[#2d6a4f] font-medium hover:underline">Edit</button>
+                    {{-- Edit --}}
+                    <button @click="openEdit({{ $product->toJson() }})" title="Edit"
+                            class="p-1.5 rounded-lg text-gray-400 hover:text-[#2d6a4f] hover:bg-[#2d6a4f]/10 transition-colors">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/>
+                        </svg>
+                    </button>
+                    {{-- Delete --}}
                     <form method="POST" action="{{ route('admin.invoice-product.destroy', $product) }}" onsubmit="return confirm('Hapus produk ini?')">
                         @csrf @method('DELETE')
-                        <button type="submit" class="text-xs text-red-500 hover:underline">Hapus</button>
+                        <button type="submit" title="Hapus"
+                                class="p-1.5 rounded-lg text-gray-400 hover:text-red-500 hover:bg-red-50 transition-colors">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
+                            </svg>
+                        </button>
                     </form>
                 </div>
             </div>
@@ -72,7 +114,7 @@
 @endforelse
 
 {{-- Modal --}}
-<div x-show="open" class="fixed inset-0 z-50 flex items-center justify-center p-4" style="display:none">
+<div x-show="open" x-cloak class="fixed inset-0 z-50 flex items-center justify-center p-4">
     <div class="absolute inset-0 bg-black/40" @click="open = false"></div>
     <div class="relative bg-white rounded-xl shadow-xl w-full max-w-md p-6 max-h-[90vh] overflow-y-auto">
         <div class="flex items-center justify-between mb-5">

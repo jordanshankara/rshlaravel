@@ -8,8 +8,7 @@ class Invoice extends Model
 {
     protected $fillable = [
         'invoice_number', 'client_name', 'invoice_date', 'payment_status',
-        'total_amount', 'notes', 'author_id', 'payment_detail_id',
-        'registration_id', 'is_system_generated',
+        'total_amount', 'notes', 'author_id', 'payment_detail_id', 'registration_id',
     ];
 
     protected $casts = ['invoice_date' => 'date'];

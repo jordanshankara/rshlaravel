@@ -122,12 +122,13 @@ class ArtikelController extends Controller
             $slug = $base . '-' . $count++;
         }
 
-        $data['slug']        = $slug;
-        $data['author_id']   = Auth::id();
+        $data['slug']         = $slug;
         $data['published_at'] = $request->status === 'PUBLISHED' ? now() : null;
         unset($data['categories']);
 
         $article = Article::create($data);
+        $article->author_id = Auth::id();
+        $article->save();
         if ($request->categories) {
             $article->categories()->sync($request->categories);
         }

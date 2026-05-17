@@ -25,12 +25,9 @@ class PendaftaranController extends Controller
     public function index()
     {
         $periods = ProgramPeriod::where('is_active', true)
+            ->withCount(['registrations as filled' => fn($q) => $q->whereNotIn('status', ['CANCELLED'])])
             ->orderBy('start_date')
-            ->get()
-            ->map(function ($p) {
-                $p->filled = $p->registrations()->whereNotIn('status', ['CANCELLED'])->count();
-                return $p;
-            });
+            ->get();
 
         $settings = SiteSetting::getMany(['bank_name', 'bank_account_number', 'bank_account_name']);
         $settings['turnstile_site_key'] = config('services.turnstile.site_key', '');
@@ -277,6 +274,12 @@ class PendaftaranController extends Controller
 
     public function downloadInvoice(string $code)
     {
+        $dlKey = 'invoice-dl:' . request()->ip();
+        if (RateLimiter::tooManyAttempts($dlKey, 5)) {
+            abort(429, 'Terlalu banyak permintaan. Coba lagi nanti.');
+        }
+        RateLimiter::hit($dlKey, 60);
+
         $registration = Registration::where('registration_code', strtoupper(trim($code)))
             ->with('invoice.items', 'invoice.paymentDetail')
             ->firstOrFail();
@@ -306,7 +309,7 @@ class PendaftaranController extends Controller
     private function generateCode(): string
     {
         do {
-            $code = 'RSH' . strtoupper(substr(uniqid(), -7));
+            $code = 'RSH' . strtoupper(\Illuminate\Support\Str::random(9));
         } while (Registration::where('registration_code', $code)->exists());
         return $code;
     }

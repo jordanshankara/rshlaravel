@@ -29,12 +29,9 @@ class DashboardController extends Controller
             ->get();
 
         $activePeriods = ProgramPeriod::where('is_active', true)
+            ->withCount(['registrations as filled' => fn($q) => $q->whereNotIn('status', ['CANCELLED'])])
             ->orderBy('start_date')
-            ->get()
-            ->map(function ($p) {
-                $p->filled = $p->registrations()->whereNotIn('status', ['CANCELLED'])->count();
-                return $p;
-            });
+            ->get();
 
         return view('admin.dashboard', compact('stats', 'recentRegistrations', 'activePeriods'));
     }

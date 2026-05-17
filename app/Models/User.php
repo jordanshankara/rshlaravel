@@ -9,16 +9,11 @@ class User extends Authenticatable
 {
     use Notifiable;
 
-    protected $fillable = ['username', 'password', 'name', 'role'];
+    protected $fillable = ['username', 'password', 'name'];
 
     protected $hidden = ['password', 'remember_token'];
 
     protected $casts = ['password' => 'hashed'];
-
-    public function getAuthIdentifierName(): string
-    {
-        return 'username';
-    }
 
     public function articles()
     {
