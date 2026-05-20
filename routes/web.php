@@ -81,6 +81,12 @@ Route::prefix('admin')->name('admin.')->middleware(['auth'])->group(function () 
         Route::post('/test-email', [Admin\PengaturanController::class, 'testEmail'])->name('test-email');
     });
 
+    // Log viewer (Admin only)
+    Route::prefix('log')->name('log.')->middleware('admin')->group(function () {
+        Route::get('/', [Admin\LogController::class, 'index'])->name('index');
+        Route::post('/clear', [Admin\LogController::class, 'clear'])->name('clear');
+    });
+
     // Payment Detail standalone page (Admin only)
     Route::prefix('payment-detail')->name('payment-detail.')->middleware('admin')->group(function () {
         Route::get('/', [Admin\PaymentDetailController::class, 'index'])->name('index');
