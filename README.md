@@ -1,66 +1,131 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+# RSH Satu Bumi — Laravel
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+Website & admin panel untuk program retreat kesehatan RSH Satu Bumi.
 
-## About Laravel
+---
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+## Setup Lokal (XAMPP di D:\xampp, project di F:\)
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+Karena project ada di drive berbeda dari XAMPP, cara paling mudah adalah menjalankan
+Laravel lewat PHP bawaan XAMPP tanpa perlu mengkonfigurasi Apache Virtual Host.
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+### 1. Jalankan MySQL XAMPP
 
-## Learning Laravel
+Buka **XAMPP Control Panel** → klik **Start** di baris **MySQL**.  
+Apache tidak perlu dijalankan.
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework.
+### 2. Buka terminal di folder project
 
-You may also try the [Laravel Bootcamp](https://bootcamp.laravel.com), where you will be guided through building a modern Laravel application from scratch.
+```
+F:\0. Code\rshsatubumi-laravel\
+```
 
-If you don't feel like reading, [Laracasts](https://laracasts.com) can help. Laracasts contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+Bisa klik kanan di folder → *Open in Terminal*, atau buka PowerShell lalu:
 
-## Laravel Sponsors
+```powershell
+cd "F:\0. Code\rshsatubumi-laravel"
+```
 
-We would like to extend our thanks to the following sponsors for funding Laravel development. If you are interested in becoming a sponsor, please visit the [Laravel Partners program](https://partners.laravel.com).
+### 3. Jalankan dev server pakai PHP dari XAMPP
 
-### Premium Partners
+```powershell
+D:\xampp\php\php.exe artisan serve
+```
 
-- **[Vehikl](https://vehikl.com/)**
-- **[Tighten Co.](https://tighten.co)**
-- **[WebReinvent](https://webreinvent.com/)**
-- **[Kirschbaum Development Group](https://kirschbaumdevelopment.com)**
-- **[64 Robots](https://64robots.com)**
-- **[Curotec](https://www.curotec.com/services/technologies/laravel/)**
-- **[Cyber-Duck](https://cyber-duck.co.uk)**
-- **[DevSquad](https://devsquad.com/hire-laravel-developers)**
-- **[Jump24](https://jump24.co.uk)**
-- **[Redberry](https://redberry.international/laravel/)**
-- **[Active Logic](https://activelogic.com)**
-- **[byte5](https://byte5.de)**
-- **[OP.GG](https://op.gg)**
+Akses di browser: **http://localhost:8000**
 
-## Contributing
+> Kalau port 8000 sudah dipakai, tambahkan `--port=8001` (atau port lain).
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+---
 
-## Code of Conduct
+## Pertama Kali Setup (clone fresh)
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+```powershell
+# 1. Install dependencies
+D:\xampp\php\php.exe D:\xampp\php\composer.phar install
 
-## Security Vulnerabilities
+# 2. Salin file environment
+copy .env.example .env
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+# 3. Generate app key
+D:\xampp\php\php.exe artisan key:generate
 
-## License
+# 4. Buat database baru di phpMyAdmin (http://localhost/phpmyadmin)
+#    Nama database: rshsatubumi (atau sesuai .env DB_DATABASE)
 
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+# 5. Jalankan migrasi
+D:\xampp\php\php.exe artisan migrate
+
+# 6. Jalankan dev server
+D:\xampp\php\php.exe artisan serve
+```
+
+---
+
+## Konfigurasi .env Penting
+
+```env
+APP_URL=http://localhost:8000
+
+DB_CONNECTION=mysql
+DB_HOST=127.0.0.1
+DB_PORT=3306
+DB_DATABASE=rshsatubumi
+DB_USERNAME=root
+DB_PASSWORD=
+
+MAIL_MAILER=smtp
+MAIL_HOST=mail.rshsatubumi.id
+MAIL_PORT=587
+MAIL_USERNAME=ai@rshsatubumi.id
+MAIL_PASSWORD=YourLuxuryHealing123
+MAIL_ENCRYPTION=tls
+MAIL_FROM_ADDRESS="ai@rshsatubumi.id"
+MAIL_FROM_NAME="RSH Satu Bumi"
+EMAIL_CS="rshsatubumi@gmail.com"
+```
+
+---
+
+## URL Penting
+
+| URL | Keterangan |
+|-----|------------|
+| `http://localhost:8000` | Halaman publik |
+| `http://localhost:8000/admin` | Dashboard admin |
+| `http://localhost:8000/admin/pengaturan` | Pengaturan + tes email |
+| `http://localhost:8000/admin/log` | Log error aplikasi |
+| `http://localhost:8000/daftar` | Halaman pendaftaran peserta |
+
+---
+
+## Perintah Artisan yang Sering Dipakai
+
+```powershell
+# Jalankan server
+D:\xampp\php\php.exe artisan serve
+
+# Bersihkan cache (wajib setelah ubah .env atau config)
+D:\xampp\php\php.exe artisan config:clear
+D:\xampp\php\php.exe artisan cache:clear
+D:\xampp\php\php.exe artisan view:clear
+
+# Migrasi database
+D:\xampp\php\php.exe artisan migrate
+
+# Buat symlink storage (untuk akses file upload)
+D:\xampp\php\php.exe artisan storage:link
+```
+
+---
+
+## Deploy ke Server (Hostwhitelabel)
+
+Upload file, lalu jalankan `deploy.php` sekali via browser dengan token:
+
+```
+https://rshsatubumi.id/deploy.php?confirm=DEPLOY_RSH_YYYYMMDD
+```
+
+Ganti `YYYYMMDD` dengan tanggal hari ini (contoh: `DEPLOY_RSH_20260520`).  
+**Hapus `deploy.php` dari server segera setelah selesai.**
