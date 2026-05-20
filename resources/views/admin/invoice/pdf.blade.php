@@ -43,6 +43,13 @@ table { border-collapse: collapse; }
 
 {{-- ── BODY ────────────────────────────────────────────── --}}
 <div style="padding:24px 30px;">
+@php
+    $period    = $invoice->registration?->programPeriod;
+    $isDP      = $period
+                 && $invoice->payment_status !== 'DIBATALKAN'
+                 && $invoice->total_amount < $period->price;
+    $remaining = ($isDP && $period) ? ($period->price - $invoice->total_amount) : 0;
+@endphp
 
   {{-- Bill-To / Date --}}
   <table width="100%" style="margin-bottom:18px;">
@@ -58,7 +65,9 @@ table { border-collapse: collapse; }
         <div style="font-size:8px;text-transform:uppercase;color:#9ca3af;letter-spacing:1px;margin-bottom:5px;">Tanggal Invoice</div>
         <div style="font-size:12px;font-weight:600;color:#111827;">{{ $invoice->invoice_date->format('d F Y') }}</div>
         <div style="margin-top:7px;">
-          @if($invoice->payment_status === 'LUNAS')
+          @if($isDP)
+            <span style="display:inline-block;padding:3px 12px;border-radius:20px;font-size:9px;font-weight:700;background:#fef9c3;color:#854d0e;">DOWN PAYMENT</span>
+          @elseif($invoice->payment_status === 'LUNAS')
             <span style="display:inline-block;padding:3px 12px;border-radius:20px;font-size:9px;font-weight:700;background:#d1fae5;color:#065f46;">LUNAS</span>
           @elseif($invoice->payment_status === 'DIBATALKAN')
             <span style="display:inline-block;padding:3px 12px;border-radius:20px;font-size:9px;font-weight:700;background:#f3f4f6;color:#6b7280;">DIBATALKAN</span>
@@ -122,8 +131,26 @@ table { border-collapse: collapse; }
   </div>
   @endif
 
-  {{-- Notes --}}
-  @if($invoice->notes)
+  {{-- DP Kekurangan / Notes --}}
+  @if($isDP && $remaining > 0)
+  <div style="border:1px solid #fde68a; border-radius:6px; padding:14px; margin-top:18px; background:#fefce8;">
+    <div style="font-size:9px; text-transform:uppercase; color:#854d0e; font-weight:700; letter-spacing:0.5px; margin-bottom:9px;">Perhatian — Invoice Down Payment (DP)</div>
+    <table style="margin:0; width:100%; border-collapse:collapse;">
+      <tr>
+        <td style="padding:3px 0; color:#6b7280; width:60%; font-size:10px;">Harga Program</td>
+        <td style="padding:3px 0; font-weight:600; font-size:11px; text-align:right;">Rp {{ number_format($period->price, 0, ',', '.') }}</td>
+      </tr>
+      <tr>
+        <td style="padding:3px 0; color:#6b7280; font-size:10px;">DP Dibayar</td>
+        <td style="padding:3px 0; font-weight:600; font-size:11px; text-align:right;">Rp {{ number_format($invoice->total_amount, 0, ',', '.') }}</td>
+      </tr>
+      <tr style="border-top:1px solid #fde68a;">
+        <td style="padding:5px 0 3px; color:#854d0e; font-size:10px; font-weight:700;">Nominal Kekurangan yang Harus Dibayar</td>
+        <td style="padding:5px 0 3px; font-weight:700; font-size:13px; color:#854d0e; text-align:right;">Rp {{ number_format($remaining, 0, ',', '.') }}</td>
+      </tr>
+    </table>
+  </div>
+  @elseif($invoice->notes)
   <div style="background:#f9fafb; border-left:3px solid #d1fae5; padding:10px 14px; border-radius:4px; font-size:10px; color:#6b7280; margin-top:16px;">
     {{ $invoice->notes }}
   </div>

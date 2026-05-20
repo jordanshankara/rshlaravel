@@ -12,6 +12,7 @@ use App\Services\SheetsService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\RateLimiter;
 
 class PendaftaranController extends Controller
@@ -136,7 +137,9 @@ class PendaftaranController extends Controller
             // Send CS notification email (non-critical)
             try {
                 $this->emailService->sendNewRegistrationNotification($registration);
-            } catch (\Throwable) {}
+            } catch (\Throwable $e) {
+                Log::warning('Email send failed for registration ' . $registration->registration_code . ': ' . $e->getMessage());
+            }
 
             // Sync Google Sheets (non-critical)
             try {

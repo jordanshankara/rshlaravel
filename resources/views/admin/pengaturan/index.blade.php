@@ -34,7 +34,25 @@
     </div>
 
     {{-- Notifikasi Email --}}
-    <div class="bg-white rounded-xl border shadow-sm p-6">
+    <div class="bg-white rounded-xl border shadow-sm p-6"
+         x-data="{
+             testing: false,
+             result: null,
+             async testEmail() {
+                 this.testing = true;
+                 this.result = null;
+                 try {
+                     const res = await fetch('{{ route('admin.pengaturan.test-email') }}', {
+                         method: 'POST',
+                         headers: { 'X-CSRF-TOKEN': '{{ csrf_token() }}', 'Accept': 'application/json' }
+                     });
+                     this.result = await res.json();
+                 } catch(e) {
+                     this.result = { success: false, error: e.message };
+                 }
+                 this.testing = false;
+             }
+         }">
         <h2 class="font-semibold text-gray-800 mb-1">Notifikasi Email</h2>
         <p class="text-xs text-gray-400 mb-4">Email yang menerima notifikasi setiap kali ada pendaftaran baru. Pisahkan dengan koma jika lebih dari satu.</p>
         <form method="POST" action="{{ route('admin.pengaturan.update') }}" class="space-y-4">
@@ -46,8 +64,28 @@
                        placeholder="admin@rshsatubumi.id, cs@rshsatubumi.id"
                        class="w-full px-3 py-2 border rounded-lg text-sm focus:ring-2 focus:ring-[#2d6a4f]/30 focus:outline-none">
             </div>
-            <button type="submit" class="px-5 py-2 bg-[#2d6a4f] text-white text-sm font-semibold rounded-lg hover:bg-[#1a5a3f] transition-colors">Simpan</button>
+            <div class="flex items-center gap-3">
+                <button type="submit" class="px-5 py-2 bg-[#2d6a4f] text-white text-sm font-semibold rounded-lg hover:bg-[#1a5a3f] transition-colors">Simpan</button>
+                <button type="button" @click="testEmail()" :disabled="testing"
+                        class="px-4 py-2 border border-gray-300 text-gray-700 text-sm font-medium rounded-lg hover:bg-gray-50 transition-colors disabled:opacity-50">
+                    <span x-show="!testing">Tes Kirim Email</span>
+                    <span x-show="testing">Mengirim...</span>
+                </button>
+            </div>
         </form>
+        <div x-show="result !== null" x-cloak class="mt-3 p-3 rounded-lg text-sm"
+             :class="result?.success ? 'bg-green-50 border border-green-200 text-green-800' : 'bg-red-50 border border-red-200 text-red-800'">
+            <template x-if="result?.success">
+                <p>Email tes berhasil dikirim ke: <strong x-text="result.to"></strong></p>
+            </template>
+            <template x-if="result && !result.success">
+                <div>
+                    <p class="font-semibold mb-1">Gagal mengirim email</p>
+                    <p x-text="result.to ? 'Ke: ' + result.to : ''"></p>
+                    <p class="font-mono text-xs mt-1 break-all" x-text="result.error"></p>
+                </div>
+            </template>
+        </div>
     </div>
 
     {{-- Konfigurasi AI --}}

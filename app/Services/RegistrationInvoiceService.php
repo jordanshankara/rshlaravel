@@ -37,13 +37,13 @@ class RegistrationInvoiceService
         $invoiceNumber = 'INV-' . $registration->registration_code;
 
         $periodLabel = $period->name . ' · ' . $this->fmtDate($period->start_date) . ' – ' . $this->fmtDate($period->end_date);
-        $description = $isFullyPaid
-            ? "Program 7 Hari Menuju Sehat Raga & Jiwa\n{$periodLabel}"
-            : "DP (50%) Program 7 Hari Menuju Sehat Raga & Jiwa\n{$periodLabel}";
+        $description = "Program 7 Hari Menuju Sehat Raga & Jiwa\n{$periodLabel}";
 
         $notes = $isCancelled
             ? 'Pendaftaran dibatalkan.'
-            : (!$isPaid ? 'Sisa pelunasan ' . $this->formatRupiah($period->price - $period->dp_amount) . ' dibayarkan saat check-in.' : null);
+            : (!$isFullyPaid && !$isCancelled
+                ? 'Nominal Kekurangan yang Harus Dibayar: ' . $this->formatRupiah($period->price - $period->dp_amount)
+                : null);
 
         $defaultPayment = $isPending ? PaymentDetail::where('is_default', true)->first() : null;
         $paymentDetailId = $defaultPayment?->id;

@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\PaymentDetail;
 use App\Models\SiteSetting;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Mail;
 
 class PengaturanController extends Controller
 {
@@ -96,5 +97,33 @@ class PengaturanController extends Controller
     {
         $paymentDetail->delete();
         return back()->with('success', 'Detail pembayaran berhasil dihapus.');
+    }
+
+    public function testEmail(Request $request)
+    {
+        $raw = SiteSetting::get('notification_emails', env('EMAIL_CS', ''));
+        $recipients = array_values(array_filter(array_map('trim', explode(',', $raw ?? ''))));
+
+        if (empty($recipients)) {
+            return response()->json(['success' => false, 'error' => 'Belum ada email penerima yang dikonfigurasi.']);
+        }
+
+        $fromAddress = config('mail.from.address', 'ai@rshsatubumi.id');
+        $fromName    = config('mail.from.name', 'RSH Satu Bumi');
+        $to          = implode(', ', $recipients);
+
+        try {
+            Mail::html(
+                '<p style="font-family:sans-serif">Ini adalah email tes dari sistem RSH Satu Bumi.<br>Jika kamu menerima ini, konfigurasi SMTP berfungsi dengan baik.</p>',
+                function ($message) use ($recipients, $fromAddress, $fromName) {
+                    $message->from($fromAddress, $fromName)
+                            ->to($recipients)
+                            ->subject('[Tes] Email Notifikasi RSH Satu Bumi — ' . now()->format('d M Y H:i'));
+                }
+            );
+            return response()->json(['success' => true, 'to' => $to]);
+        } catch (\Throwable $e) {
+            return response()->json(['success' => false, 'error' => $e->getMessage(), 'to' => $to]);
+        }
     }
 }

@@ -135,7 +135,7 @@ class EmailService
       {$this->row('Periode', $periodName)}
       {$this->row('Tanggal', $periodDates)}
       {$this->row('Harga Program', $price)}
-      {$this->row('DP (50%)', $dp)}
+      {$this->row('DP', $dp)}
       {$this->row('Nomor Invoice', $invoiceNum)}
       {$this->row('Total Tagihan', $invoiceAmt)}
     </td>

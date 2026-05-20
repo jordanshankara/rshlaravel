@@ -78,6 +78,7 @@ Route::prefix('admin')->name('admin.')->middleware(['auth'])->group(function () 
         Route::post('/payment-detail', [Admin\PengaturanController::class, 'storePaymentDetail'])->name('payment-detail.store');
         Route::put('/payment-detail/{paymentDetail}', [Admin\PengaturanController::class, 'updatePaymentDetail'])->name('payment-detail.update');
         Route::delete('/payment-detail/{paymentDetail}', [Admin\PengaturanController::class, 'destroyPaymentDetail'])->name('payment-detail.destroy');
+        Route::post('/test-email', [Admin\PengaturanController::class, 'testEmail'])->name('test-email');
     });
 
     // Payment Detail standalone page (Admin only)
