@@ -2,7 +2,7 @@
 /**
  * RSH Satu Bumi — Safe Deploy Script
  *
- * Upload to server root, access via browser ONCE, then DELETE immediately.
+ * Upload to public_html/, access via browser ONCE, then DELETE immediately.
  * NEVER run this on a local dev machine.
  *
  * What this script does (in order):
@@ -17,12 +17,23 @@
  */
 
 // ── Bootstrap ────────────────────────────────────────────────────────────────
-define('LARAVEL_ROOT', __DIR__);
-define('ARTISAN',      PHP_BINARY . ' ' . LARAVEL_ROOT . '/artisan');
-define('COMPOSER',     PHP_BINARY . ' ' . LARAVEL_ROOT . '/vendor/bin/composer');
+// DirectAdmin layout: deploy.php lives in public_html/, Laravel root is ../laravel/
+// Standard layout: deploy.php in public/, Laravel root is parent dir.
+if (is_file(dirname(__DIR__) . '/laravel/artisan')) {
+    define('LARAVEL_ROOT', dirname(__DIR__) . '/laravel');
+} elseif (is_file(dirname(__DIR__) . '/artisan')) {
+    define('LARAVEL_ROOT', dirname(__DIR__));
+} else {
+    define('LARAVEL_ROOT', __DIR__);
+}
+
+define('ARTISAN', PHP_BINARY . ' ' . LARAVEL_ROOT . '/artisan --no-ansi');
 
 set_time_limit(300);
-ini_set('output_buffering', 0);
+ini_set('output_buffering', 'off');
+ini_set('zlib.output_compression', false);
+while (ob_get_level()) ob_end_flush();
+ob_implicit_flush(true);
 
 function run(string $cmd): array
 {
@@ -30,27 +41,28 @@ function run(string $cmd): array
     return ['cmd' => $cmd, 'output' => implode("\n", $output), 'code' => $code];
 }
 
-function ok(string $msg): void  { echo "✅ {$msg}\n"; }
-function warn(string $msg): void { echo "⚠️  {$msg}\n"; }
-function fail(string $msg): void { echo "❌ {$msg}\n"; }
-function section(string $title): void { echo "\n── {$title} " . str_repeat('─', max(0, 50 - strlen($title))) . "\n"; }
+function ok(string $msg): void   { echo "OK  {$msg}\n"; flush(); }
+function warn(string $msg): void  { echo "WRN {$msg}\n"; flush(); }
+function fail(string $msg): void  { echo "ERR {$msg}\n"; flush(); }
+function section(string $t): void { echo "\n-- {$t} " . str_repeat('-', max(0, 50 - strlen($t))) . "\n"; flush(); }
 
 header('Content-Type: text/plain; charset=utf-8');
-echo "RSH Satu Bumi — Deploy Script\n";
+header('X-Accel-Buffering: no');
+echo "RSH Satu Bumi -- Deploy Script\n";
 echo date('Y-m-d H:i:s T') . "\n";
-echo str_repeat('═', 55) . "\n";
+echo str_repeat('=', 55) . "\n";
+echo "LARAVEL_ROOT: " . LARAVEL_ROOT . "\n";
+flush();
 
 // ── Guard 1: .env must exist ─────────────────────────────────────────────────
 section('Guard: .env');
 $envPath = LARAVEL_ROOT . '/.env';
 if (!file_exists($envPath)) {
-    fail('.env file NOT found. Deploy aborted.');
-    echo "\nCreate .env from .env.example and configure all values before deploying.\n";
+    fail('.env NOT found. Deploy aborted. Create .env from .env.example first.');
     exit(1);
 }
 ok('.env exists');
 
-// Parse key env values for checks
 $envContent = file_get_contents($envPath);
 preg_match('/^APP_DEBUG\s*=\s*(.+)$/m', $envContent, $m);
 $appDebug = trim($m[1] ?? 'unknown');
@@ -58,7 +70,7 @@ preg_match('/^APP_ENV\s*=\s*(.+)$/m', $envContent, $m);
 $appEnv = trim($m[1] ?? 'unknown');
 
 if (strtolower($appDebug) === 'true') {
-    warn("APP_DEBUG=true in .env — set to false for production!");
+    warn("APP_DEBUG=true -- set to false for production!");
 } else {
     ok("APP_DEBUG={$appDebug}");
 }
@@ -70,67 +82,44 @@ $token = $_GET['confirm'] ?? '';
 if ($token !== 'DEPLOY_RSH_' . date('Ymd')) {
     warn('Missing or wrong ?confirm= token. To run deploy, append:');
     echo '  ?confirm=DEPLOY_RSH_' . date('Ymd') . "\n";
-    echo "\nThis prevents accidental execution.\n";
+    echo "This prevents accidental execution.\n";
     exit(1);
 }
 ok('Safety token verified');
+flush();
 
-// ── Step 1: Migration count before ───────────────────────────────────────────
-section('Database — Before');
-$bootstrap = require LARAVEL_ROOT . '/bootstrap/app.php';
-$app = $bootstrap->make(\Illuminate\Contracts\Console\Kernel::class);
-$app->bootstrap();
-
-try {
-    $migrationsBefore = \Illuminate\Support\Facades\DB::table('migrations')->count();
-    ok("Migrations already run: {$migrationsBefore}");
-    $dbOk = true;
-} catch (\Throwable $e) {
-    fail('DB connection failed: ' . $e->getMessage());
-    $dbOk = false;
-    $migrationsBefore = 0;
-}
-
-// ── Step 2: Composer install ─────────────────────────────────────────────────
+// ── Step 1: Composer install ─────────────────────────────────────────────────
 section('Composer Install');
 $composerBin = LARAVEL_ROOT . '/vendor/bin/composer';
 if (!file_exists($composerBin)) {
-    // Try system composer
     $composerBin = 'composer';
 }
-$result = run(PHP_BINARY . " {$composerBin} install --no-dev --optimize-autoloader --working-dir=" . LARAVEL_ROOT);
+echo "Running composer install...\n"; flush();
+$result = run(PHP_BINARY . " {$composerBin} install --no-dev --optimize-autoloader --no-interaction --working-dir=" . escapeshellarg(LARAVEL_ROOT));
 if ($result['code'] === 0) {
     ok('composer install completed');
 } else {
-    warn('composer install had issues (exit ' . $result['code'] . ')');
+    warn('composer install exit=' . $result['code']);
     echo $result['output'] . "\n";
 }
+flush();
 
-// ── Step 3: Migrate (never fresh, never seed) ────────────────────────────────
-section('Database — Migrate');
+// ── Step 2: Migrate (never fresh, never seed) ────────────────────────────────
+section('Database -- Migrate');
 echo "Running: php artisan migrate --force\n";
-echo "(Only pending migrations — existing data is safe)\n\n";
+echo "(Only pending migrations -- existing data is safe)\n\n";
+flush();
 
 $result = run(ARTISAN . ' migrate --force');
 echo $result['output'] . "\n";
 if ($result['code'] === 0) {
     ok('migrate --force completed');
 } else {
-    fail('Migration failed (exit ' . $result['code'] . ') — investigate before proceeding');
+    fail('Migration failed (exit ' . $result['code'] . ') -- investigate before proceeding');
 }
+flush();
 
-// Migration count after
-if ($dbOk) {
-    try {
-        $migrationsAfter = \Illuminate\Support\Facades\DB::table('migrations')->count();
-        $newMigrations = $migrationsAfter - $migrationsBefore;
-        ok("Migrations after: {$migrationsAfter} (+{$newMigrations} new)");
-    } catch (\Throwable $e) {
-        warn('Could not recount migrations: ' . $e->getMessage());
-    }
-}
-
-// ── Step 4: Clear caches ─────────────────────────────────────────────────────
+// ── Step 3: Clear caches ─────────────────────────────────────────────────────
 section('Clear Caches');
 foreach ([
     'config:clear'  => 'Config cache',
@@ -144,22 +133,19 @@ foreach ([
     } else {
         warn("{$label} clear failed: " . $result['output']);
     }
+    flush();
 }
 
-// ── Step 5: Storage symlink ──────────────────────────────────────────────────
+// ── Step 4: Storage symlink ──────────────────────────────────────────────────
 section('Storage Symlink');
-$symlinkPath  = LARAVEL_ROOT . '/public/storage';
-$symlinkTarget = LARAVEL_ROOT . '/storage/app/public';
+$symlinkPath = LARAVEL_ROOT . '/public/storage';
 
 if (is_link($symlinkPath)) {
-    $actual = readlink($symlinkPath);
-    ok("Symlink exists → {$actual}");
+    ok("Symlink exists -> " . readlink($symlinkPath));
 } elseif (is_dir($symlinkPath)) {
-    warn('public/storage is a directory (not a symlink) — attempting storage:link');
-    $result = run(ARTISAN . ' storage:link');
-    echo $result['output'] . "\n";
+    warn('public/storage is a real directory, not a symlink');
 } else {
-    echo "Creating storage symlink...\n";
+    echo "Creating storage symlink...\n"; flush();
     $result = run(ARTISAN . ' storage:link');
     if ($result['code'] === 0) {
         ok('storage:link created');
@@ -167,33 +153,24 @@ if (is_link($symlinkPath)) {
         warn('storage:link failed: ' . $result['output']);
     }
 }
+flush();
 
-// ── Step 6: Health summary ───────────────────────────────────────────────────
+// ── Step 5: Health summary ───────────────────────────────────────────────────
 section('Post-Deploy Health');
-
-// DB
-if ($dbOk) {
-    ok("Database: connected");
-} else {
-    fail("Database: connection failed");
-}
-
-// APP_DEBUG warning
+echo "APP_DEBUG : {$appDebug}\n";
+echo "APP_ENV   : {$appEnv}\n";
 if (strtolower($appDebug) === 'true') {
-    fail("APP_DEBUG=true — MUST be false in production (set in .env on server)");
+    fail("APP_DEBUG=true -- MUST be false in production");
 } else {
-    ok("APP_DEBUG=false ✓");
+    ok("APP_DEBUG=false");
 }
-
-// Symlink
 if (is_link($symlinkPath) || is_dir($symlinkPath)) {
     ok("Storage symlink: OK");
 } else {
-    fail("Storage symlink: MISSING — images will 404");
+    fail("Storage symlink: MISSING -- images will 404");
 }
 
-echo "\n" . str_repeat('═', 55) . "\n";
-echo "Deploy complete — " . date('H:i:s') . "\n";
-echo "\n⚠️  DELETE this file from the server now:\n";
-echo "   rm " . __FILE__ . "\n";
-echo "   or via FTP/File Manager immediately after reviewing output.\n";
+echo "\n" . str_repeat('=', 55) . "\n";
+echo "Deploy complete -- " . date('H:i:s') . "\n";
+echo "\nDELETE this file from the server now:\n";
+echo "  " . __FILE__ . "\n";
