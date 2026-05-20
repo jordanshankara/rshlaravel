@@ -44,15 +44,6 @@ return [
             'password' => env('MAIL_PASSWORD'),
             'timeout' => null,
             'local_domain' => env('MAIL_EHLO_DOMAIN'),
-            // Shared hosting: SSL cert CN is the host server name, not the custom domain.
-            // verify_peer disabled to allow STARTTLS with mismatched CN.
-            'stream' => [
-                'ssl' => [
-                    'allow_self_signed' => true,
-                    'verify_peer'       => false,
-                    'verify_peer_name'  => false,
-                ],
-            ],
         ],
 
         'ses' => [

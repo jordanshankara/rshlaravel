@@ -47,6 +47,7 @@
                          headers: { 'X-CSRF-TOKEN': '{{ csrf_token() }}', 'Accept': 'application/json' }
                      });
                      this.result = await res.json();
+                     console.log('[Test Email]', this.result);
                  } catch(e) {
                      this.result = { success: false, error: e.message };
                  }
