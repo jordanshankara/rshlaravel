@@ -81,7 +81,21 @@ $statusLabels = [
             <div class="flex gap-6">
                 <div>
                     <span class="text-xs text-gray-400 font-medium uppercase tracking-wide">BMI</span>
-                    <p class="text-gray-700 mt-0.5">{{ $registration->bmi ?? '-' }}</p>
+                    <div class="flex items-center gap-2 mt-0.5">
+                        <span class="text-gray-700">{{ $registration->bmi ? number_format($registration->bmi, 1) : '-' }}</span>
+                        @if($registration->bmi)
+                            @php
+                                $bmi = (float) $registration->bmi;
+                                [$bmiLabel, $bmiClass] = match(true) {
+                                    $bmi < 18.5 => ['Underweight', 'bg-blue-100 text-blue-700'],
+                                    $bmi < 25.0 => ['Normal',      'bg-green-100 text-green-700'],
+                                    $bmi < 30.0 => ['Overweight',  'bg-orange-100 text-orange-700'],
+                                    default     => ['Obese',       'bg-red-100 text-red-700'],
+                                };
+                            @endphp
+                            <span class="px-2 py-0.5 rounded-full text-xs font-semibold {{ $bmiClass }}">{{ $bmiLabel }}</span>
+                        @endif
+                    </div>
                 </div>
                 <div>
                     <span class="text-xs text-gray-400 font-medium uppercase tracking-wide">Tingkat Keyakinan</span>
