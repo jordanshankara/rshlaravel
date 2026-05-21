@@ -397,8 +397,8 @@ function registrationForm() {
 
         countryCode: '62',
         waNumber: '',
-        heightVal: '165',
-        weightVal: '70',
+        heightVal: '',
+        weightVal: '',
         selectedComplaints: [],
         otherComplaints: '',
         bloodSugar: '',
@@ -618,8 +618,8 @@ function registrationForm() {
                         this.form              = Object.assign(this.form, d.form || {});
                         this.waNumber          = d.waNumber || '';
                         this.countryCode       = d.countryCode || '62';
-                        this.heightVal         = d.heightVal || '165';
-                        this.weightVal         = d.weightVal || '70';
+                        this.heightVal         = d.heightVal || '';
+                        this.weightVal         = d.weightVal || '';
                         this.selectedComplaints = d.selectedComplaints || [];
                         this.otherComplaints   = d.otherComplaints || '';
                         this.bloodSugar        = d.bloodSugar || '';
