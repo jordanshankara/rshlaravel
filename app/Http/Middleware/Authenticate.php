@@ -14,4 +14,12 @@ class Authenticate extends Middleware
     {
         return $request->expectsJson() ? null : route('login');
     }
+
+    protected function unauthenticated($request, array $guards)
+    {
+        if (!$request->expectsJson() && str_starts_with($request->path(), 'admin')) {
+            abort(404);
+        }
+        parent::unauthenticated($request, $guards);
+    }
 }

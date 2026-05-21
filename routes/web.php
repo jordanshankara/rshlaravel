@@ -7,8 +7,8 @@ use App\Http\Controllers\Public\StaticPageController;
 use Illuminate\Support\Facades\Route;
 
 // ── Auth ──────────────────────────────────────────────────────
-Route::get('/login', [LoginController::class, 'showLogin'])->name('login');
-Route::post('/login', [LoginController::class, 'login'])->name('login.post');
+Route::get('/lokasamgraha', [LoginController::class, 'showLogin'])->name('login');
+Route::post('/lokasamgraha', [LoginController::class, 'login'])->name('login.post');
 Route::post('/logout', [LoginController::class, 'logout'])->name('logout');
 
 // ── Admin ─────────────────────────────────────────────────────
