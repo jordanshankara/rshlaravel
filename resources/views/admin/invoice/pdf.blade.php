@@ -96,11 +96,15 @@ table { border-collapse: collapse; }
     <tbody>
       @foreach($invoice->items as $item)
       <tr style="border-bottom:1px solid #f3f4f6;">
+        @php
+            $displayPrice    = ($isDP && $period) ? $period->price : $item->price;
+            $displaySubtotal = $displayPrice * $item->quantity * (1 - $item->discount / 100);
+        @endphp
         <td style="padding:10px 10px; font-size:12px; color:#374151;">{{ $item->description }}</td>
         <td style="padding:10px 10px; text-align:center; font-size:12px; color:#374151;">{{ $item->quantity }}</td>
-        <td style="padding:10px 10px; text-align:right; font-size:12px; color:#374151;">Rp {{ number_format($item->price, 0, ',', '.') }}</td>
+        <td style="padding:10px 10px; text-align:right; font-size:12px; color:#374151;">Rp {{ number_format($displayPrice, 0, ',', '.') }}</td>
         <td style="padding:10px 10px; text-align:right; font-size:12px; color:#9ca3af;">{{ $item->discount > 0 ? $item->discount.'%' : '-' }}</td>
-        <td style="padding:10px 10px; text-align:right; font-size:12px; font-weight:600; color:#111827;">Rp {{ number_format($item->price * $item->quantity * (1 - $item->discount / 100), 0, ',', '.') }}</td>
+        <td style="padding:10px 10px; text-align:right; font-size:12px; font-weight:600; color:#111827;">Rp {{ number_format($displaySubtotal, 0, ',', '.') }}</td>
       </tr>
       @endforeach
       <tr style="background-color:#f0fdf4; border-top:2px solid #065f46;">
