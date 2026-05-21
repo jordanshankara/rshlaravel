@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <style>
 * { margin: 0; padding: 0; box-sizing: border-box; }
-body { font-family: DejaVu Sans, sans-serif; font-size: 11px; color: #1a1a1a; background: #fff; }
+body { font-family: DejaVu Sans, sans-serif; font-size: 12px; color: #1a1a1a; background: #fff; }
 table { border-collapse: collapse; }
 </style>
 </head>
@@ -55,24 +55,24 @@ table { border-collapse: collapse; }
   <table width="100%" style="margin-bottom:18px;">
     <tr>
       <td style="width:55%; vertical-align:top; padding-right:20px;">
-        <div style="font-size:8px;text-transform:uppercase;color:#9ca3af;letter-spacing:1px;margin-bottom:5px;">Tagihan Kepada</div>
-        <div style="font-size:13px;font-weight:700;color:#111827;">{{ $invoice->client_name }}</div>
+        <div style="font-size:9px;text-transform:uppercase;color:#9ca3af;letter-spacing:1px;margin-bottom:5px;">Tagihan Kepada</div>
+        <div style="font-size:14px;font-weight:700;color:#111827;">{{ $invoice->client_name }}</div>
         @if($invoice->registration?->programPeriod)
-        <div style="font-size:10px;color:#6b7280;margin-top:3px;">{{ $invoice->registration->programPeriod->name }}</div>
+        <div style="font-size:11px;color:#6b7280;margin-top:3px;">{{ $invoice->registration->programPeriod->name }}</div>
         @endif
       </td>
       <td style="width:45%; text-align:right; vertical-align:top;">
-        <div style="font-size:8px;text-transform:uppercase;color:#9ca3af;letter-spacing:1px;margin-bottom:5px;">Tanggal Invoice</div>
-        <div style="font-size:12px;font-weight:600;color:#111827;">{{ $invoice->invoice_date->format('d F Y') }}</div>
+        <div style="font-size:9px;text-transform:uppercase;color:#9ca3af;letter-spacing:1px;margin-bottom:5px;">Tanggal Invoice</div>
+        <div style="font-size:13px;font-weight:600;color:#111827;">{{ $invoice->invoice_date->format('d F Y') }}</div>
         <div style="margin-top:7px;">
           @if($isDP)
-            <span style="display:inline-block;padding:3px 12px;border-radius:20px;font-size:9px;font-weight:700;background:#fef9c3;color:#854d0e;">DOWN PAYMENT</span>
+            <span style="display:inline-block;padding:4px 14px;border-radius:20px;font-size:10px;font-weight:700;background:#fef9c3;color:#854d0e;">DOWN PAYMENT</span>
           @elseif($invoice->payment_status === 'LUNAS')
-            <span style="display:inline-block;padding:3px 12px;border-radius:20px;font-size:9px;font-weight:700;background:#d1fae5;color:#065f46;">LUNAS</span>
+            <span style="display:inline-block;padding:4px 14px;border-radius:20px;font-size:10px;font-weight:700;background:#d1fae5;color:#065f46;">LUNAS</span>
           @elseif($invoice->payment_status === 'DIBATALKAN')
-            <span style="display:inline-block;padding:3px 12px;border-radius:20px;font-size:9px;font-weight:700;background:#f3f4f6;color:#6b7280;">DIBATALKAN</span>
+            <span style="display:inline-block;padding:4px 14px;border-radius:20px;font-size:10px;font-weight:700;background:#f3f4f6;color:#6b7280;">DIBATALKAN</span>
           @else
-            <span style="display:inline-block;padding:3px 12px;border-radius:20px;font-size:9px;font-weight:700;background:#fef3c7;color:#92400e;">BELUM LUNAS</span>
+            <span style="display:inline-block;padding:4px 14px;border-radius:20px;font-size:10px;font-weight:700;background:#fef3c7;color:#92400e;">BELUM LUNAS</span>
           @endif
         </div>
       </td>
@@ -86,26 +86,28 @@ table { border-collapse: collapse; }
   <table width="100%">
     <thead>
       <tr style="background-color:#ecfdf5;">
-        <th style="padding:8px 10px; text-align:left; font-size:9px; color:#065f46; text-transform:uppercase; letter-spacing:0.5px;">Deskripsi</th>
-        <th style="padding:8px 10px; text-align:center; font-size:9px; color:#065f46; text-transform:uppercase; letter-spacing:0.5px; width:50px;">Qty</th>
-        <th style="padding:8px 10px; text-align:right; font-size:9px; color:#065f46; text-transform:uppercase; letter-spacing:0.5px; width:115px;">Harga</th>
-        <th style="padding:8px 10px; text-align:right; font-size:9px; color:#065f46; text-transform:uppercase; letter-spacing:0.5px; width:55px;">Disc%</th>
-        <th style="padding:8px 10px; text-align:right; font-size:9px; color:#065f46; text-transform:uppercase; letter-spacing:0.5px; width:125px;">Subtotal</th>
+        <th style="padding:9px 10px; text-align:left; font-size:10px; color:#065f46; text-transform:uppercase; letter-spacing:0.5px;">Deskripsi</th>
+        <th style="padding:9px 10px; text-align:center; font-size:10px; color:#065f46; text-transform:uppercase; letter-spacing:0.5px; width:50px;">Qty</th>
+        <th style="padding:9px 10px; text-align:right; font-size:10px; color:#065f46; text-transform:uppercase; letter-spacing:0.5px; width:115px;">Harga</th>
+        <th style="padding:9px 10px; text-align:right; font-size:10px; color:#065f46; text-transform:uppercase; letter-spacing:0.5px; width:55px;">Disc%</th>
+        <th style="padding:9px 10px; text-align:right; font-size:10px; color:#065f46; text-transform:uppercase; letter-spacing:0.5px; width:125px;">Subtotal</th>
       </tr>
     </thead>
     <tbody>
       @foreach($invoice->items as $item)
       <tr style="border-bottom:1px solid #f3f4f6;">
-        <td style="padding:9px 10px; font-size:11px; color:#374151;">{{ $item->description }}</td>
-        <td style="padding:9px 10px; text-align:center; font-size:11px; color:#374151;">{{ $item->quantity }}</td>
-        <td style="padding:9px 10px; text-align:right; font-size:11px; color:#374151;">Rp {{ number_format($item->price, 0, ',', '.') }}</td>
-        <td style="padding:9px 10px; text-align:right; font-size:11px; color:#9ca3af;">{{ $item->discount > 0 ? $item->discount.'%' : '-' }}</td>
-        <td style="padding:9px 10px; text-align:right; font-size:11px; font-weight:600; color:#111827;">Rp {{ number_format($item->price * $item->quantity * (1 - $item->discount / 100), 0, ',', '.') }}</td>
+        <td style="padding:10px 10px; font-size:12px; color:#374151;">{{ $item->description }}</td>
+        <td style="padding:10px 10px; text-align:center; font-size:12px; color:#374151;">{{ $item->quantity }}</td>
+        <td style="padding:10px 10px; text-align:right; font-size:12px; color:#374151;">Rp {{ number_format($item->price, 0, ',', '.') }}</td>
+        <td style="padding:10px 10px; text-align:right; font-size:12px; color:#9ca3af;">{{ $item->discount > 0 ? $item->discount.'%' : '-' }}</td>
+        <td style="padding:10px 10px; text-align:right; font-size:12px; font-weight:600; color:#111827;">Rp {{ number_format($item->price * $item->quantity * (1 - $item->discount / 100), 0, ',', '.') }}</td>
       </tr>
       @endforeach
       <tr style="background-color:#f0fdf4; border-top:2px solid #065f46;">
-        <td colspan="4" style="padding:11px 10px; font-size:10px; font-weight:700; color:#065f46; text-transform:uppercase; letter-spacing:0.5px;">Total Tagihan</td>
-        <td style="padding:11px 10px; text-align:right; font-size:16px; font-weight:700; color:#065f46;">Rp {{ number_format($invoice->total_amount, 0, ',', '.') }}</td>
+        <td colspan="4" style="padding:12px 10px; font-size:11px; font-weight:700; color:#065f46; text-transform:uppercase; letter-spacing:0.5px;">
+          @if($isDP) Down Payment @else Total Tagihan @endif
+        </td>
+        <td style="padding:12px 10px; text-align:right; font-size:17px; font-weight:700; color:#065f46;">Rp {{ number_format($invoice->total_amount, 0, ',', '.') }}</td>
       </tr>
     </tbody>
   </table>
@@ -113,19 +115,19 @@ table { border-collapse: collapse; }
   {{-- Payment Info (only if BELUM_LUNAS) --}}
   @if($invoice->paymentDetail && $invoice->payment_status === 'BELUM_LUNAS')
   <div style="border:1px solid #d1fae5; border-radius:6px; padding:14px; margin-top:18px; background:#f0fdf4;">
-    <div style="font-size:9px; text-transform:uppercase; color:#065f46; font-weight:700; letter-spacing:0.5px; margin-bottom:9px;">Informasi Pembayaran</div>
+    <div style="font-size:10px; text-transform:uppercase; color:#065f46; font-weight:700; letter-spacing:0.5px; margin-bottom:10px;">Informasi Pembayaran</div>
     <table style="margin:0;">
       <tr>
-        <td style="padding:3px 0; color:#6b7280; width:120px; font-size:10px;">Bank</td>
-        <td style="padding:3px 0; font-weight:600; font-size:11px;">{{ $invoice->paymentDetail->bank_name }}</td>
+        <td style="padding:4px 0; color:#6b7280; width:120px; font-size:12px;">Bank</td>
+        <td style="padding:4px 0; font-weight:600; font-size:12px;">{{ $invoice->paymentDetail->bank_name }}</td>
       </tr>
       <tr>
-        <td style="padding:3px 0; color:#6b7280; font-size:10px;">No. Rekening</td>
-        <td style="padding:3px 0; font-weight:600; font-size:11px;">{{ $invoice->paymentDetail->account_number }}</td>
+        <td style="padding:4px 0; color:#6b7280; font-size:12px;">No. Rekening</td>
+        <td style="padding:4px 0; font-weight:600; font-size:12px;">{{ $invoice->paymentDetail->account_number }}</td>
       </tr>
       <tr>
-        <td style="padding:3px 0; color:#6b7280; font-size:10px;">Atas Nama</td>
-        <td style="padding:3px 0; font-weight:600; font-size:11px;">{{ $invoice->paymentDetail->account_name }}</td>
+        <td style="padding:4px 0; color:#6b7280; font-size:12px;">Atas Nama</td>
+        <td style="padding:4px 0; font-weight:600; font-size:12px;">{{ $invoice->paymentDetail->account_name }}</td>
       </tr>
     </table>
   </div>
@@ -133,20 +135,23 @@ table { border-collapse: collapse; }
 
   {{-- DP Kekurangan / Notes --}}
   @if($isDP && $remaining > 0)
-  <div style="border:1px solid #fde68a; border-radius:6px; padding:14px; margin-top:18px; background:#fefce8;">
-    <div style="font-size:9px; text-transform:uppercase; color:#854d0e; font-weight:700; letter-spacing:0.5px; margin-bottom:9px;">Perhatian — Invoice Down Payment (DP)</div>
+  <div style="border:2px solid #f59e0b; border-radius:8px; padding:18px 20px; margin-top:20px; background:#fffbeb;">
+    <div style="font-size:10px; text-transform:uppercase; color:#92400e; font-weight:700; letter-spacing:0.8px; margin-bottom:12px;">⚠ Perhatian — Invoice Down Payment (DP)</div>
     <table style="margin:0; width:100%; border-collapse:collapse;">
       <tr>
-        <td style="padding:3px 0; color:#6b7280; width:60%; font-size:10px;">Harga Program</td>
-        <td style="padding:3px 0; font-weight:600; font-size:11px; text-align:right;">Rp {{ number_format($period->price, 0, ',', '.') }}</td>
+        <td style="padding:5px 0; color:#78716c; width:60%; font-size:12px;">Harga Program</td>
+        <td style="padding:5px 0; font-weight:600; font-size:12px; text-align:right; color:#374151;">Rp {{ number_format($period->price, 0, ',', '.') }}</td>
       </tr>
       <tr>
-        <td style="padding:3px 0; color:#6b7280; font-size:10px;">DP Dibayar</td>
-        <td style="padding:3px 0; font-weight:600; font-size:11px; text-align:right;">Rp {{ number_format($invoice->total_amount, 0, ',', '.') }}</td>
+        <td style="padding:5px 0; color:#78716c; font-size:12px;">DP Dibayar</td>
+        <td style="padding:5px 0; font-weight:600; font-size:12px; text-align:right; color:#374151;">Rp {{ number_format($invoice->total_amount, 0, ',', '.') }}</td>
       </tr>
-      <tr style="border-top:1px solid #fde68a;">
-        <td style="padding:5px 0 3px; color:#854d0e; font-size:10px; font-weight:700;">Nominal Kekurangan yang Harus Dibayar</td>
-        <td style="padding:5px 0 3px; font-weight:700; font-size:13px; color:#854d0e; text-align:right;">Rp {{ number_format($remaining, 0, ',', '.') }}</td>
+      <tr>
+        <td colspan="2" style="padding:4px 0 0;"><div style="border-top:2px solid #f59e0b;"></div></td>
+      </tr>
+      <tr>
+        <td style="padding:8px 0 4px; color:#92400e; font-size:13px; font-weight:700;">Sisa yang Harus Dilunasi</td>
+        <td style="padding:8px 0 4px; font-weight:800; font-size:18px; color:#b45309; text-align:right;">Rp {{ number_format($remaining, 0, ',', '.') }}</td>
       </tr>
     </table>
   </div>
@@ -157,7 +162,7 @@ table { border-collapse: collapse; }
   @endif
 
   {{-- Footer --}}
-  <div style="margin-top:40px; text-align:center; font-size:9px; color:#9ca3af; border-top:1px solid #f3f4f6; padding-top:16px;">
+  <div style="margin-top:40px; text-align:center; font-size:10px; color:#9ca3af; border-top:1px solid #f3f4f6; padding-top:16px;">
     Terima kasih atas kepercayaan Anda &nbsp;·&nbsp; Rumah Sehat Holistik Satu Bumi
   </div>
 
