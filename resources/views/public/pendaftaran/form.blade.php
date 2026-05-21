@@ -472,6 +472,25 @@ function registrationForm() {
             this.computeHeightWeight();
         },
 
+        saveDraft() {
+            if (this.submitted) return;
+            try {
+                localStorage.setItem('rsh_draft', JSON.stringify({
+                    form: this.form,
+                    waNumber: this.waNumber,
+                    countryCode: this.countryCode,
+                    heightVal: this.heightVal,
+                    weightVal: this.weightVal,
+                    selectedComplaints: this.selectedComplaints,
+                    otherComplaints: this.otherComplaints,
+                    bloodSugar: this.bloodSugar,
+                    bloodPressure: this.bloodPressure,
+                    cholesterol: this.cholesterol,
+                    uricAcid: this.uricAcid,
+                }));
+            } catch(e) {}
+        },
+
         async submit() {
             this.buildPayload();
             if (this.selectedComplaints.length === 0) {
@@ -503,6 +522,7 @@ function registrationForm() {
                     this.period      = data.period;
                     this.submitted   = true;
                     try {
+                        localStorage.removeItem('rsh_draft');
                         localStorage.setItem('rsh_submitted', JSON.stringify({
                             regCode: this.regCode, fullName: this.fullName,
                             invoice: this.invoice, paymentDetail: this.paymentDetail,
@@ -547,7 +567,7 @@ function registrationForm() {
 
         resetForm() {
             if (!confirm('Yakin ingin mengisi ulang dari awal? Semua data akan dihapus.')) return;
-            try { localStorage.removeItem('rsh_submitted'); } catch(e) {}
+            try { localStorage.removeItem('rsh_submitted'); localStorage.removeItem('rsh_draft'); } catch(e) {}
             this.submitted = false;
             this.error = '';
             this.regCode = '';
@@ -580,15 +600,48 @@ function registrationForm() {
                 const saved = localStorage.getItem('rsh_submitted');
                 if (saved) {
                     const s = JSON.parse(saved);
-                    this.regCode      = s.regCode || '';
-                    this.fullName     = s.fullName || '';
-                    this.invoice      = s.invoice || null;
-                    this.paymentDetail= s.paymentDetail || null;
-                    this.period       = s.period || null;
-                    this.form         = Object.assign(this.form, s.form || {});
-                    this.submitted    = true;
+                    this.regCode       = s.regCode || '';
+                    this.fullName      = s.fullName || '';
+                    this.invoice       = s.invoice || null;
+                    this.paymentDetail = s.paymentDetail || null;
+                    this.period        = s.period || null;
+                    this.form          = Object.assign(this.form, s.form || {});
+                    this.submitted     = true;
                 }
             } catch(e) {}
+
+            if (!this.submitted) {
+                try {
+                    const draft = localStorage.getItem('rsh_draft');
+                    if (draft) {
+                        const d = JSON.parse(draft);
+                        this.form              = Object.assign(this.form, d.form || {});
+                        this.waNumber          = d.waNumber || '';
+                        this.countryCode       = d.countryCode || '62';
+                        this.heightVal         = d.heightVal || '165';
+                        this.weightVal         = d.weightVal || '70';
+                        this.selectedComplaints = d.selectedComplaints || [];
+                        this.otherComplaints   = d.otherComplaints || '';
+                        this.bloodSugar        = d.bloodSugar || '';
+                        this.bloodPressure     = d.bloodPressure || '';
+                        this.cholesterol       = d.cholesterol || '';
+                        this.uricAcid          = d.uricAcid || '';
+                        this.computeHeightWeight();
+                    }
+                } catch(e) {}
+
+                this.$watch('form', () => this.saveDraft(), { deep: true });
+                this.$watch('waNumber', () => this.saveDraft());
+                this.$watch('countryCode', () => this.saveDraft());
+                this.$watch('heightVal', () => this.saveDraft());
+                this.$watch('weightVal', () => this.saveDraft());
+                this.$watch('selectedComplaints', () => this.saveDraft(), { deep: true });
+                this.$watch('otherComplaints', () => this.saveDraft());
+                this.$watch('bloodSugar', () => this.saveDraft());
+                this.$watch('bloodPressure', () => this.saveDraft());
+                this.$watch('cholesterol', () => this.saveDraft());
+                this.$watch('uricAcid', () => this.saveDraft());
+            }
         }
     }
 }
