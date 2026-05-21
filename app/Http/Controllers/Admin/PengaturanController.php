@@ -34,7 +34,17 @@ class PengaturanController extends Controller
             'site_email'         => 'nullable|email',
             'site_phone'         => 'nullable|string|max:30',
             'whatsapp_number'    => 'nullable|string|max:30',
-            'notification_emails'=> 'nullable|string|max:500',
+            'notification_emails' => [
+                'nullable', 'string', 'max:500',
+                function ($attr, $value, $fail) {
+                    if (!$value) return;
+                    foreach (array_map('trim', explode(',', $value)) as $email) {
+                        if ($email && !filter_var($email, FILTER_VALIDATE_EMAIL)) {
+                            $fail("Format email tidak valid: {$email}");
+                        }
+                    }
+                },
+            ],
         ]);
 
         foreach (self::SETTING_KEYS as $key) {

@@ -61,6 +61,10 @@ class ArtikelController extends Controller
             return back()->with('error', 'API Key AI belum dikonfigurasi. Pergi ke Pengaturan → Konfigurasi AI.');
         }
 
+        if (!$this->isAllowedAiUrl($baseUrl)) {
+            return back()->with('error', 'Base URL AI tidak valid. Harus HTTPS dan bukan alamat jaringan internal.');
+        }
+
         $systemPrompt = str_replace(
             ['{topic}', '{sources}'],
             [$request->topic, $request->sources ?? '(tidak ada)'],
@@ -97,6 +101,20 @@ class ArtikelController extends Controller
 
         session(['ai_draft' => $data]);
         return redirect()->route('admin.artikel.create');
+    }
+
+    private function isAllowedAiUrl(string $url): bool
+    {
+        $parsed = parse_url($url);
+        if (!$parsed || ($parsed['scheme'] ?? '') !== 'https') return false;
+        $host = strtolower($parsed['host'] ?? '');
+        if (!$host) return false;
+        if (in_array($host, ['localhost', '::1'], true)) return false;
+        if (filter_var($host, FILTER_VALIDATE_IP)) {
+            // Reject private, loopback, and reserved IP ranges
+            return filter_var($host, FILTER_VALIDATE_IP, FILTER_FLAG_NO_PRIV_RANGE | FILTER_FLAG_NO_RES_RANGE) !== false;
+        }
+        return true;
     }
 
     private function defaultAiPrompt(): string
