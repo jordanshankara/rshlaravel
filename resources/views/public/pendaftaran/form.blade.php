@@ -369,6 +369,49 @@
 
 </form>
 
+{{-- ═══════════════════════════════ CONFIRM MODAL ═══════════════════════════════ --}}
+<div x-show="showConfirm" x-cloak
+     class="fixed inset-0 z-50 flex items-center justify-center p-4"
+     style="background:rgba(0,0,0,0.55)">
+    <div class="bg-white rounded-2xl shadow-2xl w-full max-w-md max-h-[90vh] overflow-y-auto">
+        <div class="p-6 border-b border-gray-100">
+            <h3 class="font-bold text-gray-900 text-base">Periksa Data Sebelum Daftar</h3>
+            <p class="text-xs text-gray-400 mt-1">Setelah dikirim, data tidak dapat diubah. Pastikan sudah benar.</p>
+        </div>
+        <div class="p-6 space-y-3 text-sm">
+            <div class="grid grid-cols-2 gap-x-4 gap-y-2">
+                <span class="text-gray-500">Nama</span>
+                <span class="font-medium text-gray-900" x-text="form.full_name || '-'"></span>
+                <span class="text-gray-500">Tanggal Lahir</span>
+                <span class="font-medium text-gray-900" x-text="form.birth_date || '-'"></span>
+                <span class="text-gray-500">WhatsApp</span>
+                <span class="font-medium text-gray-900" x-text="(countryCode && waNumber) ? '+' + countryCode + waNumber : '-'"></span>
+                <span class="text-gray-500">Tinggi / Berat</span>
+                <span class="font-medium text-gray-900" x-text="form.height_weight || '-'"></span>
+                <span class="text-gray-500">Pekerjaan</span>
+                <span class="font-medium text-gray-900" x-text="form.occupation || '-'"></span>
+                <span class="text-gray-500">Periode</span>
+                <span class="font-medium text-gray-900" x-text="confirmPeriodName"></span>
+            </div>
+            <div class="pt-2 border-t border-gray-100">
+                <span class="text-gray-500">Keluhan</span>
+                <p class="font-medium text-gray-900 mt-1 text-xs leading-relaxed" x-text="selectedComplaints.join(', ') + (otherComplaints ? ', ' + otherComplaints : '')"></p>
+            </div>
+        </div>
+        <div class="p-6 border-t border-gray-100 flex gap-3">
+            <button type="button" @click="showConfirm = false"
+                    class="flex-1 py-2.5 border border-gray-300 text-gray-700 font-semibold rounded-xl text-sm hover:bg-gray-50 transition">
+                ← Kembali Edit
+            </button>
+            <button type="button" @click="doSubmit()" :disabled="loading"
+                    class="flex-1 py-2.5 bg-[#1a6b2f] text-white font-bold rounded-xl text-sm hover:bg-[#0d3d1a] disabled:opacity-50 transition">
+                <span x-show="!loading">Kirim Pendaftaran</span>
+                <span x-show="loading">Mengirim...</span>
+            </button>
+        </div>
+    </div>
+</div>
+
 </div>
 </section>
 
@@ -383,6 +426,7 @@ function registrationForm() {
         error: '',
         showInvoice: true,
         showFormData: false,
+        showConfirm: false,
 
         regCode: '',
         fullName: '',
@@ -426,6 +470,15 @@ function registrationForm() {
             health_complaints: '', clinical_details: '-',
             emotion_state: '', food_allergies: '', treatment_history: '',
             current_meds: '', confidence_level: '',
+        },
+
+        get confirmPeriodName() {
+            const id = this.form.program_period_id;
+            if (!id) return '-';
+            const el = document.querySelector('input[type="radio"][value="' + id + '"]');
+            if (!el) return 'Periode #' + id;
+            const label = el.closest('label');
+            return label ? label.querySelector('.font-semibold')?.textContent?.trim() || '-' : '-';
         },
 
         get waLink() {
@@ -491,13 +544,17 @@ function registrationForm() {
             } catch(e) {}
         },
 
-        async submit() {
+        submit() {
             this.buildPayload();
             if (this.selectedComplaints.length === 0) {
                 this.error = 'Pilih minimal satu keluhan kesehatan.';
                 return;
             }
             this.error = '';
+            this.showConfirm = true;
+        },
+
+        async doSubmit() {
             this.loading = true;
             try {
                 const payload = { ...this.form };
@@ -521,6 +578,7 @@ function registrationForm() {
                     this.paymentDetail = data.payment_detail;
                     this.period      = data.period;
                     this.submitted   = true;
+                    this.showConfirm = false;
                     try {
                         localStorage.removeItem('rsh_draft');
                         localStorage.setItem('rsh_submitted', JSON.stringify({
@@ -532,9 +590,11 @@ function registrationForm() {
                     window.scrollTo({ top: 0, behavior: 'smooth' });
                 } else {
                     this.error = data.error || 'Terjadi kesalahan.';
+                    this.showConfirm = false;
                 }
             } catch(e) {
                 this.error = 'Terjadi kesalahan jaringan. Silakan coba lagi.';
+                this.showConfirm = false;
             }
             this.loading = false;
         },

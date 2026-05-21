@@ -94,7 +94,6 @@ class EmailService
 <tr><td align="center">
 <table width="600" cellpadding="0" cellspacing="0" style="background:#ffffff;border-radius:12px;overflow:hidden;max-width:600px;width:100%">
 
-  {{-- Header --}}
   <tr>
     <td style="background:linear-gradient(135deg,#166534,#15803d);padding:32px 40px;text-align:center">
       <p style="color:#86efac;font-size:12px;font-weight:bold;letter-spacing:2px;margin:0 0 8px">PENDAFTARAN BARU</p>
@@ -103,7 +102,6 @@ class EmailService
     </td>
   </tr>
 
-  {{-- Registration Code --}}
   <tr>
     <td style="padding:32px 40px 0;text-align:center">
       <p style="color:#6b7280;font-size:12px;font-weight:bold;letter-spacing:1px;text-transform:uppercase;margin:0 0 10px">Kode Pendaftaran</p>
@@ -114,7 +112,6 @@ class EmailService
     </td>
   </tr>
 
-  {{-- Personal Data --}}
   <tr>
     <td style="padding:28px 40px 0">
       <p style="font-size:11px;font-weight:bold;color:#6b7280;text-transform:uppercase;letter-spacing:1px;border-bottom:2px solid #e5e7eb;padding-bottom:8px;margin:0 0 16px">Data Diri</p>
@@ -128,7 +125,6 @@ class EmailService
     </td>
   </tr>
 
-  {{-- Program --}}
   <tr>
     <td style="padding:24px 40px 0">
       <p style="font-size:11px;font-weight:bold;color:#6b7280;text-transform:uppercase;letter-spacing:1px;border-bottom:2px solid #e5e7eb;padding-bottom:8px;margin:0 0 16px">Program</p>
@@ -141,7 +137,6 @@ class EmailService
     </td>
   </tr>
 
-  {{-- Health Data --}}
   <tr>
     <td style="padding:24px 40px 0">
       <p style="font-size:11px;font-weight:bold;color:#6b7280;text-transform:uppercase;letter-spacing:1px;border-bottom:2px solid #e5e7eb;padding-bottom:8px;margin:0 0 16px">Data Kesehatan</p>
@@ -155,7 +150,6 @@ class EmailService
     </td>
   </tr>
 
-  {{-- Footer --}}
   <tr>
     <td style="padding:32px 40px;text-align:center;border-top:1px solid #e5e7eb;margin-top:28px">
       <p style="color:#9ca3af;font-size:12px;margin:0">Email ini dibuat otomatis oleh sistem RSH Satu Bumi.</p>
