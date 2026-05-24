@@ -35,6 +35,14 @@ $statusLabels = [
             @endforeach
         </select>
         <button type="submit" class="px-4 py-2 bg-[#2d6a4f] text-white text-sm rounded-lg hover:bg-[#1a5a3f] transition-colors whitespace-nowrap flex-shrink-0">Cari</button>
+        <a href="{{ route('admin.registrasi.export', request()->query()) }}"
+           title="Export data yang tampil ke CSV"
+           class="px-3 py-2 border border-gray-300 rounded-lg text-sm text-gray-600 hover:bg-gray-50 hover:border-gray-400 transition-colors whitespace-nowrap flex-shrink-0 inline-flex items-center gap-1.5">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3M3 17V7a2 2 0 012-2h6l2 2h6a2 2 0 012 2v8a2 2 0 01-2 2H5a2 2 0 01-2-2z"/>
+            </svg>
+            CSV
+        </a>
     </div>
 </form>
 

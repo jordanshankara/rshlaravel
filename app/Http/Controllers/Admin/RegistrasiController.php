@@ -112,6 +112,50 @@ class RegistrasiController extends Controller
         return back()->with('success', 'Jadwal berhasil diperbarui ke periode ' . $newPeriod->name . '.');
     }
 
+    public function export(Request $request)
+    {
+        $query = Registration::with('programPeriod')
+            ->when($request->get('search'), fn($q, $s) => $q->where(fn($q) =>
+                $q->where('full_name', 'like', "%{$s}%")
+                  ->orWhere('registration_code', 'like', "%{$s}%")
+                  ->orWhere('whatsapp', 'like', "%{$s}%")
+            ))
+            ->when($request->get('status'), fn($q, $s) => $q->where('status', $s))
+            ->when($request->get('period_id'), fn($q, $p) => $q->where('program_period_id', $p))
+            ->orderByDesc('submitted_at');
+
+        $filename = 'registrasi_' . now()->format('Ymd_His') . '.csv';
+
+        return response()->streamDownload(function () use ($query) {
+            $handle = fopen('php://output', 'w');
+            fputs($handle, "\xEF\xBB\xBF"); // UTF-8 BOM for Excel
+            fputcsv($handle, [
+                'Kode', 'Nama Lengkap', 'Tanggal Lahir', 'Pekerjaan',
+                'WhatsApp', 'Program', 'Tanggal Daftar', 'Status', 'BMI',
+                'Keluhan Utama', 'Alergi Makanan', 'Obat Saat Ini',
+            ]);
+            $query->chunk(200, function ($rows) use ($handle) {
+                foreach ($rows as $r) {
+                    fputcsv($handle, [
+                        $r->registration_code,
+                        $r->full_name,
+                        $r->birth_date?->format('d/m/Y'),
+                        $r->occupation,
+                        $r->whatsapp,
+                        $r->programPeriod?->name,
+                        $r->submitted_at?->format('d/m/Y H:i'),
+                        $r->status,
+                        $r->bmi,
+                        $r->health_complaints,
+                        $r->food_allergies,
+                        $r->current_meds,
+                    ]);
+                }
+            });
+            fclose($handle);
+        }, $filename, ['Content-Type' => 'text/csv']);
+    }
+
     public function getAvailablePeriods(Registration $registration)
     {
         $periods = ProgramPeriod::where('is_active', true)

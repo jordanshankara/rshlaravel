@@ -36,6 +36,41 @@
     @endforeach
 </div>
 
+{{-- Charts --}}
+<div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6">
+    {{-- Trend line chart (2/3 width) --}}
+    <div class="lg:col-span-2 bg-white rounded-xl border border-gray-200 shadow-sm p-5">
+        <h2 class="font-semibold text-gray-800 mb-4">Tren 6 Bulan Terakhir</h2>
+        <div class="relative" style="height:220px">
+            <canvas id="trendChart"></canvas>
+        </div>
+    </div>
+
+    {{-- Status donut chart (1/3 width) --}}
+    <div class="bg-white rounded-xl border border-gray-200 shadow-sm p-5">
+        <h2 class="font-semibold text-gray-800 mb-4">Status Pendaftaran</h2>
+        <div class="relative flex items-center justify-center" style="height:160px">
+            <canvas id="statusChart"></canvas>
+        </div>
+        <div class="mt-4 space-y-1.5">
+            @foreach([
+                ['Pending','bg-amber-400',$stats['pending_payment']],
+                ['DP / Konfirmasi','bg-emerald-500',$stats['confirmed']],
+                ['Lunas','bg-green-600',$stats['fully_paid']],
+                ['Dibatalkan','bg-gray-300',$stats['cancelled']],
+            ] as [$lbl,$clr,$val])
+            <div class="flex items-center justify-between text-xs">
+                <div class="flex items-center gap-1.5">
+                    <span class="w-2.5 h-2.5 rounded-full {{ $clr }} flex-shrink-0"></span>
+                    <span class="text-gray-600">{{ $lbl }}</span>
+                </div>
+                <span class="font-semibold text-gray-700">{{ $val }}</span>
+            </div>
+            @endforeach
+        </div>
+    </div>
+</div>
+
 <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
     {{-- Recent Registrations --}}
     <div class="bg-white rounded-xl border border-gray-200 shadow-sm">
@@ -102,3 +137,119 @@
     </div>
 </div>
 @endsection
+
+@push('scripts')
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4/dist/chart.umd.min.js"></script>
+<script>
+(function () {
+    const labels      = @json($chartLabels);
+    const regData     = @json($chartReg);
+    const revData     = @json($chartRevenue);
+    const statusData  = @json([
+        $stats['pending_payment'],
+        $stats['confirmed'],
+        $stats['fully_paid'],
+        $stats['cancelled'],
+    ]);
+
+    // ── Trend line chart ────────────────────────────────────────
+    new Chart(document.getElementById('trendChart'), {
+        type: 'line',
+        data: {
+            labels,
+            datasets: [
+                {
+                    label: 'Pendaftar',
+                    data: regData,
+                    borderColor: '#2d6a4f',
+                    backgroundColor: 'rgba(45,106,79,0.08)',
+                    borderWidth: 2,
+                    pointBackgroundColor: '#2d6a4f',
+                    pointRadius: 4,
+                    tension: 0.35,
+                    yAxisID: 'yReg',
+                    fill: true,
+                },
+                {
+                    label: 'Pendapatan (Rp)',
+                    data: revData,
+                    borderColor: '#f59e0b',
+                    backgroundColor: 'rgba(245,158,11,0.06)',
+                    borderWidth: 2,
+                    pointBackgroundColor: '#f59e0b',
+                    pointRadius: 4,
+                    tension: 0.35,
+                    yAxisID: 'yRev',
+                    fill: true,
+                },
+            ],
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            interaction: { mode: 'index', intersect: false },
+            plugins: {
+                legend: { position: 'top', labels: { font: { size: 11 }, boxWidth: 12 } },
+                tooltip: {
+                    callbacks: {
+                        label: function (ctx) {
+                            if (ctx.datasetIndex === 1) {
+                                return ' Rp ' + ctx.parsed.y.toLocaleString('id-ID');
+                            }
+                            return ' ' + ctx.parsed.y + ' orang';
+                        },
+                    },
+                },
+            },
+            scales: {
+                yReg: {
+                    type: 'linear', position: 'left',
+                    ticks: { stepSize: 1, font: { size: 10 } },
+                    grid: { color: 'rgba(0,0,0,0.05)' },
+                    beginAtZero: true,
+                    title: { display: true, text: 'Pendaftar', font: { size: 10 } },
+                },
+                yRev: {
+                    type: 'linear', position: 'right',
+                    ticks: {
+                        font: { size: 10 },
+                        callback: v => 'Rp ' + (v >= 1000000 ? (v / 1000000).toFixed(1) + 'jt' : v.toLocaleString('id-ID')),
+                    },
+                    grid: { drawOnChartArea: false },
+                    beginAtZero: true,
+                    title: { display: true, text: 'Pendapatan', font: { size: 10 } },
+                },
+                x: { ticks: { font: { size: 10 } }, grid: { display: false } },
+            },
+        },
+    });
+
+    // ── Status donut chart ──────────────────────────────────────
+    new Chart(document.getElementById('statusChart'), {
+        type: 'doughnut',
+        data: {
+            labels: ['Pending', 'DP / Konfirmasi', 'Lunas', 'Dibatalkan'],
+            datasets: [{
+                data: statusData,
+                backgroundColor: ['#fbbf24', '#10b981', '#16a34a', '#d1d5db'],
+                borderWidth: 2,
+                borderColor: '#fff',
+            }],
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            cutout: '68%',
+            plugins: {
+                legend: { display: false },
+                tooltip: {
+                    callbacks: {
+                        label: ctx => ' ' + ctx.label + ': ' + ctx.parsed,
+                    },
+                },
+            },
+        },
+    });
+})();
+</script>
+@endpush

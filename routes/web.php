@@ -19,6 +19,7 @@ Route::prefix('admin')->name('admin.')->middleware(['auth'])->group(function () 
     // Registrasi (Admin only)
     Route::prefix('registrasi')->name('registrasi.')->middleware('admin')->group(function () {
         Route::get('/', [Admin\RegistrasiController::class, 'index'])->name('index');
+        Route::get('/export', [Admin\RegistrasiController::class, 'export'])->name('export');
         Route::get('/{registration}', [Admin\RegistrasiController::class, 'show'])->name('show');
         Route::patch('/{registration}/status', [Admin\RegistrasiController::class, 'updateStatus'])->name('update-status');
         Route::post('/{registration}/reschedule', [Admin\RegistrasiController::class, 'reschedule'])->name('reschedule');
@@ -28,6 +29,7 @@ Route::prefix('admin')->name('admin.')->middleware(['auth'])->group(function () 
     // Invoice (Admin only)
     Route::prefix('invoice')->name('invoice.')->middleware('admin')->group(function () {
         Route::get('/', [Admin\InvoiceController::class, 'index'])->name('index');
+        Route::get('/export', [Admin\InvoiceController::class, 'export'])->name('export');
         Route::get('/create', [Admin\InvoiceController::class, 'create'])->name('create');
         Route::post('/', [Admin\InvoiceController::class, 'store'])->name('store');
         Route::get('/{invoice}', [Admin\InvoiceController::class, 'show'])->name('show');

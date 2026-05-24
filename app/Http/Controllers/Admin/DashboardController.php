@@ -33,6 +33,31 @@ class DashboardController extends Controller
             ->orderBy('start_date')
             ->get();
 
-        return view('admin.dashboard', compact('stats', 'recentRegistrations', 'activePeriods'));
+        // ── Chart data: last 6 months ────────────────────────────────────────
+        $months = collect(range(5, 0))->map(fn($i) => now()->startOfMonth()->subMonths($i));
+
+        $regByMonth = Registration::selectRaw('YEAR(submitted_at) y, MONTH(submitted_at) m, COUNT(*) n')
+            ->where('submitted_at', '>=', now()->subMonths(5)->startOfMonth())
+            ->groupBy('y', 'm')
+            ->get()
+            ->keyBy(fn($r) => "{$r->y}-{$r->m}");
+
+        $revenueByMonth = Invoice::selectRaw('YEAR(invoice_date) y, MONTH(invoice_date) m, SUM(total_amount) total')
+            ->where('payment_status', 'LUNAS')
+            ->where('invoice_date', '>=', now()->subMonths(5)->startOfMonth())
+            ->groupBy('y', 'm')
+            ->get()
+            ->keyBy(fn($r) => "{$r->y}-{$r->m}");
+
+        $indonesianMonths = ['', 'Jan', 'Feb', 'Mar', 'Apr', 'Mei', 'Jun', 'Jul', 'Agu', 'Sep', 'Okt', 'Nov', 'Des'];
+
+        $chartLabels  = $months->map(fn($d) => $indonesianMonths[$d->month] . ' ' . $d->year)->values();
+        $chartReg     = $months->map(fn($d) => (int) ($regByMonth["{$d->year}-{$d->month}"]->n ?? 0))->values();
+        $chartRevenue = $months->map(fn($d) => (float) ($revenueByMonth["{$d->year}-{$d->month}"]->total ?? 0))->values();
+
+        return view('admin.dashboard', compact(
+            'stats', 'recentRegistrations', 'activePeriods',
+            'chartLabels', 'chartReg', 'chartRevenue'
+        ));
     }
 }

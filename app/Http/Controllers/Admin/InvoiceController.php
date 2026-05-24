@@ -44,6 +44,41 @@ class InvoiceController extends Controller
         return view('admin.invoice.index', compact('invoices', 'counts', 'totalCount', 'totalRevenue', 'unpaidCount'));
     }
 
+    public function export(Request $request)
+    {
+        $query = Invoice::with(['registration.programPeriod'])
+            ->when($request->get('search'), fn($q, $s) => $q->where(fn($q) =>
+                $q->where('invoice_number', 'like', "%{$s}%")
+                  ->orWhere('client_name', 'like', "%{$s}%")
+            ))
+            ->when($request->get('status'), fn($q, $s) => $q->where('payment_status', $s))
+            ->orderByDesc('invoice_date');
+
+        $filename = 'invoice_' . now()->format('Ymd_His') . '.csv';
+
+        return response()->streamDownload(function () use ($query) {
+            $handle = fopen('php://output', 'w');
+            fputs($handle, "\xEF\xBB\xBF"); // UTF-8 BOM for Excel
+            fputcsv($handle, [
+                'No. Invoice', 'Nama Klien', 'Tanggal Invoice',
+                'Program', 'Total (Rp)', 'Status Bayar',
+            ]);
+            $query->chunk(200, function ($rows) use ($handle) {
+                foreach ($rows as $inv) {
+                    fputcsv($handle, [
+                        $inv->invoice_number,
+                        $inv->client_name,
+                        $inv->invoice_date?->format('d/m/Y'),
+                        $inv->registration?->programPeriod?->name ?? '-',
+                        $inv->total_amount,
+                        $inv->payment_status,
+                    ]);
+                }
+            });
+            fclose($handle);
+        }, $filename, ['Content-Type' => 'text/csv']);
+    }
+
     public function show(Invoice $invoice)
     {
         $invoice->load('items', 'paymentDetail', 'author', 'registration.programPeriod');
