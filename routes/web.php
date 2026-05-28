@@ -3,6 +3,7 @@
 use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\Admin;
 use App\Http\Controllers\Public as Pub;
+use App\Http\Controllers\Public\MonitoringController;
 use App\Http\Controllers\Public\StaticPageController;
 use Illuminate\Support\Facades\Route;
 
@@ -106,6 +107,21 @@ Route::prefix('admin')->name('admin.')->middleware(['auth'])->group(function () 
         Route::delete('/{invoiceProduct}', [Admin\InvoiceProductController::class, 'destroy'])->name('destroy');
         Route::patch('/{invoiceProduct}/toggle', [Admin\InvoiceProductController::class, 'toggle'])->name('toggle');
     });
+
+    // Peserta Program (Admin only)
+    Route::prefix('peserta')->name('peserta.')->middleware('admin')->group(function () {
+        Route::get('/', [Admin\PesertaController::class, 'index'])->name('index');
+        Route::get('/{id}', [Admin\PesertaController::class, 'show'])->name('show');
+        Route::post('/{id}/hadir', [Admin\PesertaController::class, 'markPresent'])->name('hadir');
+        Route::delete('/{id}/monitoring/{day}', [Admin\PesertaController::class, 'resetDay'])->name('reset-day');
+        Route::post('/{id}/reregister-link', [Admin\PesertaController::class, 'createReregLink'])->name('reregister-link');
+    });
+
+    // Monitoring Dashboard (Admin only)
+    Route::prefix('monitoring')->name('monitoring.')->middleware('admin')->group(function () {
+        Route::get('/', [Admin\MonitoringDashboardController::class, 'index'])->name('index');
+        Route::get('/period/{id}/export', [Admin\MonitoringDashboardController::class, 'export'])->name('export');
+    });
 });
 
 // ── Public ───────────────────────────────────────────────────
@@ -131,4 +147,11 @@ Route::prefix('daftar')->name('daftar.')->group(function () {
     Route::get('/invoice/{code}', [Pub\PendaftaranController::class, 'downloadInvoice'])->name('invoice');
     Route::get('/cek', [Pub\PendaftaranController::class, 'confirm'])->name('confirm');
     Route::post('/cek', [Pub\PendaftaranController::class, 'checkCode'])->name('check');
+    Route::get('/kembali/{token}', [Pub\PendaftaranController::class, 'reregister'])->name('reregister');
+    Route::post('/kembali/{token}', [Pub\PendaftaranController::class, 'storeReregister'])->name('reregister.store');
 });
+
+// ── Public Monitoring (tokenized, no auth) ────────────────────
+Route::get('/monitoring/{token}', [MonitoringController::class, 'show'])->name('monitoring.show');
+Route::post('/monitoring/{token}', [MonitoringController::class, 'store'])->name('monitoring.store');
+Route::get('/monitoring/{token}/selesai', [MonitoringController::class, 'thankyou'])->name('monitoring.thankyou');

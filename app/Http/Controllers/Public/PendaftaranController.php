@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Public;
 use App\Http\Controllers\Controller;
 use App\Models\ProgramPeriod;
 use App\Models\Registration;
+use App\Models\ReregistrationToken;
 use App\Models\SiteSetting;
 use App\Services\EmailService;
 use App\Services\RegistrationInvoiceService;
@@ -307,6 +308,122 @@ class PendaftaranController extends Controller
             default      => 'BELUM-LUNAS',
         };
         return $pdf->download("Invoice-{$invoice->invoice_number}-{$statusLabel}.pdf");
+    }
+
+    // ── Re-registration ─────────────────────────────────────────────────────────
+
+    public function reregister(string $token)
+    {
+        $reregToken = ReregistrationToken::where('token', $token)
+            ->with('registration.programPeriod')
+            ->firstOrFail();
+
+        if (!$reregToken->isValid()) {
+            return view('public.pendaftaran.reregister-invalid', [
+                'reason' => $reregToken->isUsed() ? 'used' : 'expired',
+            ]);
+        }
+
+        $periods = ProgramPeriod::where('is_active', true)
+            ->where('id', '!=', $reregToken->registration->program_period_id)
+            ->withCount(['registrations as filled' => fn($q) => $q->whereNotIn('status', ['CANCELLED'])])
+            ->orderBy('start_date')
+            ->get()
+            ->filter(fn($p) => $p->filled < $p->quota);
+
+        $settings = SiteSetting::getMany(['bank_name', 'bank_account_number', 'bank_account_name']);
+
+        return view('public.pendaftaran.reregister', [
+            'reregToken'   => $reregToken,
+            'registration' => $reregToken->registration,
+            'periods'      => $periods,
+            'settings'     => $settings,
+        ]);
+    }
+
+    public function storeReregister(string $token, Request $request)
+    {
+        $reregToken = ReregistrationToken::where('token', $token)
+            ->with('registration')
+            ->firstOrFail();
+
+        if (!$reregToken->isValid()) {
+            abort(410, 'Link re-registrasi sudah tidak valid.');
+        }
+
+        $request->validate([
+            'program_period_id' => 'required|exists:program_periods,id',
+            'height_weight'     => 'required|string|max:100',
+            'health_complaints' => 'required|string',
+            'clinical_details'  => 'nullable|string',
+            'bmi'               => 'nullable|numeric',
+            'emotion_state'     => 'required|string',
+            'food_allergies'    => 'required|string',
+            'treatment_history' => 'required|string',
+            'current_meds'      => 'required|string',
+            'confidence_level'  => 'required|integer|min:1|max:5',
+        ]);
+
+        $old = $reregToken->registration;
+
+        try {
+            $newReg = DB::transaction(function () use ($request, $old, $reregToken) {
+                $period = ProgramPeriod::lockForUpdate()->findOrFail($request->program_period_id);
+
+                if (!$period->is_active) {
+                    throw new \Exception('PERIOD_INACTIVE');
+                }
+                $filled = $period->registrations()->whereNotIn('status', ['CANCELLED'])->count();
+                if ($filled >= $period->quota) {
+                    throw new \Exception('QUOTA_FULL');
+                }
+
+                $reg = Registration::create([
+                    'registration_code' => $this->generateCode(),
+                    'full_name'         => $old->full_name,
+                    'birth_date'        => $old->birth_date,
+                    'occupation'        => $old->occupation,
+                    'whatsapp'          => $old->whatsapp,
+                    'address'           => $old->address,
+                    'height_weight'     => $request->height_weight,
+                    'program_period_id' => $request->program_period_id,
+                    'health_complaints' => $request->health_complaints,
+                    'clinical_details'  => $request->clinical_details,
+                    'bmi'               => $request->bmi,
+                    'emotion_state'     => $request->emotion_state,
+                    'food_allergies'    => $request->food_allergies,
+                    'treatment_history' => $request->treatment_history,
+                    'current_meds'      => $request->current_meds,
+                    'confidence_level'  => $request->confidence_level,
+                    'status'            => 'PENDING_PAYMENT',
+                    'submitted_at'      => now(),
+                ]);
+
+                $reregToken->update([
+                    'used_at'             => now(),
+                    'new_registration_id' => $reg->id,
+                ]);
+
+                return $reg;
+            });
+
+            // Sync invoice (non-critical)
+            try {
+                $this->invoiceService->syncInvoice($newReg->load('programPeriod', 'invoice'));
+            } catch (\Throwable) {}
+
+            return redirect()->route('daftar.confirm')
+                ->with('reregistered', $newReg->registration_code);
+
+        } catch (\Exception $e) {
+            return back()->withErrors([
+                'general' => match ($e->getMessage()) {
+                    'QUOTA_FULL'      => 'Kuota periode yang dipilih sudah penuh.',
+                    'PERIOD_INACTIVE' => 'Periode program tidak aktif.',
+                    default           => 'Terjadi kesalahan. Silakan coba lagi.',
+                },
+            ])->withInput();
+        }
     }
 
     private function generateCode(): string
