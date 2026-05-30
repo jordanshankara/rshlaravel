@@ -108,6 +108,19 @@ Route::prefix('admin')->name('admin.')->middleware(['auth'])->group(function () 
         Route::patch('/{invoiceProduct}/toggle', [Admin\InvoiceProductController::class, 'toggle'])->name('toggle');
     });
 
+    // Database Kontak (Admin only)
+    Route::prefix('kontak')->name('kontak.')->middleware('admin')->group(function () {
+        Route::get('/',               [Admin\ContactController::class, 'index'])->name('index');
+        Route::get('/create',         [Admin\ContactController::class, 'create'])->name('create');
+        Route::post('/',              [Admin\ContactController::class, 'store'])->name('store');
+        Route::get('/import',         [Admin\ContactController::class, 'importForm'])->name('import');
+        Route::post('/import',        [Admin\ContactController::class, 'importStore'])->name('import.store');
+        Route::get('/{contact}/edit', [Admin\ContactController::class, 'edit'])->name('edit');
+        Route::put('/{contact}',      [Admin\ContactController::class, 'update'])->name('update');
+        Route::delete('/{contact}',   [Admin\ContactController::class, 'destroy'])->name('destroy');
+        Route::post('/{contact}/log', [Admin\ContactController::class, 'log'])->name('log');
+    });
+
     // Peserta Program (Admin only)
     Route::prefix('peserta')->name('peserta.')->middleware('admin')->group(function () {
         Route::get('/', [Admin\PesertaController::class, 'index'])->name('index');
