@@ -29,8 +29,9 @@
             <div class="inline-flex flex-col items-center bg-white/10 border border-white/20 rounded-2xl px-8 py-5 mb-6">
                 <p class="text-green-300 text-base font-medium mb-1">Energy Level</p>
                 <div class="flex items-baseline gap-2">
+                    <span class="text-green-300 text-xl font-semibold">Hari</span>
                     <span class="text-7xl font-extrabold text-white leading-none">{{ $token->day_number }}</span>
-                    <span class="text-2xl text-green-300 font-medium">/ {{ config('monitoring.days', 7) }}</span>
+                    <span class="text-xl text-green-300 font-medium">dari {{ config('monitoring.days', 7) }}</span>
                 </div>
                 <p class="text-green-200 text-base mt-1">berhasil disimpan ✓</p>
             </div>
