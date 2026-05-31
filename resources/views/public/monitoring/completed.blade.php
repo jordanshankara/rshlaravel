@@ -6,44 +6,46 @@
     <title>Sudah Diisi — RSH Satu Bumi</title>
     <script src="https://cdn.tailwindcss.com"></script>
 </head>
-<body class="bg-gray-50 min-h-screen flex items-start justify-center px-4 py-10">
-<div class="max-w-md w-full">
+<body class="min-h-screen">
 
-    <div class="bg-white rounded-2xl border border-gray-200 shadow-sm p-6 text-center mb-5">
-        <div class="text-4xl mb-3">✅</div>
-        <h1 class="text-base font-bold text-gray-900 mb-1">Sudah Diisi</h1>
-        <p class="text-sm text-gray-500">
-            Anda sudah mengisi Energy Level hari ke-<strong>{{ $token->day_number }}</strong>
-            pada {{ $token->completed_at->translatedFormat('d F Y, H:i') }}.
+    <div class="min-h-screen relative flex flex-col items-center justify-center px-5 py-12"
+         style="background: url('{{ asset('assets/env/building.jpg') }}') center center / cover no-repeat;">
+
+        <div class="absolute inset-0" style="background: rgba(13, 43, 30, 0.78);"></div>
+
+        <div class="relative z-10 max-w-sm w-full text-center">
+
+            <img src="{{ asset('assets/logo/logo-rec-white.png') }}"
+                 alt="RSH Satu Bumi"
+                 class="h-10 w-auto object-contain mx-auto mb-10 opacity-90">
+
+            <div class="text-5xl mb-6">✅</div>
+
+            <h1 class="text-2xl font-bold text-white mb-3">
+                Sudah Diisi
+            </h1>
+            <p class="text-green-200 text-sm leading-relaxed mb-2">
+                Anda sudah mengisi Energy Level
+                hari ke-<strong class="text-white">{{ $token->day_number }}</strong>
+                pada {{ $token->completed_at->setTimezone('Asia/Jakarta')->format('d M Y') }}.
+            </p>
+            <p class="text-green-300/70 text-sm leading-relaxed mb-10">
+                Terima kasih atas partisipasi Anda. 🙏
+            </p>
+
+            <div class="border-t border-white/10 mb-10"></div>
+
+            <a href="{{ route('home') }}"
+               class="inline-flex items-center gap-2 px-8 py-3.5 bg-white text-[#2d6a4f] font-semibold rounded-full text-sm hover:bg-green-50 transition-colors shadow-lg">
+                ← Kembali ke Beranda
+            </a>
+        </div>
+
+        <p class="relative z-10 mt-12 text-white/30 text-xs">
+            Rumah Sehat Holistik Satu Bumi &copy; {{ date('Y') }}
         </p>
+
     </div>
 
-    {{-- Summary --}}
-    <div class="grid grid-cols-2 gap-3 mb-5">
-        @php
-            $emosiColor = $emosiLevel['color'] === 'green' ? 'bg-green-50 border-green-200 text-green-800'
-                : ($emosiLevel['color'] === 'yellow' ? 'bg-yellow-50 border-yellow-200 text-yellow-800'
-                : 'bg-red-50 border-red-200 text-red-800');
-            $fisikColor = $fisikLevel['color'] === 'green' ? 'bg-green-50 border-green-200 text-green-800'
-                : ($fisikLevel['color'] === 'yellow' ? 'bg-yellow-50 border-yellow-200 text-yellow-800'
-                : 'bg-red-50 border-red-200 text-red-800');
-        @endphp
-        <div class="rounded-xl border p-4 text-center {{ $emosiColor }}">
-            <p class="text-xs font-medium opacity-70 mb-1">Emosi & Pikiran</p>
-            <p class="text-2xl font-bold">{{ $emosiScore }}<span class="text-sm font-normal">/16</span></p>
-            <p class="text-xs font-semibold mt-1">{{ $emosiLevel['label'] }}</p>
-        </div>
-        <div class="rounded-xl border p-4 text-center {{ $fisikColor }}">
-            <p class="text-xs font-medium opacity-70 mb-1">Kondisi Fisik</p>
-            <p class="text-2xl font-bold">{{ $fisikScore }}<span class="text-sm font-normal">/16</span></p>
-            <p class="text-xs font-semibold mt-1">{{ $fisikLevel['label'] }}</p>
-        </div>
-    </div>
-
-    <p class="text-xs text-gray-400 text-center">
-        Link ini hanya bisa digunakan sekali. Terima kasih! 🙏
-    </p>
-
-</div>
 </body>
 </html>

@@ -6,64 +6,54 @@
     <title>Terima Kasih — RSH Satu Bumi</title>
     <script src="https://cdn.tailwindcss.com"></script>
 </head>
-<body class="bg-gray-50 min-h-screen flex items-start justify-center px-4 py-10">
-<div class="max-w-md w-full">
+<body class="min-h-screen">
 
-    {{-- Success header --}}
-    <div class="bg-[#2d6a4f] rounded-2xl p-6 text-white text-center mb-5">
-        <div class="text-4xl mb-2">🙏</div>
-        <h1 class="text-lg font-bold">Terima kasih, {{ $registration->full_name }}!</h1>
-        <p class="text-green-200 text-sm mt-1">
-            Energy Level Hari ke-{{ $token->day_number }} berhasil disimpan.
+    {{-- Full-screen background --}}
+    <div class="min-h-screen relative flex flex-col items-center justify-center px-5 py-12"
+         style="background: url('{{ asset('assets/env/building.jpg') }}') center center / cover no-repeat;">
+
+        {{-- Green overlay --}}
+        <div class="absolute inset-0" style="background: rgba(13, 43, 30, 0.78);"></div>
+
+        {{-- Content --}}
+        <div class="relative z-10 max-w-sm w-full text-center">
+
+            {{-- Logo --}}
+            <img src="{{ asset('assets/logo/logo-rec-white.png') }}"
+                 alt="RSH Satu Bumi"
+                 class="h-10 w-auto object-contain mx-auto mb-10 opacity-90">
+
+            {{-- Icon --}}
+            <div class="text-5xl mb-6">🙏</div>
+
+            {{-- Message --}}
+            <h1 class="text-2xl font-bold text-white mb-3">
+                Terima kasih, {{ $registration->full_name }}!
+            </h1>
+            <p class="text-green-200 text-sm leading-relaxed mb-2">
+                Energy Level Hari ke-<strong class="text-white">{{ $token->day_number }}</strong>
+                berhasil disimpan.
+            </p>
+            <p class="text-green-300/70 text-sm leading-relaxed mb-10">
+                Semoga hari-hari Anda di program ini membawa kesehatan dan kedamaian. 🌿
+            </p>
+
+            {{-- Divider --}}
+            <div class="border-t border-white/10 mb-10"></div>
+
+            {{-- Back to Home --}}
+            <a href="{{ route('home') }}"
+               class="inline-flex items-center gap-2 px-8 py-3.5 bg-white text-[#2d6a4f] font-semibold rounded-full text-sm hover:bg-green-50 transition-colors shadow-lg">
+                ← Kembali ke Beranda
+            </a>
+        </div>
+
+        {{-- Bottom tagline --}}
+        <p class="relative z-10 mt-12 text-white/30 text-xs">
+            Rumah Sehat Holistik Satu Bumi &copy; {{ date('Y') }}
         </p>
+
     </div>
 
-    {{-- Score cards --}}
-    <div class="grid grid-cols-2 gap-3 mb-5">
-        @php
-            $emosiColor = $emosiLevel['color'] === 'green' ? 'bg-green-50 border-green-200 text-green-800'
-                : ($emosiLevel['color'] === 'yellow' ? 'bg-yellow-50 border-yellow-200 text-yellow-800'
-                : 'bg-red-50 border-red-200 text-red-800');
-            $fisikColor = $fisikLevel['color'] === 'green' ? 'bg-green-50 border-green-200 text-green-800'
-                : ($fisikLevel['color'] === 'yellow' ? 'bg-yellow-50 border-yellow-200 text-yellow-800'
-                : 'bg-red-50 border-red-200 text-red-800');
-        @endphp
-        <div class="rounded-xl border p-4 text-center {{ $emosiColor }}">
-            <p class="text-xs font-medium opacity-70 mb-1">Emosi & Pikiran</p>
-            <p class="text-2xl font-bold">{{ $emosiScore }}<span class="text-sm font-normal">/{{ $maxScore }}</span></p>
-            <p class="text-xs font-semibold mt-1">{{ $emosiLevel['label'] }}</p>
-        </div>
-        <div class="rounded-xl border p-4 text-center {{ $fisikColor }}">
-            <p class="text-xs font-medium opacity-70 mb-1">Kondisi Fisik</p>
-            <p class="text-2xl font-bold">{{ $fisikScore }}<span class="text-sm font-normal">/{{ $maxScore }}</span></p>
-            <p class="text-xs font-semibold mt-1">{{ $fisikLevel['label'] }}</p>
-        </div>
-    </div>
-
-    {{-- Message based on worst level --}}
-    @php
-        $worst = ($emosiLevel['color'] === 'red' || $fisikLevel['color'] === 'red') ? 'red'
-            : (($emosiLevel['color'] === 'yellow' || $fisikLevel['color'] === 'yellow') ? 'yellow' : 'green');
-    @endphp
-    <div class="bg-white rounded-xl border border-gray-200 p-4 text-sm text-gray-700 mb-5">
-        @if($worst === 'green')
-        <p>✨ Kondisi Anda sangat baik hari ini! Teruskan semangat dan jagalah kebiasaan positif selama program berlangsung.</p>
-        @elseif($worst === 'yellow')
-        <p>💛 Perlu sedikit perhatian. Luangkan waktu untuk latihan <strong>Nafas Perut</strong> atau sesi <strong>Reiki</strong> untuk menyeimbangkan kondisi Anda.</p>
-        @else
-        <p>❤️ Tim fasilitator akan menghubungi Anda untuk <strong>sesi pendampingan khusus</strong>. Anda tidak sendirian — kami ada untuk mendukung Anda. 🙏</p>
-        @endif
-    </div>
-
-    {{-- Program info --}}
-    @if($registration->programPeriod)
-    <div class="bg-white rounded-xl border border-gray-200 px-4 py-3 text-xs text-gray-500 text-center">
-        {{ $registration->programPeriod->name }} &middot;
-        {{ $registration->programPeriod->start_date->format('d M') }} –
-        {{ $registration->programPeriod->end_date->format('d M Y') }}
-    </div>
-    @endif
-
-</div>
 </body>
 </html>
