@@ -17,7 +17,7 @@ return new class extends Migration
                 ->nullable()
                 ->constrained('registrations')
                 ->nullOnDelete();
-            $table->timestamp('expires_at');
+            $table->timestamp('expires_at')->nullable();
             $table->timestamp('created_at')->useCurrent();
 
             $table->index('token');

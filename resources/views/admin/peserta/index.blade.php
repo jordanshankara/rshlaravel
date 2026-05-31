@@ -103,7 +103,7 @@
                                 @csrf
                                 <button type="submit"
                                         class="text-xs px-2.5 py-1 border border-gray-300 rounded-lg text-gray-500 hover:bg-green-50 hover:border-green-300 hover:text-green-700 transition-colors"
-                                        onclick="return confirm('Tandai {{ $reg->full_name }} sebagai hadir dan buat 7 link monitoring?')">
+                                        @click.prevent="adminConfirm('Tandai Hadir', 'Tandai {{ addslashes($reg->full_name) }} sebagai hadir dan generate 7 link monitoring?', {okLabel:'Ya, Tandai'}).then(ok => ok && $el.closest('form').submit())">
                                     Tandai Hadir
                                 </button>
                             </form>

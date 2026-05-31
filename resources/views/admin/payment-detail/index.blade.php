@@ -46,7 +46,7 @@
             @endif
             <button @click="openEdit({{ $pd->toJson() }})"
                     class="text-xs text-[#2d6a4f] font-medium hover:underline">Edit</button>
-            <form method="POST" action="{{ route('admin.payment-detail.destroy', $pd) }}" onsubmit="return confirm('Hapus rekening ini?')">
+            <form method="POST" action="{{ route('admin.payment-detail.destroy', $pd) }}" @submit.prevent="adminConfirm('Hapus Rekening', 'Rekening ini akan dihapus dari daftar metode pembayaran.', {danger:true, okLabel:'Ya, Hapus'}).then(ok => ok && $el.submit())">
                 @csrf @method('DELETE')
                 <button type="submit" class="text-xs text-red-500 hover:underline">Hapus</button>
             </form>

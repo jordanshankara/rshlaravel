@@ -241,7 +241,7 @@
                                     </svg>
                                 </a>
                                 <form method="POST" action="{{ route('admin.kontak.destroy', $contact) }}"
-                                      onsubmit="return confirm('Hapus {{ addslashes($contact->name) }}?')">
+                                      @submit.prevent="adminConfirm('Hapus Kontak', 'Hapus {{ addslashes($contact->name) }} dari database?', {danger:true, okLabel:'Ya, Hapus'}).then(ok => ok && $el.submit())">
                                     @csrf @method('DELETE')
                                     <button type="submit" class="p-1.5 text-gray-300 hover:text-red-500 rounded transition-colors">
                                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -311,8 +311,13 @@ function bulkSelect() {
             form.submit();
         },
 
-        confirmBulkDelete() {
-            if (!confirm(`Hapus ${this.selected.length} kontak yang dipilih? Tindakan ini tidak dapat dibatalkan tanpa menggunakan History.`)) return;
+        async confirmBulkDelete() {
+            const ok = await adminConfirm(
+                `Hapus ${this.selected.length} Kontak`,
+                `${this.selected.length} kontak yang dipilih akan dihapus. Gunakan History untuk membatalkan jika diperlukan.`,
+                { danger: true, okLabel: 'Ya, Hapus' }
+            );
+            if (!ok) return;
             const form = document.getElementById('bulkDeleteForm');
             const idsDiv = document.getElementById('bulkDeleteIds');
             idsDiv.innerHTML = this.selected.map(id =>

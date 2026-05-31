@@ -35,11 +35,15 @@
                 <label class="block text-sm font-medium text-gray-700 mb-1.5">Password</label>
                 <input type="password" name="password" required class="input">
             </div>
-            <div class="flex items-center gap-2">
-                <input type="checkbox" id="remember" name="remember"
-                       class="rounded border-gray-300 text-[#2d6a4f] focus:ring-[#2d6a4f]">
-                <label for="remember" class="text-sm text-gray-600">Ingat saya</label>
+
+            <div class="flex items-center justify-between text-sm">
+                <label class="flex items-center gap-2 cursor-pointer text-gray-600 select-none">
+                    <input type="checkbox" name="remember" value="1"
+                           class="rounded border-gray-300 text-[#2d6a4f] focus:ring-[#2d6a4f]">
+                    Ingat Saya
+                </label>
             </div>
+
             @if($turnstileSiteKey)
             <div class="cf-turnstile" data-sitekey="{{ $turnstileSiteKey }}" data-theme="light"></div>
             @endif

@@ -42,7 +42,7 @@ $levelConfig = [
 
             {{-- Clear --}}
             <form method="POST" action="{{ route('admin.log.clear') }}"
-                  onsubmit="return confirm('Hapus semua log? Tindakan ini tidak dapat dibatalkan.')">
+                  @submit.prevent="adminConfirm('Hapus Semua Log', 'Semua log error akan dihapus permanen. Tindakan ini tidak dapat dibatalkan.', {danger:true, okLabel:'Ya, Hapus Semua'}).then(ok => ok && $el.submit())">
                 @csrf
                 <button type="submit"
                         class="px-4 py-2 border border-red-200 text-red-600 text-sm font-medium rounded-lg hover:bg-red-50 transition-colors whitespace-nowrap">

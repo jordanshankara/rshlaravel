@@ -99,22 +99,22 @@
                     ✅ Hadir sejak {{ $registration->present_at?->format('d M Y, H:i') }}
                 </div>
             @else
-                <form method="POST" action="{{ route('admin.peserta.hadir', $registration->id) }}" class="mb-3">
+                <form method="POST" action="{{ route('admin.peserta.hadir', $registration->id) }}" class="mb-3"
+                      @submit.prevent="adminConfirm('Tandai Hadir', 'Tandai peserta sebagai hadir dan generate 7 link monitoring?', {okLabel:'Ya, Tandai'}).then(ok => ok && $el.submit())">
                     @csrf
                     <button type="submit"
-                            class="w-full py-2.5 border-2 border-dashed border-gray-300 rounded-xl text-sm text-gray-500 hover:border-green-400 hover:text-green-600 hover:bg-green-50 transition-colors"
-                            onclick="return confirm('Tandai sebagai hadir dan generate 7 link monitoring?')">
+                            class="w-full py-2.5 border-2 border-dashed border-gray-300 rounded-xl text-sm text-gray-500 hover:border-green-400 hover:text-green-600 hover:bg-green-50 transition-colors">
                         ☑ Tandai Hadir
                     </button>
                 </form>
             @endif
 
             {{-- Re-registration link --}}
-            <form method="POST" action="{{ route('admin.peserta.reregister-link', $registration->id) }}">
+            <form method="POST" action="{{ route('admin.peserta.reregister-link', $registration->id) }}"
+                  @submit.prevent="adminConfirm('Buat Link Daftar Ulang', 'Buat link re-registrasi untuk {{ addslashes($registration->full_name) }}? Link lama akan diganti.', {okLabel:'Buat Link'}).then(ok => ok && $el.submit())">
                 @csrf
                 <button type="submit"
-                        class="w-full py-2 text-xs border border-gray-200 rounded-lg text-gray-500 hover:bg-gray-50 transition-colors"
-                        onclick="return confirm('Buat link daftar ulang untuk {{ $registration->full_name }}?')">
+                        class="w-full py-2 text-xs border border-gray-200 rounded-lg text-gray-500 hover:bg-gray-50 transition-colors">
                     🔗 Buat Link Daftar Ulang
                 </button>
             </form>
@@ -183,7 +183,7 @@
                         </button>
                         @if ($token->isCompleted())
                         <form method="POST" action="{{ route('admin.peserta.reset-day', [$registration->id, $day]) }}"
-                              onsubmit="return confirm('Reset jawaban hari ke-{{ $day }}? Peserta bisa mengisi ulang.')">
+                              @submit.prevent="adminConfirm('Reset Hari ke-{{ $day }}', 'Jawaban monitoring hari ke-{{ $day }} akan dihapus. Peserta bisa mengisi ulang.', {danger:true, okLabel:'Reset'}).then(ok => ok && $el.submit())">
                             @csrf @method('DELETE')
                             <button type="submit" class="p-1.5 text-gray-300 hover:text-red-500 rounded transition-colors text-xs" title="Reset">↺</button>
                         </form>
@@ -211,11 +211,14 @@
         @push('scripts')
         <script>
         (function() {
-            const tokenData = @json($tokensByDay->filter(fn($t) => $t->completed_at)->map(fn($t) => [
-                'day'        => $t->day_number,
-                'emosi'      => $t->emosiScore(),
-                'fisik'      => $t->fisikScore(),
-            ])->values());
+            @php
+                $chartData = $tokensByDay->filter(fn($t) => $t->completed_at)->map(fn($t) => [
+                    'day'   => $t->day_number,
+                    'emosi' => $t->emosiScore(),
+                    'fisik' => $t->fisikScore(),
+                ])->values();
+            @endphp
+            const tokenData = @json($chartData);
 
             const labels = tokenData.map(d => 'Hari ' + d.day);
             const emosiData = tokenData.map(d => d.emosi);

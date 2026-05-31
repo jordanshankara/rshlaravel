@@ -36,7 +36,7 @@
                             </svg>
                         </a>
                         @if($user->id !== auth()->id())
-                        <form method="POST" action="{{ route('admin.pengguna.destroy', $user) }}" onsubmit="return confirm('Hapus pengguna ini?')">
+                        <form method="POST" action="{{ route('admin.pengguna.destroy', $user) }}" @submit.prevent="adminConfirm('Hapus Pengguna', 'Akun pengguna ini akan dihapus permanen.', {danger:true, okLabel:'Ya, Hapus'}).then(ok => ok && $el.submit())">
                             @csrf @method('DELETE')
                             <button type="submit" title="Hapus"
                                     class="p-1.5 rounded-lg text-gray-400 hover:text-red-500 hover:bg-red-50 transition-colors">

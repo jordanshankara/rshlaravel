@@ -103,7 +103,7 @@
     {{-- Action buttons --}}
     <div class="flex gap-3">
         <form method="POST" action="{{ route('admin.kontak.history.restore', $history) }}"
-              onsubmit="return confirm('Yakin ingin memulihkan? Data kontak akan berubah sesuai kondisi ini.')">
+              @submit.prevent="adminConfirm('Pulihkan Data', 'Data kontak akan dikembalikan ke kondisi sebelumnya. Tindakan ini tidak bisa dibatalkan.', {okLabel:'Ya, Pulihkan'}).then(ok => ok && $el.submit())">
             @csrf
             <button type="submit"
                     class="px-6 py-3 bg-[#2d6a4f] text-white font-semibold rounded-xl text-sm hover:bg-[#1a5a3f] transition-colors">

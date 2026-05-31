@@ -92,7 +92,7 @@
                         </svg>
                     </button>
                     {{-- Delete --}}
-                    <form method="POST" action="{{ route('admin.invoice-product.destroy', $product) }}" onsubmit="return confirm('Hapus produk ini?')">
+                    <form method="POST" action="{{ route('admin.invoice-product.destroy', $product) }}" @submit.prevent="adminConfirm('Hapus Produk', 'Produk ini akan dihapus permanen.', {danger:true, okLabel:'Ya, Hapus'}).then(ok => ok && $el.submit())">
                         @csrf @method('DELETE')
                         <button type="submit" title="Hapus"
                                 class="p-1.5 rounded-lg text-gray-400 hover:text-red-500 hover:bg-red-50 transition-colors">

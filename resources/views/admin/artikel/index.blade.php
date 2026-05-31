@@ -129,7 +129,7 @@
                                 </svg>
                             </a>
                             <form method="POST" action="{{ route('admin.artikel.destroy', $article) }}"
-                                  onsubmit="return confirm('Hapus artikel ini?')">
+                                  @submit.prevent="adminConfirm('Hapus Artikel', 'Artikel ini akan dihapus permanen.', {danger:true, okLabel:'Ya, Hapus'}).then(ok => ok && $el.submit())">
                                 @csrf @method('DELETE')
                                 <button type="submit" title="Hapus"
                                         class="p-1.5 rounded-lg text-gray-400 hover:text-red-500 hover:bg-red-50 transition-colors">

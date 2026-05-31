@@ -145,12 +145,8 @@
     const labels      = @json($chartLabels);
     const regData     = @json($chartReg);
     const revData     = @json($chartRevenue);
-    const statusData  = @json([
-        $stats['pending_payment'],
-        $stats['confirmed'],
-        $stats['fully_paid'],
-        $stats['cancelled'],
-    ]);
+    @php $statusArr = [$stats['pending_payment'], $stats['confirmed'], $stats['fully_paid'], $stats['cancelled']]; @endphp
+    const statusData  = @json($statusArr);
 
     // ── Trend line chart ────────────────────────────────────────
     new Chart(document.getElementById('trendChart'), {

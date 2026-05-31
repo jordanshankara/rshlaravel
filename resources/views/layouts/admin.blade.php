@@ -25,7 +25,7 @@
     <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
     @stack('styles')
 </head>
-<body class="h-full" x-data="{ sidebarOpen: false }">
+<body class="h-full" x-data="adminApp()">
 <div class="flex h-full min-h-screen">
 
     {{-- Desktop sidebar --}}
@@ -87,6 +87,82 @@
         </main>
     </div>
 </div>
+{{-- ── Global Confirm Modal ──────────────────────────────────────────────── --}}
+<div x-show="confirm.show" x-cloak
+     class="fixed inset-0 z-[60] flex items-center justify-center p-4"
+     x-transition:enter="transition ease-out duration-200"
+     x-transition:enter-start="opacity-0"
+     x-transition:enter-end="opacity-100">
+    {{-- Backdrop --}}
+    <div class="absolute inset-0 bg-black/40" @click="confirm.cancel()"></div>
+    {{-- Card --}}
+    <div class="relative bg-white rounded-2xl shadow-2xl w-full max-w-sm p-6 z-10"
+         x-transition:enter="transition ease-out duration-200"
+         x-transition:enter-start="opacity-0 scale-95"
+         x-transition:enter-end="opacity-100 scale-100"
+         @keydown.escape.window="confirm.cancel()">
+        {{-- Icon --}}
+        <div class="flex items-center gap-3 mb-3">
+            <div class="w-10 h-10 rounded-full flex items-center justify-center flex-shrink-0"
+                 :class="confirm.danger ? 'bg-red-100' : 'bg-amber-100'">
+                <svg class="w-5 h-5" :class="confirm.danger ? 'text-red-600' : 'text-amber-600'"
+                     fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                          d="M12 9v2m0 4h.01M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/>
+                </svg>
+            </div>
+            <h3 class="text-base font-semibold text-gray-900" x-text="confirm.title"></h3>
+        </div>
+        <p class="text-sm text-gray-500 mb-6 leading-relaxed" x-text="confirm.message"></p>
+        <div class="flex gap-3 justify-end">
+            <button @click="confirm.cancel()"
+                    class="px-4 py-2 text-sm font-medium text-gray-600 border border-gray-300 rounded-xl hover:bg-gray-50 transition-colors">
+                Batal
+            </button>
+            <button @click="confirm.ok()"
+                    class="px-4 py-2 text-sm font-semibold text-white rounded-xl transition-colors"
+                    :class="confirm.danger ? 'bg-red-500 hover:bg-red-600' : 'bg-[#2d6a4f] hover:bg-[#1a5a3f]'"
+                    x-text="confirm.okLabel">
+            </button>
+        </div>
+    </div>
+</div>
+
+<script>
+function adminApp() {
+    return {
+        sidebarOpen: false,
+        confirm: {
+            show: false,
+            title: '',
+            message: '',
+            okLabel: 'Ya, Lanjutkan',
+            danger: false,
+            _resolve: null,
+            ok()    { this.show = false; if (this._resolve) this._resolve(true);  this._resolve = null; },
+            cancel(){ this.show = false; if (this._resolve) this._resolve(false); this._resolve = null; },
+        },
+    };
+}
+
+/**
+ * Replace browser confirm() with the themed modal.
+ * Usage: await adminConfirm('Judul', 'Pesan', { danger: true, okLabel: 'Hapus' })
+ * Returns a Promise<boolean>.
+ */
+window.adminConfirm = function(title, message, opts = {}) {
+    return new Promise(resolve => {
+        const app = document.querySelector('[x-data]').__x?.$data ?? Alpine.$data(document.body);
+        app.confirm.title   = title;
+        app.confirm.message = message;
+        app.confirm.okLabel = opts.okLabel  ?? 'Ya, Lanjutkan';
+        app.confirm.danger  = opts.danger   ?? false;
+        app.confirm._resolve = resolve;
+        app.confirm.show    = true;
+    });
+};
+</script>
+
 @stack('scripts')
 </body>
 </html>
