@@ -13,7 +13,7 @@
 
         <div class="absolute inset-0" style="background: rgba(13, 43, 30, 0.82);"></div>
 
-        <div class="relative z-10 max-w-sm w-full text-center">
+        <div class="relative z-10 w-full max-w-sm sm:max-w-lg lg:max-w-2xl text-center">
 
             <img src="{{ asset('assets/logo/logo-rec-white.png') }}"
                  alt="RSH Satu Bumi"
@@ -26,22 +26,22 @@
             </h1>
 
             {{-- Day number highlighted --}}
-            <div class="inline-flex flex-col items-center bg-white/10 border border-white/20 rounded-2xl px-8 py-5 mb-6">
-                <p class="text-green-300 text-base font-medium mb-1">Energy Level</p>
-                <div class="flex items-baseline gap-2">
-                    <span class="text-green-300 text-xl font-semibold">Hari</span>
-                    <span class="text-7xl font-extrabold text-white leading-none">{{ $token->day_number }}</span>
-                    <span class="text-xl text-green-300 font-medium">dari {{ config('monitoring.days', 7) }}</span>
+            <div class="inline-flex flex-col items-center bg-white/10 border border-white/20 rounded-2xl px-10 sm:px-20 lg:px-32 py-6 lg:py-10 mb-8 w-full">
+                <p class="text-green-300 text-lg lg:text-2xl font-medium mb-2">Energy Level</p>
+                <div class="flex items-baseline gap-3">
+                    <span class="text-green-300 text-2xl lg:text-3xl font-semibold">Hari</span>
+                    <span class="text-8xl lg:text-9xl font-extrabold text-white leading-none">{{ $token->day_number }}</span>
+                    <span class="text-2xl lg:text-3xl text-green-300 font-medium">dari {{ config('monitoring.days', 7) }}</span>
                 </div>
-                <p class="text-green-200 text-base mt-1">berhasil disimpan ✓</p>
+                <p class="text-green-200 text-lg lg:text-xl mt-2">berhasil disimpan ✓</p>
             </div>
 
-            <p class="text-white/80 text-xl font-medium mb-10">
+            <p class="text-white/80 text-xl lg:text-2xl font-medium mb-10">
                 Rahayu, Salam Sehat 🌿
             </p>
 
             <a href="{{ route('home') }}"
-               class="inline-flex items-center gap-2 px-10 py-4 bg-white text-[#2d6a4f] font-bold rounded-full text-base hover:bg-green-50 transition-colors shadow-lg">
+               class="inline-flex items-center gap-2 px-12 py-4 lg:py-5 bg-white text-[#2d6a4f] font-bold rounded-full text-lg lg:text-xl hover:bg-green-50 transition-colors shadow-lg">
                 ← Kembali ke Beranda
             </a>
         </div>
