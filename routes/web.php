@@ -113,8 +113,9 @@ Route::prefix('admin')->name('admin.')->middleware(['auth'])->group(function () 
         Route::get('/',               [Admin\ContactController::class, 'index'])->name('index');
         Route::get('/create',         [Admin\ContactController::class, 'create'])->name('create');
         Route::post('/',              [Admin\ContactController::class, 'store'])->name('store');
-        Route::get('/import',         [Admin\ContactController::class, 'importForm'])->name('import');
-        Route::post('/import',        [Admin\ContactController::class, 'importStore'])->name('import.store');
+        Route::get('/import',          [Admin\ContactController::class, 'importForm'])->name('import');
+        Route::post('/import',         [Admin\ContactController::class, 'importStore'])->name('import.store');
+        Route::get('/import/sample',   [Admin\ContactController::class, 'sampleCsv'])->name('import.sample');
         Route::post('/bulk-destroy',  [Admin\ContactController::class, 'bulkDestroy'])->name('bulk-destroy');
         Route::post('/bulk-update',   [Admin\ContactController::class, 'bulkUpdate'])->name('bulk-update');
         Route::get('/history',                    [Admin\ContactController::class, 'historyIndex'])->name('history');

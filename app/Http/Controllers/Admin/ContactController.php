@@ -244,6 +244,38 @@ class ContactController extends Controller
         return view('admin.kontak.import');
     }
 
+    public function sampleCsv()
+    {
+        $headers = [
+            'Nama Lengkap', 'No. Telepon', 'Email', 'Jenis Kelamin',
+            'Alamat', 'Usia', 'Penyakit/Keluhan', 'Sumber Info', 'Asal File',
+        ];
+
+        $rows = [
+            ['Budi Santoso', '6281234567890', 'budi@email.com', 'Laki-laki',
+             'Jl. Mawar No. 5, Jakarta Selatan', '65', 'Diabetes', 'Rekomendasi Teman', 'Webinar_2024'],
+            ['Siti Rahayu', '6285678901234', 'siti.rahayu@gmail.com', 'Perempuan',
+             'Jl. Melati No. 12, Bandung', '72', 'Hipertensi', 'Instagram', 'Talkshow_2024'],
+            ['Andi Wijaya', '6289012345678', '', 'Laki-laki',
+             'Jl. Kenanga No. 3, Surabaya', '58', 'Obesitas, Kolesterol Tinggi', 'WhatsApp', 'Webinar_2024'],
+            ['Maria Dewi', '6287890123456', 'maria.dewi@yahoo.com', 'Perempuan',
+             '', '70', 'Insomnia', 'Rekomendasi Teman', 'Gereja_2024'],
+            ['Hendra Gunawan', '6282345678901', '', '',
+             '', '', 'Diabetes, Hipertensi', '', 'Webinar_2024'],
+        ];
+
+        return response()->streamDownload(function () use ($headers, $rows) {
+            $handle = fopen('php://output', 'w');
+            // UTF-8 BOM agar Excel baca karakter Indonesia dengan benar
+            fputs($handle, "\xEF\xBB\xBF");
+            fputcsv($handle, $headers);
+            foreach ($rows as $row) {
+                fputcsv($handle, $row);
+            }
+            fclose($handle);
+        }, 'sample_kontak.csv', ['Content-Type' => 'text/csv; charset=UTF-8']);
+    }
+
     public function importStore(Request $request)
     {
         $request->validate(['csv_file' => 'required|file|mimes:csv,txt|max:5120']);
