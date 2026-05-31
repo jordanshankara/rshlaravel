@@ -4,12 +4,16 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\Contact;
+use App\Models\ContactHistory;
 use App\Models\ContactLog;
-use Illuminate\Http\Request;
+use App\Services\ContactHistoryService;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Request;
 
 class ContactController extends Controller
 {
+    public function __construct(private ContactHistoryService $history) {}
+
     // ── Index ────────────────────────────────────────────────────────────────
 
     public function index(Request $request)
@@ -38,12 +42,11 @@ class ContactController extends Controller
 
         $contacts = $query->orderBy('name')->paginate(30)->withQueryString();
 
-        // For filter dropdowns — distinct values
         $sources    = Contact::select('source_file')->distinct()->whereNotNull('source_file')->pluck('source_file');
         $complaints = Contact::select('health_complaint')->distinct()->whereNotNull('health_complaint')
             ->orderBy('health_complaint')->pluck('health_complaint');
 
-        $totalCount    = Contact::count();
+        $totalCount     = Contact::count();
         $contactedCount = Contact::whereNotNull('last_contacted_at')->count();
 
         return view('admin.kontak.index', compact(
@@ -73,6 +76,10 @@ class ContactController extends Controller
             'notes'            => 'nullable|string',
         ]);
 
+        $this->history->record('create', "Tambah kontak: {$data['name']}", [
+            ['type' => 'added', 'contact_id' => null, 'old' => null, 'new' => $data],
+        ], auth()->id());
+
         Contact::create($data);
 
         return redirect()->route('admin.kontak.index')
@@ -101,6 +108,10 @@ class ContactController extends Controller
             'notes'            => 'nullable|string',
         ]);
 
+        $this->history->record('edit', "Edit kontak: {$contact->name}", [
+            $this->history->buildModifiedChange($contact, $data),
+        ], auth()->id());
+
         $contact->update($data);
 
         return redirect()->route('admin.kontak.index')
@@ -111,9 +122,71 @@ class ContactController extends Controller
 
     public function destroy(Contact $contact)
     {
+        $this->history->record('delete', "Hapus kontak: {$contact->name}",
+            $this->history->buildDeletedChanges(collect([$contact])),
+            auth()->id()
+        );
+
         $contact->delete();
+
         return redirect()->route('admin.kontak.index')
             ->with('success', 'Kontak dihapus.');
+    }
+
+    // ── Bulk Delete ──────────────────────────────────────────────────────────
+
+    public function bulkDestroy(Request $request)
+    {
+        $request->validate(['ids' => 'required|array', 'ids.*' => 'integer|exists:contacts,id']);
+
+        $contacts = Contact::whereIn('id', $request->ids)->get();
+
+        $this->history->record(
+            'bulk_delete',
+            "Bulk hapus {$contacts->count()} kontak",
+            $this->history->buildDeletedChanges($contacts),
+            auth()->id()
+        );
+
+        Contact::whereIn('id', $request->ids)->delete();
+
+        return redirect()->route('admin.kontak.index')
+            ->with('success', "{$contacts->count()} kontak berhasil dihapus.");
+    }
+
+    // ── Bulk Edit ────────────────────────────────────────────────────────────
+
+    public function bulkUpdate(Request $request)
+    {
+        $allowedFields = [
+            'health_complaint', 'info_source', 'source_file', 'notes', 'gender',
+        ];
+
+        $request->validate([
+            'ids'   => 'required|array',
+            'ids.*' => 'integer|exists:contacts,id',
+            'field' => 'required|string|in:' . implode(',', $allowedFields),
+            'value' => 'nullable|string|max:500',
+        ]);
+
+        $field    = $request->field;
+        $value    = $request->value ?: null;
+        $contacts = Contact::whereIn('id', $request->ids)->get();
+
+        $changes = $contacts->map(fn($c) => $this->history->buildModifiedChange($c, [$field => $value]))
+            ->values()->all();
+
+        $this->history->record(
+            'bulk_edit',
+            "Bulk edit {$contacts->count()} kontak: kolom {$field}",
+            $changes,
+            auth()->id()
+        );
+
+        Contact::whereIn('id', $request->ids)->update([$field => $value]);
+
+        return redirect()->route('admin.kontak.index')
+            ->with('success', "{$contacts->count()} kontak berhasil diperbarui.");
     }
 
     // ── Log Contact (AJAX) ───────────────────────────────────────────────────
@@ -143,6 +216,27 @@ class ContactController extends Controller
         ]);
     }
 
+    // ── History ──────────────────────────────────────────────────────────────
+
+    public function historyIndex()
+    {
+        $histories = ContactHistory::orderByDesc('created_at')->limit(3)->get();
+        return view('admin.kontak.history', compact('histories'));
+    }
+
+    public function historyShow(ContactHistory $history)
+    {
+        $preview = $this->history->previewRestore($history);
+        return view('admin.kontak.history-show', compact('history', 'preview'));
+    }
+
+    public function historyRestore(ContactHistory $history)
+    {
+        $affected = $this->history->applyRestore($history);
+        return redirect()->route('admin.kontak.index')
+            ->with('success', "Berhasil dipulihkan. {$affected} kontak dikembalikan ke kondisi sebelumnya.");
+    }
+
     // ── Import CSV ───────────────────────────────────────────────────────────
 
     public function importForm()
@@ -154,27 +248,28 @@ class ContactController extends Controller
     {
         $request->validate(['csv_file' => 'required|file|mimes:csv,txt|max:5120']);
 
-        $path    = $request->file('csv_file')->getRealPath();
-        $handle  = fopen($path, 'r');
+        $path   = $request->file('csv_file')->getRealPath();
+        $handle = fopen($path, 'r');
 
         if (!$handle) {
             return back()->withErrors(['csv_file' => 'Gagal membuka file.']);
         }
 
-        // Read header row — detect BOM and normalize
-        $rawHeader = fgetcsv($handle);
+        // Auto-detect delimiter: Excel Indonesia pakai ';', internasional pakai ','
+        $firstLine = fgets($handle);
+        rewind($handle);
+        $firstLine = ltrim($firstLine, "\xEF\xBB\xBF");
+        $delimiter = substr_count($firstLine, ';') >= substr_count($firstLine, ',') ? ';' : ',';
+
+        // Header row
+        $rawHeader = fgetcsv($handle, 0, $delimiter);
         if (!$rawHeader) {
             fclose($handle);
             return back()->withErrors(['csv_file' => 'File CSV kosong atau format tidak valid.']);
         }
-
-        // Strip BOM from first column header
         $rawHeader[0] = ltrim($rawHeader[0], "\xEF\xBB\xBF");
-
-        // Normalize headers: lowercase + trim
         $headers = array_map(fn($h) => strtolower(trim($h)), $rawHeader);
 
-        // Column mapping: CSV header → DB column
         $map = [
             'nama lengkap'     => 'name',
             'no. telepon'      => 'phone',
@@ -189,25 +284,34 @@ class ContactController extends Controller
             'asal file'        => 'source_file',
         ];
 
-        // Build index: position → db_column
         $colIndex = [];
         foreach ($headers as $i => $h) {
-            if (isset($map[$h])) {
-                $colIndex[$i] = $map[$h];
-            }
+            if (isset($map[$h])) $colIndex[$i] = $map[$h];
         }
 
-        $inserted = 0;
-        $updated  = 0;
-        $skipped  = 0;
+        if (empty($colIndex)) {
+            fclose($handle);
+            return back()->withErrors([
+                'csv_file' => 'Tidak ada kolom yang dikenali. Header ditemukan: ' . implode(' | ', $headers),
+            ]);
+        }
 
-        while (($row = fgetcsv($handle)) !== false) {
-            if (empty(array_filter($row))) continue; // skip blank rows
+        $inserted       = 0;
+        $updated        = 0;
+        $skipped        = 0;
+        $addedChanges   = [];
+
+        while (($row = fgetcsv($handle, 0, $delimiter)) !== false) {
+            if (empty(array_filter($row))) continue;
 
             $data = [];
             foreach ($colIndex as $pos => $col) {
-                $val = isset($row[$pos]) ? trim($row[$pos]) : null;
-                $data[$col] = ($val === '' || $val === null) ? null : $val;
+                $raw = isset($row[$pos]) ? trim($row[$pos]) : null;
+                if ($raw === '' || $raw === null) { $data[$col] = null; continue; }
+                if (!mb_check_encoding($raw, 'UTF-8')) {
+                    $raw = mb_convert_encoding($raw, 'UTF-8', 'Windows-1252');
+                }
+                $data[$col] = $raw;
             }
 
             if (empty($data['name']) || empty($data['phone'])) {
@@ -215,15 +319,17 @@ class ContactController extends Controller
                 continue;
             }
 
-            // Normalize phone: ensure starts with digits, strip spaces/dashes
-            $data['phone'] = preg_replace('/[\s\-]/', '', $data['phone']);
+            // Fix Excel scientific notation phone numbers
+            $phone = $data['phone'];
+            if (preg_match('/^[\d.]+[eE][+\-]?\d+$/', $phone)) {
+                $phone = number_format((float) $phone, 0, '.', '');
+            }
+            $data['phone'] = preg_replace('/[\s\-]/', '', $phone);
 
-            // Age: integer only
             if (isset($data['age'])) {
                 $data['age'] = is_numeric($data['age']) ? (int) $data['age'] : null;
             }
 
-            // Upsert by phone
             $existing = Contact::where('phone', $data['phone'])->first();
             if ($existing) {
                 $existing->update($data);
@@ -231,10 +337,21 @@ class ContactController extends Controller
             } else {
                 Contact::create($data);
                 $inserted++;
+                $addedChanges[] = ['type' => 'added', 'contact_id' => null, 'old' => null, 'new' => $data];
             }
         }
 
         fclose($handle);
+
+        // Record history only if something was inserted
+        if ($inserted > 0 && !empty($addedChanges)) {
+            $this->history->record(
+                'import',
+                "Import CSV: {$inserted} kontak baru" . ($updated > 0 ? ", {$updated} diperbarui" : ''),
+                $addedChanges,
+                auth()->id()
+            );
+        }
 
         $msg = "Import selesai: {$inserted} kontak baru, {$updated} diperbarui";
         if ($skipped > 0) $msg .= ", {$skipped} baris dilewati (nama/telepon kosong)";
