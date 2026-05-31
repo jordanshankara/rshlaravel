@@ -246,34 +246,56 @@ class ContactController extends Controller
 
     public function sampleCsv()
     {
-        $headers = [
+        $cols = [
             'Nama Lengkap', 'No. Telepon', 'Email', 'Jenis Kelamin',
             'Alamat', 'Usia', 'Penyakit/Keluhan', 'Sumber Info', 'Asal File',
         ];
 
         $rows = [
-            ['Budi Santoso', '6281234567890', 'budi@email.com', 'Laki-laki',
-             'Jl. Mawar No. 5, Jakarta Selatan', '65', 'Diabetes', 'Rekomendasi Teman', 'Webinar_2024'],
-            ['Siti Rahayu', '6285678901234', 'siti.rahayu@gmail.com', 'Perempuan',
-             'Jl. Melati No. 12, Bandung', '72', 'Hipertensi', 'Instagram', 'Talkshow_2024'],
-            ['Andi Wijaya', '6289012345678', '', 'Laki-laki',
-             'Jl. Kenanga No. 3, Surabaya', '58', 'Obesitas, Kolesterol Tinggi', 'WhatsApp', 'Webinar_2024'],
-            ['Maria Dewi', '6287890123456', 'maria.dewi@yahoo.com', 'Perempuan',
-             '', '70', 'Insomnia', 'Rekomendasi Teman', 'Gereja_2024'],
-            ['Hendra Gunawan', '6282345678901', '', '',
-             '', '', 'Diabetes, Hipertensi', '', 'Webinar_2024'],
+            ['Budi Santoso',   '6281234567890', 'budi@email.com',       'Laki-laki', 'Jl. Mawar No. 5, Jakarta Selatan', '65', 'Diabetes',                      'Rekomendasi Teman', 'Webinar_2024'],
+            ['Siti Rahayu',    '6285678901234', 'siti.rahayu@gmail.com','Perempuan', 'Jl. Melati No. 12, Bandung',       '72', 'Hipertensi',                     'Instagram',         'Talkshow_2024'],
+            ['Andi Wijaya',    '6289012345678', '',                     'Laki-laki', 'Jl. Kenanga No. 3, Surabaya',      '58', 'Obesitas, Kolesterol Tinggi',    'WhatsApp',          'Webinar_2024'],
+            ['Maria Dewi',     '6287890123456', 'maria.dewi@yahoo.com', 'Perempuan', '',                                  '70', 'Insomnia',                       'Rekomendasi Teman', 'Gereja_2024'],
+            ['Hendra Gunawan', '6282345678901', '',                     '',          '',                                  '',   'Diabetes, Hipertensi',           '',                  'Webinar_2024'],
         ];
 
-        return response()->streamDownload(function () use ($headers, $rows) {
-            $handle = fopen('php://output', 'w');
-            // UTF-8 BOM agar Excel baca karakter Indonesia dengan benar
-            fputs($handle, "\xEF\xBB\xBF");
-            fputcsv($handle, $headers);
-            foreach ($rows as $row) {
-                fputcsv($handle, $row);
+        // Generate as HTML table that Excel opens natively — avoids all CSV delimiter issues
+        $th = fn(string $v) => '<th style="background:#2d6a4f;color:#fff;font-weight:bold;border:1px solid #ccc;padding:6px 10px;white-space:nowrap">' . htmlspecialchars($v) . '</th>';
+        $td = fn(string $v, bool $phone = false) => '<td style="border:1px solid #ddd;padding:5px 10px;' .
+            ($phone ? 'mso-number-format:\'@\';' : '') .
+            (!$v ? 'color:#aaa;font-style:italic;' : '') . '">' .
+            ($v ? htmlspecialchars($v) : '(kosong)') . '</td>';
+
+        $html  = '<?xml version="1.0" encoding="UTF-8"?>' . "\n";
+        $html .= '<?mso-application progid="Excel.Sheet"?>' . "\n";
+        $html .= '<Workbook xmlns="urn:schemas-microsoft-com:office:spreadsheet"
+                           xmlns:ss="urn:schemas-microsoft-com:office:spreadsheet"
+                           xmlns:o="urn:schemas-microsoft-com:office:office"
+                           xmlns:x="urn:schemas-microsoft-com:office:excel">' . "\n";
+        $html .= '<Worksheet ss:Name="Kontak"><Table>' . "\n";
+
+        // Header row
+        $html .= '<Row>';
+        foreach ($cols as $col) {
+            $html .= '<Cell><Data ss:Type="String">' . htmlspecialchars($col) . '</Data></Cell>';
+        }
+        $html .= '</Row>' . "\n";
+
+        // Data rows
+        foreach ($rows as $row) {
+            $html .= '<Row>';
+            foreach ($row as $i => $val) {
+                $html .= '<Cell><Data ss:Type="String">' . htmlspecialchars($val) . '</Data></Cell>';
             }
-            fclose($handle);
-        }, 'sample_kontak.csv', ['Content-Type' => 'text/csv; charset=UTF-8']);
+            $html .= '</Row>' . "\n";
+        }
+
+        $html .= '</Table></Worksheet></Workbook>';
+
+        return response($html, 200, [
+            'Content-Type'        => 'application/vnd.ms-excel; charset=UTF-8',
+            'Content-Disposition' => 'attachment; filename="sample_kontak.xls"',
+        ]);
     }
 
     public function importStore(Request $request)

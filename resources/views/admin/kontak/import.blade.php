@@ -22,7 +22,7 @@
             </div>
             <a href="{{ route('admin.kontak.import.sample') }}"
                class="flex-shrink-0 inline-flex items-center gap-2 px-4 py-2.5 bg-[#2d6a4f] text-white text-sm font-semibold rounded-lg hover:bg-[#1a5a3f] transition-colors whitespace-nowrap">
-                ↓ Download Contoh CSV
+                ↓ Download Contoh (Excel)
             </a>
         </div>
 
@@ -108,8 +108,8 @@
             </div>
         </div>
         <div class="mt-3 p-3 bg-blue-50 rounded-lg text-xs text-blue-700">
-            💡 <strong>Tips:</strong> Setelah selesai merapikan data di Excel, simpan sebagai
-            <strong>File → Save As → CSV (Comma delimited)</strong>, bukan format Excel (.xlsx).
+            💡 <strong>Tips:</strong> File contoh yang didownload sudah rapi di Excel. Setelah selesai edit, simpan sebagai
+            <strong>File → Save As → CSV (Comma delimited)</strong> sebelum diupload di sini.
         </div>
     </div>
 
