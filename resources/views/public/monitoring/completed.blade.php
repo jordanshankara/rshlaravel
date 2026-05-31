@@ -13,7 +13,7 @@
         <div class="text-4xl mb-3">✅</div>
         <h1 class="text-base font-bold text-gray-900 mb-1">Sudah Diisi</h1>
         <p class="text-sm text-gray-500">
-            Anda sudah mengisi monitoring hari ke-<strong>{{ $token->day_number }}</strong>
+            Anda sudah mengisi Energy Level hari ke-<strong>{{ $token->day_number }}</strong>
             pada {{ $token->completed_at->translatedFormat('d F Y, H:i') }}.
         </p>
     </div>

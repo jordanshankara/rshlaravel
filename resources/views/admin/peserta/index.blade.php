@@ -2,9 +2,9 @@
 @section('title', 'Peserta Program')
 @section('page-title', 'Peserta Program')
 @section('header-actions')
-<a href="{{ route('admin.monitoring.index') }}"
+<a href="{{ route('admin.energylevel.index') }}"
    class="inline-flex items-center gap-1.5 px-3 py-2 text-sm bg-[#2d6a4f] text-white rounded-lg hover:bg-[#1a5a3f]">
-    📊 Dashboard Monitoring
+    📊 Dashboard Energy Level
 </a>
 @endsection
 @section('content')
@@ -57,7 +57,7 @@
                     <th class="text-left px-4 py-3 font-medium text-gray-500 text-xs">Periode</th>
                     <th class="text-left px-4 py-3 font-medium text-gray-500 text-xs">Status</th>
                     <th class="text-center px-4 py-3 font-medium text-gray-500 text-xs">Kehadiran</th>
-                    <th class="text-center px-4 py-3 font-medium text-gray-500 text-xs">Monitoring</th>
+                    <th class="text-center px-4 py-3 font-medium text-gray-500 text-xs">Energy Level</th>
                     <th class="px-4 py-3"></th>
                 </tr>
             </thead>
@@ -103,7 +103,7 @@
                                 @csrf
                                 <button type="submit"
                                         class="text-xs px-2.5 py-1 border border-gray-300 rounded-lg text-gray-500 hover:bg-green-50 hover:border-green-300 hover:text-green-700 transition-colors"
-                                        @click.prevent="adminConfirm('Tandai Hadir', 'Tandai {{ addslashes($reg->full_name) }} sebagai hadir dan generate 7 link monitoring?', {okLabel:'Ya, Tandai'}).then(ok => ok && $el.closest('form').submit())">
+                                        @click.prevent="adminConfirm('Tandai Hadir', 'Tandai {{ addslashes($reg->full_name) }} sebagai hadir dan generate 7 link Energy Level?', {okLabel:'Ya, Tandai'}).then(ok => ok && $el.closest('form').submit())">
                                     Tandai Hadir
                                 </button>
                             </form>

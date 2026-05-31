@@ -24,7 +24,7 @@ class WhatsAppService
     public function sendMonitoringLink(Registration $registration, int $dayNumber, string $link): bool
     {
         $name    = $registration->full_name;
-        $message = "Halo {$name}, 🙏\n\nIni link monitoring hari ke-{$dayNumber} program Rumah Sehat Satu Bumi:\n{$link}\n\nSilakan isi dengan jujur. Terima kasih! 🙏";
+        $message = "Halo {$name}, 🙏\n\nIni link Energy Level hari ke-{$dayNumber} program Rumah Sehat Satu Bumi:\n{$link}\n\nSilakan isi dengan jujur. Terima kasih! 🙏";
         return $this->sendText($registration->whatsapp, $message);
     }
 

@@ -3,18 +3,13 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-    <title>Monitoring Hari ke-{{ $token->day_number }} — RSH Satu Bumi</title>
+    <title>Energy Level Hari ke-{{ $token->day_number }} — RSH Satu Bumi</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <style>
-        .option-btn {
-            transition: all 0.12s ease;
-            -webkit-tap-highlight-color: transparent;
-        }
-        .option-btn.is-selected-green  { background:#15803d; color:#fff; border-color:#15803d; }
-        .option-btn.is-selected-yellow { background:#ca8a04; color:#fff; border-color:#ca8a04; }
-        .option-btn.is-selected-red    { background:#dc2626; color:#fff; border-color:#dc2626; }
-    </style>
     <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+    <style>
+        .opt { transition: all 0.12s ease; -webkit-tap-highlight-color: transparent; }
+        .opt.chosen { background:#2d6a4f; color:#fff; border-color:#2d6a4f; }
+    </style>
 </head>
 <body class="bg-gray-50 min-h-screen">
 
@@ -34,13 +29,12 @@
         </div>
     </div>
 
-    <form method="POST" action="{{ route('monitoring.store', $token->token) }}" id="monForm"
-          x-data="monitoringForm()">
+    <form method="POST" action="{{ route('energylevel.store', $token->token) }}" id="monForm"
+          x-data="elForm()">
         @csrf
 
         <div class="max-w-lg mx-auto px-4 py-6 space-y-8 pb-32">
 
-            {{-- Instruction card --}}
             <div class="bg-white rounded-xl border border-gray-200 p-4 text-sm text-gray-600 leading-relaxed">
                 Pilih jawaban yang paling sesuai dengan kondisi Anda hari ini.
                 Tidak ada jawaban benar atau salah — isilah dengan jujur. 🙏
@@ -48,40 +42,26 @@
 
             @foreach ($categories as $catKey => $category)
             <div>
-                <h2 class="text-base font-bold text-gray-800 mb-4 flex items-center gap-2">
-                    @if($catKey === 'EMOSI')
-                    <span class="text-xl">🧘</span>
-                    @else
-                    <span class="text-xl">💪</span>
-                    @endif
-                    {{ $category['label'] }}
-                </h2>
+                <h2 class="text-base font-bold text-gray-800 mb-4">{{ $category['label'] }}</h2>
 
                 <div class="space-y-4">
                     @foreach ($category['questions'] as $qNum => $question)
                     <div class="bg-white rounded-xl border border-gray-200 p-4">
-                        <p class="text-sm font-medium text-gray-800 mb-3">
-                            <span class="inline-flex items-center justify-center w-5 h-5 rounded-full bg-[#2d6a4f]/10 text-[#2d6a4f] text-xs font-bold mr-1.5">{{ $qNum }}</span>
+                        <p class="text-sm font-medium text-gray-700 mb-3">
+                            <span class="inline-flex items-center justify-center w-5 h-5 rounded-full bg-gray-100 text-gray-500 text-xs font-bold mr-1.5">{{ $qNum }}</span>
                             {{ $question['text'] }}
                         </p>
                         <div class="flex flex-col gap-2">
                             @foreach ($question['options'] as $value => $option)
-                            {{-- Hidden radio for form submission --}}
                             <input type="radio"
                                    name="answers[{{ $catKey }}][{{ $qNum }}]"
                                    value="{{ $value }}"
                                    id="opt_{{ $catKey }}_{{ $qNum }}_{{ $value }}"
                                    class="sr-only">
-                            {{-- Clickable button (not a label) --}}
-                            <div class="option-btn flex items-center gap-3 border-2 border-gray-200 rounded-xl px-4 py-3 cursor-pointer select-none bg-white"
-                                 :class="answers['{{ $catKey }}'] && answers['{{ $catKey }}'][{{ $qNum }}] == {{ $value }} ? 'is-selected-{{ $option['color'] }}' : 'hover:border-gray-400'"
+                            <div class="opt border border-gray-200 rounded-xl px-4 py-3 cursor-pointer select-none bg-white text-sm text-gray-700 font-medium"
+                                 :class="answers['{{ $catKey }}'] && answers['{{ $catKey }}'][{{ $qNum }}] == {{ $value }} ? 'chosen' : 'hover:border-gray-400 hover:bg-gray-50'"
                                  @click="pick('{{ $catKey }}', {{ $qNum }}, {{ $value }})">
-                                <span class="text-xl leading-none">
-                                    @if($option['color'] === 'green') 🟢
-                                    @elseif($option['color'] === 'yellow') 🟡
-                                    @else 🔴 @endif
-                                </span>
-                                <span class="text-sm font-medium">{{ $option['label'] }}</span>
+                                {{ $option['label'] }}
                             </div>
                             @endforeach
                         </div>
@@ -96,16 +76,12 @@
         {{-- Sticky submit bar --}}
         <div class="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 px-4 py-3 z-10 shadow-lg">
             <div class="max-w-lg mx-auto">
-                {{-- Progress dots --}}
                 <div class="flex items-center gap-1 mb-2 justify-center" id="progressDots"></div>
-
                 <div x-show="error" class="text-xs text-red-600 text-center mb-2" x-text="error"></div>
-
-                <button type="button"
-                        @click="submitForm()"
-                        class="w-full py-3.5 bg-[#2d6a4f] text-white font-semibold rounded-xl text-sm hover:bg-[#1a5a3f] active:bg-[#0f3d2a] transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                <button type="button" @click="submitForm()"
+                        class="w-full py-3.5 bg-[#2d6a4f] text-white font-semibold rounded-xl text-sm hover:bg-[#1a5a3f] active:bg-[#0f3d2a] transition-colors"
                         :disabled="submitting">
-                    <span x-show="!submitting">Kirim Monitoring →</span>
+                    <span x-show="!submitting">Kirim →</span>
                     <span x-show="submitting">Menyimpan…</span>
                 </button>
             </div>
@@ -114,20 +90,18 @@
     </form>
 
 <script>
-function monitoringForm() {
+function elForm() {
     @php
-        $catKeys   = array_keys($categories);
-        $qNumsMap  = array_map(fn($cat) => array_keys($cat['questions']), $categories);
-        $qTotal    = array_sum(array_map(fn($cat) => count($cat['questions']), $categories));
+        $catKeys  = array_keys($categories);
+        $qNumsMap = array_map(fn($cat) => array_keys($cat['questions']), $categories);
+        $qTotal   = array_sum(array_map(fn($cat) => count($cat['questions']), $categories));
     @endphp
     const catKeys  = @json($catKeys);
-    const qNumsMap = @json($qNumsMap);  // { EMOSI: [1,2,...8], FISIK: [...] }
+    const qNumsMap = @json($qNumsMap);
     const qTotal   = {{ $qTotal }};
 
     return {
-        answers:    {},
-        error:      '',
-        submitting: false,
+        answers: {}, error: '', submitting: false,
 
         init() {
             catKeys.forEach(cat => { this.answers[cat] = {}; });
@@ -139,16 +113,14 @@ function monitoringForm() {
             if (!this.answers[cat]) this.answers[cat] = {};
             this.answers[cat][qNum] = value;
             this.answers = { ...this.answers };
-            // Sync hidden radio
-            const radio = document.getElementById('opt_' + cat + '_' + qNum + '_' + value);
-            if (radio) radio.checked = true;
+            const r = document.getElementById('opt_' + cat + '_' + qNum + '_' + value);
+            if (r) r.checked = true;
         },
 
         totalAnswered() {
             let n = 0;
             catKeys.forEach(cat => {
-                const nums = qNumsMap[cat] || [];
-                nums.forEach(q => {
+                (qNumsMap[cat] || []).forEach(q => {
                     if (this.answers[cat] && this.answers[cat][q] !== undefined) n++;
                 });
             });
@@ -156,25 +128,22 @@ function monitoringForm() {
         },
 
         renderDots() {
-            const container = document.getElementById('progressDots');
-            if (!container) return;
-            const answered = this.totalAnswered();
-            let html = '';
-            for (let i = 0; i < qTotal; i++) {
-                html += `<span class="inline-block w-2 h-2 rounded-full transition-colors ${i < answered ? 'bg-[#2d6a4f]' : 'bg-gray-300'}"></span>`;
-            }
-            container.innerHTML = html;
+            const el = document.getElementById('progressDots');
+            if (!el) return;
+            const done = this.totalAnswered();
+            el.innerHTML = Array.from({ length: qTotal }, (_, i) =>
+                `<span class="inline-block w-2 h-2 rounded-full transition-colors ${i < done ? 'bg-[#2d6a4f]' : 'bg-gray-300'}"></span>`
+            ).join('');
         },
 
         submitForm() {
-            const answered = this.totalAnswered();
-            if (answered < qTotal) {
-                this.error = `Mohon isi semua pertanyaan. (${answered}/${qTotal} terjawab)`;
+            const done = this.totalAnswered();
+            if (done < qTotal) {
+                this.error = `Mohon isi semua pertanyaan. (${done}/${qTotal} terjawab)`;
                 window.scrollTo({ top: 0, behavior: 'smooth' });
                 return;
             }
-            this.error = '';
-            this.submitting = true;
+            this.error = ''; this.submitting = true;
             document.getElementById('monForm').submit();
         },
     };

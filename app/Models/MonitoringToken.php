@@ -86,7 +86,7 @@ class MonitoringToken extends Model
             hash_hmac('sha256', $this->registration_id . '-' . $this->day_number, config('app.key')),
             0, 10
         );
-        return url("/monitoring/{$this->registration_id}/{$this->day_number}/{$sig}");
+        return url("/energylevel/{$this->registration_id}/{$this->day_number}/{$sig}");
     }
 
     // ── Scopes ──────────────────────────────────────────────────

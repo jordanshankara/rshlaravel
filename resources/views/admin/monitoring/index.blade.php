@@ -1,6 +1,6 @@
 @extends('layouts.admin')
-@section('title', 'Dashboard Monitoring')
-@section('page-title', 'Dashboard Monitoring')
+@section('title', 'Dashboard Energy Level')
+@section('page-title', 'Dashboard Energy Level')
 @push('scripts')
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4/dist/chart.umd.min.js"></script>
 @endpush
@@ -22,7 +22,7 @@
         </div>
     </form>
     @if ($period)
-    <a href="{{ route('admin.monitoring.export', $period->id) }}"
+    <a href="{{ route('admin.energylevel.export', $period->id) }}"
        class="inline-flex items-center gap-1.5 px-3 py-2 text-sm border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50">
         ↓ Export CSV
     </a>

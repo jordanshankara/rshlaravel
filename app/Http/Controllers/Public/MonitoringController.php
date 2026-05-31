@@ -13,7 +13,7 @@ class MonitoringController extends Controller
     public function __construct(private MonitoringService $service) {}
 
     /**
-     * Friendly URL: /monitoring/{regId}/{day}/{sig}
+     * Friendly URL: /energylevel/{regId}/{day}/{sig}
      * Verifies HMAC signature, then delegates to show().
      */
     public function showByParams(int $regId, int $day, string $sig)
@@ -24,7 +24,7 @@ class MonitoringController extends Controller
         );
         if (!hash_equals($expected, $sig)) abort(404);
 
-        $monitoringToken = \App\Models\MonitoringToken::where('registration_id', $regId)
+        $monitoringToken = MonitoringToken::where('registration_id', $regId)
             ->where('day_number', $day)
             ->firstOrFail();
 
@@ -39,14 +39,14 @@ class MonitoringController extends Controller
 
         if ($monitoringToken->isCompleted()) {
             return view('public.monitoring.completed', [
-                'token'       => $monitoringToken,
+                'token'        => $monitoringToken,
                 'registration' => $monitoringToken->registration,
-                'emosiScore'  => $monitoringToken->emosiScore(),
-                'fisikScore'  => $monitoringToken->fisikScore(),
-                'emosiLevel'  => $monitoringToken->emosiLevel(),
-                'fisikLevel'  => $monitoringToken->fisikLevel(),
-                'questions'   => config('monitoring.categories'),
-                'responses'   => $monitoringToken->responses->keyBy(fn($r) => $r->category . '_' . $r->question_number),
+                'emosiScore'   => $monitoringToken->emosiScore(),
+                'fisikScore'   => $monitoringToken->fisikScore(),
+                'emosiLevel'   => $monitoringToken->emosiLevel(),
+                'fisikLevel'   => $monitoringToken->fisikLevel(),
+                'questions'    => config('monitoring.categories'),
+                'responses'    => $monitoringToken->responses->keyBy(fn($r) => $r->category . '_' . $r->question_number),
             ]);
         }
 
@@ -54,7 +54,7 @@ class MonitoringController extends Controller
             'token'        => $monitoringToken,
             'registration' => $monitoringToken->registration,
             'categories'   => config('monitoring.categories'),
-            'maxScore'     => config('monitoring.scoring.max_per_category'),
+            'days'         => config('monitoring.days', 7),
         ]);
     }
 
@@ -65,17 +65,15 @@ class MonitoringController extends Controller
             ->firstOrFail();
 
         if ($monitoringToken->isCompleted()) {
-            return redirect()->route('monitoring.show', $token);
+            return redirect()->route('energylevel.show', $token);
         }
 
-        // Rate limit by IP
-        $key = 'monitoring:' . $request->ip();
+        $key = 'energylevel:' . $request->ip();
         if (RateLimiter::tooManyAttempts($key, 10)) {
             return back()->withErrors(['rate' => 'Terlalu banyak percobaan. Coba lagi nanti.']);
         }
         RateLimiter::hit($key, 60);
 
-        // Validate all 16 answers
         $categories = array_keys(config('monitoring.categories'));
         $rules = [];
         foreach ($categories as $cat) {
@@ -88,7 +86,7 @@ class MonitoringController extends Controller
 
         $this->service->submitResponse($monitoringToken, $request->input('answers', []));
 
-        return redirect()->route('monitoring.thankyou', $token);
+        return redirect()->route('energylevel.thankyou', $token);
     }
 
     public function thankyou(string $token)
@@ -98,7 +96,7 @@ class MonitoringController extends Controller
             ->firstOrFail();
 
         if (!$monitoringToken->isCompleted()) {
-            return redirect()->route('monitoring.show', $token);
+            return redirect()->route('energylevel.show', $token);
         }
 
         $emosiScore = $monitoringToken->emosiScore();

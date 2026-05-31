@@ -14,7 +14,7 @@
         <div class="text-4xl mb-2">🙏</div>
         <h1 class="text-lg font-bold">Terima kasih, {{ $registration->full_name }}!</h1>
         <p class="text-green-200 text-sm mt-1">
-            Monitoring Hari ke-{{ $token->day_number }} berhasil disimpan.
+            Energy Level Hari ke-{{ $token->day_number }} berhasil disimpan.
         </p>
     </div>
 

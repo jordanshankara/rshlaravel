@@ -135,8 +135,8 @@ Route::prefix('admin')->name('admin.')->middleware(['auth'])->group(function () 
         Route::post('/{id}/reregister-link', [Admin\PesertaController::class, 'createReregLink'])->name('reregister-link');
     });
 
-    // Monitoring Dashboard (Admin only)
-    Route::prefix('monitoring')->name('monitoring.')->middleware('admin')->group(function () {
+    // Energy Level Dashboard (Admin only)
+    Route::prefix('energylevel')->name('energylevel.')->middleware('admin')->group(function () {
         Route::get('/', [Admin\MonitoringDashboardController::class, 'index'])->name('index');
         Route::get('/period/{id}/export', [Admin\MonitoringDashboardController::class, 'export'])->name('export');
     });
@@ -169,11 +169,11 @@ Route::prefix('daftar')->name('daftar.')->group(function () {
     Route::post('/kembali/{token}', [Pub\PendaftaranController::class, 'storeReregister'])->name('reregister.store');
 });
 
-// ── Public Monitoring ─────────────────────────────────────────
-// Friendly URL: /monitoring/{reg_id}/{day}/{sig}
-Route::get('/monitoring/{regId}/{day}/{sig}', [MonitoringController::class, 'showByParams'])->name('monitoring.params');
+// ── Public Energy Level ───────────────────────────────────────
+// Friendly URL: /energylevel/{reg_id}/{day}/{sig}
+Route::get('/energylevel/{regId}/{day}/{sig}', [MonitoringController::class, 'showByParams'])->name('energylevel.params');
 
-// Token URL (legacy / internal redirect target)
-Route::get('/monitoring/{token}', [MonitoringController::class, 'show'])->name('monitoring.show');
-Route::post('/monitoring/{token}', [MonitoringController::class, 'store'])->name('monitoring.store');
-Route::get('/monitoring/{token}/selesai', [MonitoringController::class, 'thankyou'])->name('monitoring.thankyou');
+// Token URL (internal redirect target)
+Route::get('/energylevel/{token}', [MonitoringController::class, 'show'])->name('energylevel.show');
+Route::post('/energylevel/{token}', [MonitoringController::class, 'store'])->name('energylevel.store');
+Route::get('/energylevel/{token}/selesai', [MonitoringController::class, 'thankyou'])->name('energylevel.thankyou');

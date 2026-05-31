@@ -100,7 +100,7 @@
                 </div>
             @else
                 <form method="POST" action="{{ route('admin.peserta.hadir', $registration->id) }}" class="mb-3"
-                      @submit.prevent="adminConfirm('Tandai Hadir', 'Tandai peserta sebagai hadir dan generate 7 link monitoring?', {okLabel:'Ya, Tandai'}).then(ok => ok && $el.submit())">
+                      @submit.prevent="adminConfirm('Tandai Hadir', 'Tandai peserta sebagai hadir dan generate 7 link Energy Level?', {okLabel:'Ya, Tandai'}).then(ok => ok && $el.submit())">
                     @csrf
                     <button type="submit"
                             class="w-full py-2.5 border-2 border-dashed border-gray-300 rounded-xl text-sm text-gray-500 hover:border-green-400 hover:text-green-600 hover:bg-green-50 transition-colors">
@@ -128,7 +128,7 @@
         {{-- 7 monitoring links --}}
         <div class="bg-white rounded-xl border shadow-sm p-5">
             <h3 class="text-sm font-semibold text-gray-700 mb-4">
-                Link Monitoring Harian
+                Link Energy Level Harian
                 @if($registration->is_present)
                 <span class="ml-2 text-xs font-normal text-gray-400">{{ $registration->monitoringProgress() }} hari diisi</span>
                 @endif
@@ -136,7 +136,7 @@
 
             @if (!$registration->is_present)
             <p class="text-sm text-gray-400 py-4 text-center">
-                Tandai peserta sebagai hadir terlebih dahulu untuk membuat link monitoring.
+                Tandai peserta sebagai hadir terlebih dahulu untuk membuat link Energy Level.
             </p>
             @else
             <div class="space-y-2">
@@ -183,7 +183,7 @@
                         </button>
                         @if ($token->isCompleted())
                         <form method="POST" action="{{ route('admin.peserta.reset-day', [$registration->id, $day]) }}"
-                              @submit.prevent="adminConfirm('Reset Hari ke-{{ $day }}', 'Jawaban monitoring hari ke-{{ $day }} akan dihapus. Peserta bisa mengisi ulang.', {danger:true, okLabel:'Reset'}).then(ok => ok && $el.submit())">
+                              @submit.prevent="adminConfirm('Reset Hari ke-{{ $day }}', 'Jawaban Energy Level hari ke-{{ $day }} akan dihapus. Peserta bisa mengisi ulang.', {danger:true, okLabel:'Reset'}).then(ok => ok && $el.submit())">
                             @csrf @method('DELETE')
                             <button type="submit" class="p-1.5 text-gray-300 hover:text-red-500 rounded transition-colors text-xs" title="Reset">↺</button>
                         </form>
