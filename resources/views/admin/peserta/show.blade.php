@@ -169,13 +169,13 @@
                             @endif
                         </div>
                         @if ($token)
-                        <p class="text-xs text-gray-400 font-mono truncate mt-0.5">{{ url('/monitoring/' . $token->token) }}</p>
+                        <p class="text-xs text-gray-400 font-mono truncate mt-0.5">{{ $token->friendlyUrl() }}</p>
                         @endif
                     </div>
                     @if ($token)
                     <div class="flex items-center gap-1 flex-shrink-0" x-data="{ copied{{ $day }}: false }">
                         <button type="button"
-                                @click="navigator.clipboard.writeText('{{ url('/monitoring/' . $token->token) }}'); copied{{ $day }}=true; setTimeout(()=>copied{{ $day }}=false,2000)"
+                                @click="navigator.clipboard.writeText('{{ $token->friendlyUrl() }}'); copied{{ $day }}=true; setTimeout(()=>copied{{ $day }}=false,2000)"
                                 class="p-1.5 text-gray-400 hover:text-[#2d6a4f] rounded transition-colors"
                                 title="Salin link">
                             <span x-show="!copied{{ $day }}">📋</span>

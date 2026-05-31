@@ -169,7 +169,11 @@ Route::prefix('daftar')->name('daftar.')->group(function () {
     Route::post('/kembali/{token}', [Pub\PendaftaranController::class, 'storeReregister'])->name('reregister.store');
 });
 
-// ── Public Monitoring (tokenized, no auth) ────────────────────
+// ── Public Monitoring ─────────────────────────────────────────
+// Friendly URL: /monitoring/{reg_id}/{day}/{sig}
+Route::get('/monitoring/{regId}/{day}/{sig}', [MonitoringController::class, 'showByParams'])->name('monitoring.params');
+
+// Token URL (legacy / internal redirect target)
 Route::get('/monitoring/{token}', [MonitoringController::class, 'show'])->name('monitoring.show');
 Route::post('/monitoring/{token}', [MonitoringController::class, 'store'])->name('monitoring.store');
 Route::get('/monitoring/{token}/selesai', [MonitoringController::class, 'thankyou'])->name('monitoring.thankyou');

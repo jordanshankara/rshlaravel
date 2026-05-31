@@ -12,6 +12,25 @@ class MonitoringController extends Controller
 {
     public function __construct(private MonitoringService $service) {}
 
+    /**
+     * Friendly URL: /monitoring/{regId}/{day}/{sig}
+     * Verifies HMAC signature, then delegates to show().
+     */
+    public function showByParams(int $regId, int $day, string $sig)
+    {
+        $expected = substr(
+            hash_hmac('sha256', $regId . '-' . $day, config('app.key')),
+            0, 10
+        );
+        if (!hash_equals($expected, $sig)) abort(404);
+
+        $monitoringToken = \App\Models\MonitoringToken::where('registration_id', $regId)
+            ->where('day_number', $day)
+            ->firstOrFail();
+
+        return $this->show($monitoringToken->token);
+    }
+
     public function show(string $token)
     {
         $monitoringToken = MonitoringToken::where('token', $token)

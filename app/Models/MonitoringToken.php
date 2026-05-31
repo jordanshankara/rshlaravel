@@ -75,6 +75,20 @@ class MonitoringToken extends Model
         return config('monitoring.scoring.levels')[2]; // fallback: lowest
     }
 
+    /**
+     * Generate a human-readable, secure URL for this monitoring token.
+     * Format: /monitoring/{registration_id}/{day_number}/{10-char HMAC}
+     * Example: /monitoring/4/1/a3b7f2c9d4
+     */
+    public function friendlyUrl(): string
+    {
+        $sig = substr(
+            hash_hmac('sha256', $this->registration_id . '-' . $this->day_number, config('app.key')),
+            0, 10
+        );
+        return url("/monitoring/{$this->registration_id}/{$this->day_number}/{$sig}");
+    }
+
     // ── Scopes ──────────────────────────────────────────────────
 
     public function scopeCompleted($query)
