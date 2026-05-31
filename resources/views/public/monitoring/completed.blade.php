@@ -8,40 +8,45 @@
 </head>
 <body class="min-h-screen">
 
-    <div class="min-h-screen relative flex flex-col items-center justify-center px-5 py-12"
+    <div class="min-h-screen relative flex flex-col items-center justify-center px-6 py-12"
          style="background: url('{{ asset('assets/env/building.jpg') }}') center center / cover no-repeat;">
 
-        <div class="absolute inset-0" style="background: rgba(13, 43, 30, 0.78);"></div>
+        <div class="absolute inset-0" style="background: rgba(13, 43, 30, 0.82);"></div>
 
         <div class="relative z-10 max-w-sm w-full text-center">
 
             <img src="{{ asset('assets/logo/logo-rec-white.png') }}"
                  alt="RSH Satu Bumi"
-                 class="h-10 w-auto object-contain mx-auto mb-10 opacity-90">
+                 class="h-12 w-auto object-contain mx-auto mb-10 opacity-90">
 
-            <div class="text-5xl mb-6">✅</div>
+            <div class="text-6xl mb-6">✅</div>
 
-            <h1 class="text-2xl font-bold text-white mb-3">
+            <h1 class="text-3xl font-bold text-white mb-5 leading-tight">
                 Sudah Diisi
             </h1>
-            <p class="text-green-200 text-sm leading-relaxed mb-2">
-                Anda sudah mengisi Energy Level
-                hari ke-<strong class="text-white">{{ $token->day_number }}</strong>
-                pada {{ $token->completed_at->setTimezone('Asia/Jakarta')->format('d M Y') }}.
-            </p>
-            <p class="text-green-300/70 text-sm leading-relaxed mb-10">
-                Terima kasih atas partisipasi Anda. 🙏
-            </p>
 
-            <div class="border-t border-white/10 mb-10"></div>
+            <div class="inline-flex flex-col items-center bg-white/10 border border-white/20 rounded-2xl px-8 py-5 mb-6">
+                <p class="text-green-300 text-base font-medium mb-1">Energy Level</p>
+                <div class="flex items-baseline gap-2">
+                    <span class="text-7xl font-extrabold text-white leading-none">{{ $token->day_number }}</span>
+                    <span class="text-2xl text-green-300 font-medium">/ {{ config('monitoring.days', 7) }}</span>
+                </div>
+                <p class="text-green-200 text-base mt-1">
+                    {{ $token->completed_at->setTimezone('Asia/Jakarta')->format('d M Y') }}
+                </p>
+            </div>
+
+            <p class="text-white/80 text-xl font-medium mb-10">
+                Rahayu, Salam Sehat 🌿
+            </p>
 
             <a href="{{ route('home') }}"
-               class="inline-flex items-center gap-2 px-8 py-3.5 bg-white text-[#2d6a4f] font-semibold rounded-full text-sm hover:bg-green-50 transition-colors shadow-lg">
+               class="inline-flex items-center gap-2 px-10 py-4 bg-white text-[#2d6a4f] font-bold rounded-full text-base hover:bg-green-50 transition-colors shadow-lg">
                 ← Kembali ke Beranda
             </a>
         </div>
 
-        <p class="relative z-10 mt-12 text-white/30 text-xs">
+        <p class="relative z-10 mt-12 text-white/30 text-sm">
             Rumah Sehat Holistik Satu Bumi &copy; {{ date('Y') }}
         </p>
 
