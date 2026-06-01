@@ -18,7 +18,7 @@
                    placeholder="Nama / kode…"
                    class="w-full px-3 py-2 border rounded-lg text-sm focus:ring-2 focus:ring-[#2d6a4f]/30 focus:outline-none">
         </div>
-        <div class="w-52">
+        <div class="flex-1 min-w-[8rem]">
             <label class="block text-xs text-gray-500 mb-1">Periode</label>
             <select name="period_id" class="w-full px-3 py-2 border rounded-lg text-sm focus:ring-2 focus:ring-[#2d6a4f]/30 focus:outline-none">
                 <option value="">Semua Periode</option>
@@ -29,7 +29,7 @@
                 @endforeach
             </select>
         </div>
-        <div class="w-36">
+        <div class="w-auto min-w-[7rem]">
             <label class="block text-xs text-gray-500 mb-1">Kehadiran</label>
             <select name="hadir" class="w-full px-3 py-2 border rounded-lg text-sm focus:ring-2 focus:ring-[#2d6a4f]/30 focus:outline-none">
                 <option value="">Semua</option>
@@ -112,7 +112,7 @@
                     <td class="px-4 py-3">
                         @if ($reg->is_present)
                         <div class="flex items-center gap-2">
-                            <div class="flex-1 bg-gray-200 rounded-full h-1.5" style="min-width:60px">
+                            <div class="flex-1 bg-gray-200 rounded-full h-1.5">
                                 <div class="bg-[#2d6a4f] h-1.5 rounded-full" style="width:{{ $pct }}%"></div>
                             </div>
                             <span class="text-xs text-gray-500 whitespace-nowrap">{{ $progress }} hari</span>

@@ -7,6 +7,7 @@ use App\Models\MonitoringResponse;
 use App\Models\ProgramPeriod;
 use App\Models\Registration;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 
 class MonitoringService
@@ -37,25 +38,32 @@ class MonitoringService
      */
     public function submitResponse(MonitoringToken $token, array $answers): void
     {
-        $rows = [];
-        foreach ($answers as $category => $questions) {
-            foreach ($questions as $qNum => $answer) {
-                $rows[] = [
-                    'monitoring_token_id' => $token->id,
-                    'category'            => strtoupper($category),
-                    'question_number'     => (int) $qNum,
-                    'answer'              => (int) $answer,
-                ];
+        DB::transaction(function () use ($token, $answers) {
+            $locked = MonitoringToken::lockForUpdate()->find($token->id);
+            if ($locked->isCompleted()) {
+                return;
             }
-        }
 
-        MonitoringResponse::upsert(
-            $rows,
-            ['monitoring_token_id', 'category', 'question_number'],
-            ['answer']
-        );
+            $rows = [];
+            foreach ($answers as $category => $questions) {
+                foreach ($questions as $qNum => $answer) {
+                    $rows[] = [
+                        'monitoring_token_id' => $locked->id,
+                        'category'            => strtoupper($category),
+                        'question_number'     => (int) $qNum,
+                        'answer'              => (int) $answer,
+                    ];
+                }
+            }
 
-        $token->update(['completed_at' => now()]);
+            MonitoringResponse::upsert(
+                $rows,
+                ['monitoring_token_id', 'category', 'question_number'],
+                ['answer']
+            );
+
+            $locked->update(['completed_at' => now()]);
+        });
     }
 
     /**

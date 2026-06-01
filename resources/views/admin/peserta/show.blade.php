@@ -142,12 +142,12 @@
             <div class="space-y-2">
                 @for ($day = 1; $day <= $days; $day++)
                 @php $token = $tokensByDay->get($day); @endphp
-                <div class="flex items-center gap-3 p-3 rounded-lg {{ $token?->isCompleted() ? 'bg-green-50 border border-green-100' : 'bg-gray-50 border border-gray-100' }}">
+                <div class="flex items-center gap-2 sm:gap-3 p-3 rounded-lg {{ $token?->isCompleted() ? 'bg-green-50 border border-green-100' : 'bg-gray-50 border border-gray-100' }}">
                     <div class="w-7 h-7 rounded-full flex items-center justify-center text-xs font-bold flex-shrink-0
                                 {{ $token?->isCompleted() ? 'bg-green-500 text-white' : 'bg-gray-200 text-gray-500' }}">
                         {{ $day }}
                     </div>
-                    <div class="flex-1 min-w-0">
+                    <div class="flex-1 min-w-0 overflow-hidden">
                         <div class="flex items-center gap-2">
                             <span class="text-xs font-medium text-gray-700">Hari ke-{{ $day }}</span>
                             @if ($token?->isCompleted())
@@ -169,11 +169,11 @@
                             @endif
                         </div>
                         @if ($token)
-                        <p class="text-xs text-gray-400 font-mono truncate mt-0.5">{{ $token->friendlyUrl() }}</p>
+                        <p class="text-xs text-gray-400 font-mono truncate mt-0.5 min-w-0">{{ $token->friendlyUrl() }}</p>
                         @endif
                     </div>
                     @if ($token)
-                    <div class="flex items-center gap-1 flex-shrink-0" x-data="{ copied{{ $day }}: false }">
+                    <div class="flex items-center gap-1 flex-shrink-0 ml-auto" x-data="{ copied{{ $day }}: false }">
                         <button type="button"
                                 @click="navigator.clipboard.writeText('{{ $token->friendlyUrl() }}'); copied{{ $day }}=true; setTimeout(()=>copied{{ $day }}=false,2000)"
                                 class="p-1.5 text-gray-400 hover:text-[#2d6a4f] rounded transition-colors"

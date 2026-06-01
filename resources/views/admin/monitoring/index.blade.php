@@ -63,9 +63,12 @@
 
 {{-- Matrix table --}}
 <div class="bg-white rounded-xl border shadow-sm overflow-hidden mb-5">
-    <div class="px-5 py-3 border-b bg-gray-50">
-        <h3 class="text-sm font-semibold text-gray-700">Matrix Peserta × Hari</h3>
-        <p class="text-xs text-gray-400 mt-0.5">Hover cell untuk detail score Emosi & Fisik</p>
+    <div class="px-5 py-3 border-b bg-gray-50 flex items-center justify-between">
+        <div>
+            <h3 class="text-sm font-semibold text-gray-700">Matrix Peserta × Hari</h3>
+            <p class="text-xs text-gray-400 mt-0.5">Hover cell untuk detail score Emosi & Fisik</p>
+        </div>
+        <p class="text-xs text-gray-300 lg:hidden">← geser →</p>
     </div>
     @if (empty($summary))
     <div class="p-8 text-center text-gray-400 text-sm">Belum ada peserta yang hadir di periode ini.</div>
@@ -74,9 +77,9 @@
         <table class="text-xs w-full">
             <thead class="bg-gray-50 border-b">
                 <tr>
-                    <th class="text-left px-4 py-2.5 font-medium text-gray-500 sticky left-0 bg-gray-50 min-w-40">Peserta</th>
+                    <th class="text-left px-2 sm:px-4 py-2.5 font-medium text-gray-500 sticky left-0 bg-gray-50 min-w-[8rem]">Peserta</th>
                     @for ($d = 1; $d <= $days; $d++)
-                    <th class="text-center px-3 py-2.5 font-medium text-gray-500 w-14">H{{ $d }}</th>
+                    <th class="text-center px-2 sm:px-3 py-2.5 font-medium text-gray-500 w-10 sm:w-14">H{{ $d }}</th>
                     @endfor
                     <th class="text-center px-3 py-2.5 font-medium text-gray-500">Tren</th>
                 </tr>
@@ -96,9 +99,9 @@
                     }
                 @endphp
                 <tr class="hover:bg-gray-50 transition-colors">
-                    <td class="px-4 py-2.5 sticky left-0 bg-white hover:bg-gray-50">
+                    <td class="px-2 sm:px-4 py-2.5 sticky left-0 bg-white hover:bg-gray-50">
                         <a href="{{ route('admin.peserta.show', $reg->id) }}"
-                           class="font-medium text-gray-800 hover:text-[#2d6a4f] truncate block max-w-[140px]">
+                           class="font-medium text-gray-800 hover:text-[#2d6a4f] truncate block max-w-[8rem] sm:max-w-[10rem]">
                             {{ $reg->full_name }}
                         </a>
                     </td>
@@ -119,6 +122,7 @@
                         <div class="relative group cursor-default inline-block">
                             <span class="text-base">{{ $emoji }}</span>
                             <div class="absolute bottom-full left-1/2 -translate-x-1/2 mb-1 hidden group-hover:block z-20
+                                        first:left-0 first:translate-x-0 last:left-auto last:right-0 last:translate-x-0
                                         {{ $tipClass }} text-white text-xs rounded px-2 py-1 whitespace-nowrap shadow-lg pointer-events-none">
                                 E:{{ $day['emosi_score'] }}/16 · F:{{ $day['fisik_score'] }}/16
                             </div>

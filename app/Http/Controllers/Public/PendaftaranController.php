@@ -368,6 +368,11 @@ class PendaftaranController extends Controller
 
         try {
             $newReg = DB::transaction(function () use ($request, $old, $reregToken) {
+                $lockedToken = ReregistrationToken::lockForUpdate()->findOrFail($reregToken->id);
+                if (!$lockedToken->isValid()) {
+                    throw new \Exception('TOKEN_USED');
+                }
+
                 $period = ProgramPeriod::lockForUpdate()->findOrFail($request->program_period_id);
 
                 if (!$period->is_active) {
@@ -399,7 +404,7 @@ class PendaftaranController extends Controller
                     'submitted_at'      => now(),
                 ]);
 
-                $reregToken->update([
+                $lockedToken->update([
                     'used_at'             => now(),
                     'new_registration_id' => $reg->id,
                 ]);
@@ -420,6 +425,7 @@ class PendaftaranController extends Controller
                 'general' => match ($e->getMessage()) {
                     'QUOTA_FULL'      => 'Kuota periode yang dipilih sudah penuh.',
                     'PERIOD_INACTIVE' => 'Periode program tidak aktif.',
+                    'TOKEN_USED'      => 'Link re-registrasi ini sudah digunakan.',
                     default           => 'Terjadi kesalahan. Silakan coba lagi.',
                 },
             ])->withInput();

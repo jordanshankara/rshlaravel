@@ -20,7 +20,7 @@ class MonitoringController extends Controller
     {
         $expected = substr(
             hash_hmac('sha256', $regId . '-' . $day, config('app.key')),
-            0, 10
+            0, 24
         );
         if (!hash_equals($expected, $sig)) abort(404);
 
@@ -76,13 +76,20 @@ class MonitoringController extends Controller
 
         $categories = array_keys(config('monitoring.categories'));
         $rules = [];
+        $expectedCount = 0;
         foreach ($categories as $cat) {
             $questions = config("monitoring.categories.{$cat}.questions");
             foreach (array_keys($questions) as $q) {
                 $rules["answers.{$cat}.{$q}"] = 'required|integer|in:0,1,2';
+                $expectedCount++;
             }
         }
         $request->validate($rules);
+
+        $actualCount = collect($request->input('answers', []))->flatMap(fn($q) => $q)->count();
+        if ($actualCount !== $expectedCount) {
+            return back()->withErrors(['answers' => 'Semua pertanyaan harus dijawab sebelum mengirim.']);
+        }
 
         $this->service->submitResponse($monitoringToken, $request->input('answers', []));
 

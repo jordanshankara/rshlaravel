@@ -2,18 +2,18 @@
 @section('title', 'Database Kontak')
 @section('page-title', 'Database Kontak')
 @section('header-actions')
-<div class="flex items-center gap-2">
+<div class="flex flex-wrap items-center gap-2">
     <a href="{{ route('admin.kontak.history') }}"
        class="inline-flex items-center gap-1.5 px-3 py-2 text-sm border border-gray-300 rounded-lg text-gray-600 hover:bg-gray-50">
-        🕓 History
+        🕓 <span class="hidden sm:inline">History</span>
     </a>
     <a href="{{ route('admin.kontak.import') }}"
        class="inline-flex items-center gap-1.5 px-3 py-2 text-sm border border-gray-300 rounded-lg text-gray-600 hover:bg-gray-50">
-        ↑ Import CSV
+        ↑ <span class="hidden sm:inline">Import CSV</span><span class="sm:hidden">Import</span>
     </a>
     <a href="{{ route('admin.kontak.create') }}"
        class="inline-flex items-center gap-1.5 px-3 py-2 text-sm bg-[#2d6a4f] text-white rounded-lg hover:bg-[#1a5a3f]">
-        + Tambah
+        + <span class="hidden sm:inline">Tambah</span>
     </a>
 </div>
 @endsection
@@ -38,13 +38,13 @@
 {{-- Filters --}}
 <div class="bg-white rounded-xl border shadow-sm p-4 mb-4">
     <form method="GET" class="flex flex-wrap gap-3 items-end">
-        <div class="flex-1 min-w-36">
+        <div class="flex-1 min-w-[10rem]">
             <label class="block text-xs text-gray-500 mb-1">Cari</label>
             <input type="text" name="search" value="{{ request('search') }}"
                    placeholder="Nama / telepon / email…"
                    class="w-full px-3 py-2 border rounded-lg text-sm focus:ring-2 focus:ring-[#2d6a4f]/30 focus:outline-none">
         </div>
-        <div class="w-44">
+        <div class="flex-1 min-w-[8rem]">
             <label class="block text-xs text-gray-500 mb-1">Keluhan</label>
             <select name="complaint" class="w-full px-3 py-2 border rounded-lg text-sm focus:ring-2 focus:ring-[#2d6a4f]/30 focus:outline-none">
                 <option value="">Semua Keluhan</option>
@@ -53,7 +53,7 @@
                 @endforeach
             </select>
         </div>
-        <div class="w-40">
+        <div class="flex-1 min-w-[8rem]">
             <label class="block text-xs text-gray-500 mb-1">Sumber</label>
             <select name="source" class="w-full px-3 py-2 border rounded-lg text-sm focus:ring-2 focus:ring-[#2d6a4f]/30 focus:outline-none">
                 <option value="">Semua Sumber</option>
@@ -171,7 +171,7 @@
                         <th class="text-left px-4 py-3 font-medium text-gray-500">Telepon</th>
                         <th class="text-left px-4 py-3 font-medium text-gray-500">Email</th>
                         <th class="text-left px-4 py-3 font-medium text-gray-500">Keluhan</th>
-                        <th class="text-left px-4 py-3 font-medium text-gray-500 min-w-36">Terakhir Dihubungi</th>
+                        <th class="text-left px-4 py-3 font-medium text-gray-500 min-w-[8rem]">Terakhir Dihubungi</th>
                         <th class="px-4 py-3"></th>
                     </tr>
                 </thead>
@@ -200,7 +200,7 @@
                         <td class="px-4 py-3">
                             @if ($contact->email)
                             <div class="flex items-center gap-2">
-                                <span class="text-gray-600 text-xs truncate max-w-[140px]" title="{{ $contact->email }}">{{ $contact->email }}</span>
+                                <span class="text-gray-600 text-xs truncate max-w-[8rem] sm:max-w-xs" title="{{ $contact->email }}">{{ $contact->email }}</span>
                                 <button onclick="contactLog({{ $contact->id }}, 'email', 'mailto:{{ $contact->email }}')"
                                         class="inline-flex items-center gap-1 px-2 py-1 bg-blue-500 text-white rounded-lg text-xs font-medium hover:bg-blue-600 transition-colors flex-shrink-0">
                                     ✉️

@@ -354,9 +354,15 @@ class ContactController extends Controller
         $updated        = 0;
         $skipped        = 0;
         $addedChanges   = [];
+        $rowCount       = 0;
+        $maxRows        = 5000;
 
         while (($row = fgetcsv($handle, 0, $delimiter)) !== false) {
             if (empty(array_filter($row))) continue;
+            if (++$rowCount > $maxRows) {
+                fclose($handle);
+                return back()->withErrors(['csv_file' => "File CSV melebihi batas {$maxRows} baris. Pecah file menjadi beberapa bagian."]);
+            }
 
             $data = [];
             foreach ($colIndex as $pos => $col) {

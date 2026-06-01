@@ -86,12 +86,13 @@
                     <div class="text-sm font-medium text-gray-800">{{ $reg->full_name }}</div>
                     <div class="text-xs text-gray-400 mt-0.5">{{ $reg->registration_code }} · {{ $reg->programPeriod?->name }}</div>
                 </div>
-                <div class="text-right">
-                    <span class="text-xs px-2 py-1 rounded-full font-medium
+                <div class="text-right flex-shrink-0 ml-2">
+                    <span class="text-xs px-2 py-1 rounded-full font-medium inline-block max-w-[100px] truncate
                         {{ $reg->status === 'FULLY_PAID' ? 'bg-green-100 text-green-700' :
                            ($reg->status === 'CONFIRMED' ? 'bg-emerald-100 text-emerald-700' :
                            ($reg->status === 'CANCELLED' ? 'bg-gray-100 text-gray-500' :
-                           'bg-amber-100 text-amber-700')) }}">
+                           'bg-amber-100 text-amber-700')) }}"
+                        title="{{ str_replace('_', ' ', $reg->status) }}">
                         {{ str_replace('_', ' ', $reg->status) }}
                     </span>
                     <div class="text-xs text-gray-400 mt-1">{{ $reg->submitted_at->diffForHumans() }}</div>

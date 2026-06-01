@@ -43,16 +43,18 @@ class MonitoringToken extends Model
 
     public function emosiScore(): int
     {
-        return (int) $this->responses()
-            ->where('category', 'EMOSI')
-            ->sum('answer');
+        if ($this->relationLoaded('responses')) {
+            return (int) $this->responses->where('category', 'EMOSI')->sum('answer');
+        }
+        return (int) $this->responses()->where('category', 'EMOSI')->sum('answer');
     }
 
     public function fisikScore(): int
     {
-        return (int) $this->responses()
-            ->where('category', 'FISIK')
-            ->sum('answer');
+        if ($this->relationLoaded('responses')) {
+            return (int) $this->responses->where('category', 'FISIK')->sum('answer');
+        }
+        return (int) $this->responses()->where('category', 'FISIK')->sum('answer');
     }
 
     public function emosiLevel(): array
@@ -84,7 +86,7 @@ class MonitoringToken extends Model
     {
         $sig = substr(
             hash_hmac('sha256', $this->registration_id . '-' . $this->day_number, config('app.key')),
-            0, 10
+            0, 24
         );
         return url("/energylevel/{$this->registration_id}/{$this->day_number}/{$sig}");
     }

@@ -15,7 +15,7 @@ $statusLabels = [
 <div class="flex flex-wrap gap-2 mb-4">
     @foreach(['' => 'Semua ('.$counts['all'].')', 'PENDING_PAYMENT' => 'Pending Payment ('.$counts['PENDING_PAYMENT'].')', 'CONFIRMED' => 'DP ('.$counts['CONFIRMED'].')', 'FULLY_PAID' => 'Full Paid ('.$counts['FULLY_PAID'].')', 'CANCELLED' => 'Dibatalkan ('.$counts['CANCELLED'].')'] as $key => $label)
     <a href="{{ request()->fullUrlWithQuery(['status' => $key, 'page' => null]) }}"
-       class="px-3 py-1.5 text-xs font-medium rounded-full border transition-colors {{ request('status', '') === $key ? 'bg-[#2d6a4f] text-white border-[#2d6a4f]' : 'bg-white text-gray-600 border-gray-200 hover:border-[#2d6a4f] hover:text-[#2d6a4f]' }}">
+       class="px-3 py-1.5 text-[11px] sm:text-xs font-medium rounded-full border transition-colors shrink-0 {{ request('status', '') === $key ? 'bg-[#2d6a4f] text-white border-[#2d6a4f]' : 'bg-white text-gray-600 border-gray-200 hover:border-[#2d6a4f] hover:text-[#2d6a4f]' }}">
         {{ $label }}
     </a>
     @endforeach

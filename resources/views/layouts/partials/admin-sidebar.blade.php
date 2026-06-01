@@ -38,7 +38,7 @@
                 </svg>
                 Invoice
             </a>
-            <div class="ml-8 mt-0.5 space-y-0.5">
+            <div class="ml-6 mt-0.5 space-y-0.5">
                 <a href="{{ route('admin.invoice.index') }}"
                    class="block px-3 py-1.5 rounded-lg text-xs font-medium transition-colors {{ request()->routeIs('admin.invoice.*') ? 'text-[#2d6a4f] bg-green-50' : 'text-gray-500 hover:text-gray-700 hover:bg-gray-50' }}">
                     Semua Invoice
@@ -128,7 +128,7 @@
                 <span class="text-[#2d6a4f] text-xs font-semibold uppercase">{{ substr(auth()->user()->name, 0, 1) }}</span>
             </div>
             <div class="min-w-0">
-                <p class="text-sm font-medium text-gray-900 truncate">{{ auth()->user()->name }}</p>
+                <p class="text-sm font-medium text-gray-900 truncate max-w-[120px]">{{ auth()->user()->name }}</p>
                 <p class="text-xs text-gray-400">{{ auth()->user()->role === 'ADMIN' ? 'Administrator' : 'Editor' }}</p>
             </div>
         </div>
