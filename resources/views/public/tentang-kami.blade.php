@@ -78,8 +78,6 @@
                 ['name'=>'Liny Tjeris','role'=>'Master Divya Ausadh (Neo Zen Reiki)','exp'=>'Pengalaman lebih dari 20 tahun','img'=>'terapis/terapis-liny.jpg'],
                 ['name'=>'Dra. Dewi Juniarti, Psi','role'=>'Psikolog','exp'=>'Pengalaman lebih dari 20 tahun','img'=>'terapis/terapis-dewi.jpg'],
                 ['name'=>'Ismoyo Palgunadi','role'=>'Pakar Ayurveda','exp'=>'Pengalaman lebih dari 18 tahun','img'=>'terapis/terapis-ismoyo.jpg'],
-                ['name'=>'Wito','role'=>'Certified Acupressure Therapist','exp'=>'','img'=>'terapis/terapis-wito.jpg'],
-                ['name'=>'Muslihah','role'=>'Certified Acupressure Therapist','exp'=>'','img'=>'terapis/terapis-muslihah.jpg'],
             ] as $t)
             <div class="glass-card rounded-2xl p-6 hover:-translate-y-1 transition-transform flex gap-4 items-start">
                 <div class="relative w-14 h-14 rounded-full overflow-hidden flex-shrink-0 ring-2 ring-[#52c273]/40">
