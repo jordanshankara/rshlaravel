@@ -1,5 +1,5 @@
 @extends('layouts.public')
-@section('title', 'Daftar Program 7 Hari — RSH Satu Bumi')
+@section('title', 'Daftar Program Pemulihan Sehat Raga & Jiwa — RSH Satu Bumi')
 
 @push('head')
 @if(!empty($settings['turnstile_site_key']))
@@ -15,7 +15,7 @@
     <div class="absolute inset-0" style="background:linear-gradient(to bottom,rgba(5,30,15,0.90),rgba(10,50,25,0.84))"></div>
     <div class="relative z-10">
         <span class="inline-block border border-[#f97316]/60 text-[#f97316] text-xs font-bold px-4 py-1.5 rounded-full uppercase tracking-widest mb-5">Program Eksklusif</span>
-        <h1 class="text-3xl sm:text-4xl lg:text-5xl font-bold text-white mb-4">7 Hari Menuju Sehat Raga &amp; Jiwa</h1>
+        <h1 class="text-3xl sm:text-4xl lg:text-5xl font-bold text-white mb-4">Program Pemulihan Sehat Raga &amp; Jiwa</h1>
         <p class="text-green-200 max-w-lg mx-auto text-sm leading-relaxed">
             Mohon luangkan 3 menit untuk melengkapi data di bawah ini. Informasi Anda bersifat rahasia<br class="hidden sm:block">
             dan akan membantu tim ahli kami merancang pendekatan yang paling tepat untuk Anda.
@@ -484,7 +484,7 @@ function registrationForm() {
         get waLink() {
             const phone = '62816677225';
             if (!this.fullName) return 'http://api.whatsapp.com/send?phone=' + phone;
-            const period = this.period ? this.period.name : 'Program 7 Hari';
+            const period = this.period ? this.period.name : 'Program Pemulihan Sehat Raga & Jiwa';
             const msg = `Halo Admin RSH Satu Bumi,\n\nSaya *${this.fullName}* ingin mengirimkan bukti pembayaran untuk *${period}*.\n\nTerima kasih.`;
             return 'http://api.whatsapp.com/send?phone=' + phone + '&text=' + encodeURIComponent(msg);
         },

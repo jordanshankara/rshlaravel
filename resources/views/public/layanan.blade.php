@@ -61,11 +61,11 @@
 
 {{-- Program Eksklusif --}}
 <section class="relative py-24 px-4 overflow-hidden">
-    <img src="{{ asset('assets/latihan/yoga.jpg') }}" alt="Program 7 Hari" class="absolute inset-0 w-full h-full object-cover object-center">
+    <img src="{{ asset('assets/latihan/yoga.jpg') }}" alt="Program Pemulihan Sehat Raga & Jiwa" class="absolute inset-0 w-full h-full object-cover object-center">
     <div class="absolute inset-0" style="background: linear-gradient(to right, rgba(5,30,15,0.95), rgba(10,50,25,0.90), rgba(15,70,35,0.82))"></div>
     <div class="max-w-4xl mx-auto text-center relative z-10">
         <span class="inline-block bg-[#f97316] text-white text-sm font-bold px-5 py-2 rounded-full mb-6 uppercase tracking-wide shadow-[0_4px_12px_rgba(249,115,22,0.4)]">PROGRAM PEMULIHAN EKSKLUSIF</span>
-        <h2 class="text-3xl sm:text-4xl lg:text-5xl font-bold text-white mb-5 leading-tight">7 Hari Menuju Sehat<br>Raga &amp; Jiwa</h2>
+        <h2 class="text-3xl sm:text-4xl lg:text-5xl font-bold text-white mb-5 leading-tight">Program Pemulihan<br>Sehat Raga &amp; Jiwa</h2>
         <p class="text-green-200 text-lg mb-4 leading-relaxed max-w-2xl mx-auto">Program yang dirancang untuk membantu Anda mengubah diri menjadi sehat dan seimbang. Selama 7 hari, Anda akan menjalani detoks alami, pola makan bergizi, Terapi Self Healing, dan aktivitas fisik yang mendukung penyembuhan tubuh dan pikiran secara holistik.</p>
         <div class="bg-white/10 backdrop-blur-md inline-flex px-6 py-3 rounded-2xl mt-2 border border-white/20">
             <p class="text-[#52c273] font-semibold text-lg italic">Your Luxury Healing Program</p>
@@ -119,7 +119,7 @@
     <div class="max-w-4xl mx-auto relative">
         <div class="text-center mb-10">
             <span class="text-[#f97316] uppercase tracking-widest text-xs font-bold block mb-3">PROGRAM DETAIL</span>
-            <h2 class="text-2xl sm:text-3xl font-bold text-[#0d3d1a] mb-3">Ikuti Program 7 Hari Menuju Sehat Raga &amp; Jiwa</h2>
+            <h2 class="text-2xl sm:text-3xl font-bold text-[#0d3d1a] mb-3">Ikuti Program Pemulihan Sehat Raga &amp; Jiwa</h2>
             <p class="text-gray-600 text-sm"><span class="font-semibold">Lokasi:</span> Rumah Sehat Holistik Satu Bumi, Jl. Raya Bukit Pelangi Km. 2 Gadog Ciawi – Bogor</p>
         </div>
 
