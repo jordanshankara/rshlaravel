@@ -1,6 +1,6 @@
 @extends('layouts.admin')
 @section('title', 'Program Periode')
-@section('page-title', 'Program 7 Hari')
+@section('page-title', 'Program Pemulihan Sehat Raga & Jiwa')
 @section('header-actions')
 <a href="{{ route('admin.program.create') }}" class="px-4 py-2 bg-[#2d6a4f] text-white text-sm font-semibold rounded-lg hover:bg-[#1a5a3f] transition-colors">+ Periode Baru</a>
 @endsection
