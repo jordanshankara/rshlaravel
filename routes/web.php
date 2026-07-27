@@ -153,6 +153,7 @@ Route::get('/anand-krishna', [StaticPageController::class, 'anandKrishna'])->nam
 Route::get('/inspirator-kami', [StaticPageController::class, 'inspiratorKami'])->name('inspirator-kami');
 Route::get('/sembuh-dari-leukimia', [StaticPageController::class, 'sembuhDariLeukimia'])->name('sembuh-dari-leukimia');
 Route::get('/yayasan-anand-ashram', [StaticPageController::class, 'yayasanAnandAshram'])->name('yayasan-anand-ashram');
+Route::get('/terms-conditions', [StaticPageController::class, 'termsConditions'])->name('terms-conditions');
 
 Route::prefix('artikel')->name('artikel.')->group(function () {
     Route::get('/', [Pub\ArtikelController::class, 'index'])->name('index');

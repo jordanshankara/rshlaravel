@@ -40,4 +40,9 @@ class StaticPageController extends Controller
     {
         return view('public.yayasan-anand-ashram');
     }
+
+    public function termsConditions()
+    {
+        return view('public.terms-conditions');
+    }
 }
