@@ -261,7 +261,10 @@
         </div>
 
         <div class="mt-10 pt-6 border-t border-white/10 flex flex-col sm:flex-row items-center justify-between gap-3">
-            <p class="text-sm text-green-100/50">&copy; {{ date('Y') }} Rumah Sehat Holistik Satu Bumi. All rights reserved.</p>
+            <div class="flex flex-col sm:flex-row items-center gap-1 sm:gap-4">
+                <p class="text-sm text-green-100/50">&copy; {{ date('Y') }} Rumah Sehat Holistik Satu Bumi. All rights reserved.</p>
+                <a href="{{ route('terms-conditions') }}" class="text-sm text-green-100/50 hover:text-[#f97316] transition-colors underline underline-offset-2">Syarat &amp; Ketentuan</a>
+            </div>
             <p class="text-xs text-green-100/30">Dibawah Naungan Yayasan Manusia Sehat Anand Krishna</p>
         </div>
     </div>
